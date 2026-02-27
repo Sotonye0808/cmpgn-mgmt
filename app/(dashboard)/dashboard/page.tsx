@@ -31,15 +31,15 @@ const KPI_STATS = [
     key: "shares",
     label: "Total Shares",
     icon: "share",
-    color: "text-ds-brand-secondary",
-    bgColor: "bg-ds-brand-secondary/10",
+    color: "text-ds-chart-3",
+    bgColor: "bg-ds-chart-3/10",
   },
   {
     key: "members",
     label: "Participants",
     icon: "users",
-    color: "text-orange-500",
-    bgColor: "bg-orange-500/10",
+    color: "text-ds-chart-4",
+    bgColor: "bg-ds-chart-4/10",
   },
 ];
 

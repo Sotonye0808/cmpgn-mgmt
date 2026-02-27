@@ -10,8 +10,11 @@ export const SMART_LINK_PREFIX = "/c/";
 export const SMART_LINK_EXPIRY_DAYS = 30;
 export const SMART_LINK_SLUG_LENGTH = 7;
 
-// ─── JWT ─────────────────────────────────────────────────────────────────────
-export const JWT_ACCESS_EXPIRY = "15m";
+// ─── Auth / JWT ──────────────────────────────────────────────────────────────
+export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET ?? "";
+export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? "";
+export const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
+export const JWT_ACCESS_EXPIRY = "180m";
 export const JWT_REFRESH_EXPIRY = "7d";
 export const JWT_ACCESS_COOKIE = "dmhicc_access";
 export const JWT_REFRESH_COOKIE = "dmhicc_refresh";

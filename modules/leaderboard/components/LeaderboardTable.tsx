@@ -94,7 +94,7 @@ export default function LeaderboardTable({
       key: "impact",
       width: 64,
       render: (v: number) => (
-        <span className="font-ds-mono text-blue-500 text-xs">
+        <span className="font-ds-mono text-ds-chart-3 text-xs">
           {formatNumber(v)}
         </span>
       ),
@@ -110,7 +110,7 @@ export default function LeaderboardTable({
       key: "consistency",
       width: 64,
       render: (v: number) => (
-        <span className="font-ds-mono text-green-500 text-xs">
+        <span className="font-ds-mono text-ds-brand-success text-xs">
           {formatNumber(v)}
         </span>
       ),
@@ -126,7 +126,7 @@ export default function LeaderboardTable({
       key: "leadership",
       width: 64,
       render: (v: number) => (
-        <span className="font-ds-mono text-amber-500 text-xs">
+        <span className="font-ds-mono text-ds-chart-4 text-xs">
           {formatNumber(v)}
         </span>
       ),
@@ -142,7 +142,7 @@ export default function LeaderboardTable({
       key: "reliability",
       width: 64,
       render: (v: number) => (
-        <span className="font-ds-mono text-purple-500 text-xs">
+        <span className="font-ds-mono text-ds-brand-accent text-xs">
           {formatNumber(v)}
         </span>
       ),

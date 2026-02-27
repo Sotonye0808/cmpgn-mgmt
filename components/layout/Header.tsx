@@ -24,8 +24,8 @@ export default function Header({ title }: HeaderProps) {
     {
       key: "profile",
       icon: <ICONS.users className="text-base" />,
-      label: "Profile",
-      onClick: () => router.push(ROUTES.PROFILE),
+      label: "Profile & Settings",
+      onClick: () => router.push(ROUTES.SETTINGS),
     },
     {
       key: "settings",

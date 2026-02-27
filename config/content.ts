@@ -55,6 +55,13 @@ export const LANDING_CONTENT = {
     },
 } as const;
 
+export const DEV_CREDENTIALS = [
+    { label: "Super Admin", email: "super@dmhicc.org", password: "Password123!", role: "SUPER_ADMIN" },
+    { label: "Admin", email: "admin@dmhicc.org", password: "Password123!", role: "ADMIN" },
+    { label: "Team Lead", email: "lead@dmhicc.org", password: "Password123!", role: "TEAM_LEAD" },
+    { label: "User", email: "user@dmhicc.org", password: "Password123!", role: "USER" },
+] as const;
+
 export const AUTH_CONTENT = {
     login: {
         title: "Welcome Back",
@@ -67,6 +74,7 @@ export const AUTH_CONTENT = {
         registerPrompt: "Don't have an account?",
         registerLink: "Register here",
         forgotPassword: "Forgot password?",
+        devCredentialsTitle: "Quick Login (Dev Only)",
     },
     register: {
         title: "Create Account",
@@ -251,6 +259,23 @@ export const SETTINGS_PAGE_CONTENT = {
     profileSection: "Profile",
     securitySection: "Security",
     adminSection: "Administration",
+} as const;
+
+export const TEAM_PAGE_CONTENT = {
+    title: "Team",
+    subtitle: "View and manage your team's participation and performance.",
+    membersTitle: "Team Members",
+    performanceTitle: "Team Performance",
+    emptyState: "No team members found.",
+    roleFilter: "Filter by role",
+} as const;
+
+export const NOT_FOUND_CONTENT = {
+    code: "404",
+    title: "Page Not Found",
+    subtitle: "The page you're looking for doesn't exist or has been moved.",
+    backButton: "Go Back",
+    homeButton: "Back to Dashboard",
 } as const;
 
 export const USERS_PAGE_CONTENT = {

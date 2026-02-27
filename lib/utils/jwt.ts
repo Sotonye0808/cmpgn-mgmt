@@ -1,14 +1,15 @@
+// NOTE: no top-level `next/headers` import — that package is Node.js-only and
+// this module is also imported by Edge middleware (for verifyAccessToken).
+// Cookie helpers use a dynamic import so they are safe to tree-shake in Edge.
 import jwt from "jsonwebtoken";
-import { cookies } from "next/headers";
 import {
     JWT_ACCESS_COOKIE,
     JWT_ACCESS_EXPIRY,
+    JWT_ACCESS_SECRET,
     JWT_REFRESH_COOKIE,
     JWT_REFRESH_EXPIRY,
+    JWT_REFRESH_SECRET,
 } from "../constants";
-
-const ACCESS_SECRET = process.env.JWT_ACCESS_SECRET ?? "dev-access-secret-change-in-prod";
-const REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? "dev-refresh-secret-change-in-prod";
 
 export interface JwtPayload {
     sub: string;
@@ -18,17 +19,27 @@ export interface JwtPayload {
     exp?: number;
 }
 
+function requireSecrets() {
+    if (!JWT_ACCESS_SECRET || !JWT_REFRESH_SECRET) {
+        throw new Error(
+            "Missing JWT secrets — set JWT_ACCESS_SECRET and JWT_REFRESH_SECRET in .env.local"
+        );
+    }
+}
+
 export function signAccessToken(payload: Omit<JwtPayload, "iat" | "exp">): string {
-    return jwt.sign(payload, ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRY });
+    requireSecrets();
+    return jwt.sign(payload, JWT_ACCESS_SECRET, { expiresIn: JWT_ACCESS_EXPIRY });
 }
 
 export function signRefreshToken(payload: Omit<JwtPayload, "iat" | "exp">): string {
-    return jwt.sign(payload, REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRY });
+    requireSecrets();
+    return jwt.sign(payload, JWT_REFRESH_SECRET, { expiresIn: JWT_REFRESH_EXPIRY });
 }
 
 export function verifyAccessToken(token: string): JwtPayload | null {
     try {
-        return jwt.verify(token, ACCESS_SECRET) as JwtPayload;
+        return jwt.verify(token, JWT_ACCESS_SECRET) as JwtPayload;
     } catch {
         return null;
     }
@@ -36,13 +47,14 @@ export function verifyAccessToken(token: string): JwtPayload | null {
 
 export function verifyRefreshToken(token: string): JwtPayload | null {
     try {
-        return jwt.verify(token, REFRESH_SECRET) as JwtPayload;
+        return jwt.verify(token, JWT_REFRESH_SECRET) as JwtPayload;
     } catch {
         return null;
     }
 }
 
 export async function setAuthCookies(accessToken: string, refreshToken: string): Promise<void> {
+    const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
     cookieStore.set(JWT_ACCESS_COOKIE, accessToken, {
         httpOnly: true,
@@ -61,6 +73,7 @@ export async function setAuthCookies(accessToken: string, refreshToken: string):
 }
 
 export async function clearAuthCookies(): Promise<void> {
+    const { cookies } = await import("next/headers");
     const cookieStore = await cookies();
     cookieStore.delete(JWT_ACCESS_COOKIE);
     cookieStore.delete(JWT_REFRESH_COOKIE);

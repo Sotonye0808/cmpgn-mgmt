@@ -16,26 +16,41 @@ const STAT_CONFIG: Array<{
   iconKey: keyof typeof ICONS;
   color: string;
 }> = [
-  { key: "clicks", label: "Clicks", iconKey: "links", color: "text-blue-500" },
-  { key: "views", label: "Views", iconKey: "view", color: "text-purple-500" },
-  { key: "shares", label: "Shares", iconKey: "share", color: "text-green-500" },
+  {
+    key: "clicks",
+    label: "Clicks",
+    iconKey: "links",
+    color: "text-ds-chart-3",
+  },
+  {
+    key: "views",
+    label: "Views",
+    iconKey: "view",
+    color: "text-ds-brand-accent",
+  },
+  {
+    key: "shares",
+    label: "Shares",
+    iconKey: "share",
+    color: "text-ds-brand-success",
+  },
   {
     key: "conversions",
     label: "Conversions",
     iconKey: "check",
-    color: "text-emerald-500",
+    color: "text-ds-brand-success",
   },
   {
     key: "referrals",
     label: "Referrals",
     iconKey: "users",
-    color: "text-amber-500",
+    color: "text-ds-chart-4",
   },
   {
     key: "uniqueVisitors",
     label: "Unique Visitors",
     iconKey: "trend",
-    color: "text-pink-500",
+    color: "text-ds-chart-5",
   },
 ];
 

@@ -1,5 +1,5 @@
 import bcrypt from "bcryptjs";
-import { DEFAULT_TRUST_SCORE } from "../constants";
+import { BCRYPT_SALT_ROUNDS } from "../constants";
 
 // Deterministic fixture data — same data on every cold start
 // All field names match Prisma schema exactly
@@ -10,7 +10,7 @@ function d(offsetDays: number): string {
     return date.toISOString();
 }
 
-const HASH = bcrypt.hashSync("Password123!", 10);
+const HASH = bcrypt.hashSync("Password123!", BCRYPT_SALT_ROUNDS);
 
 export function seedMockDb() {
     // ─── Users ───────────────────────────────────────────────────────────────────
@@ -302,6 +302,9 @@ export function seedMockDb() {
         { id: "part-4", userId: "user-lead-1", campaignId: "camp-1", joinedAt: d(-9) },
         { id: "part-5", userId: "user-lead-1", campaignId: "camp-2", joinedAt: d(-19) },
         { id: "part-6", userId: "user-1", campaignId: "camp-4", joinedAt: d(-4) },
+        { id: "part-7", userId: "user-admin-1", campaignId: "camp-1", joinedAt: d(-10) },
+        { id: "part-8", userId: "user-admin-1", campaignId: "camp-2", joinedAt: d(-20), smartLinkId: "link-admin-1" },
+        { id: "part-9", userId: "user-super-1", campaignId: "camp-3", joinedAt: d(-15) },
     ];
 
     // ─── Smart Links ─────────────────────────────────────────────────────────────
@@ -366,6 +369,36 @@ export function seedMockDb() {
             createdAt: d(-9),
             updatedAt: d(-1),
         },
+        {
+            id: "link-admin-1",
+            slug: "a1b2cd3",
+            userId: "user-admin-1",
+            campaignId: "camp-1",
+            originalUrl: "http://localhost:3000/campaigns/camp-1",
+            clickCount: 201,
+            uniqueClickCount: 165,
+            conversionCount: 18,
+            isActive: true,
+            isExpired: false,
+            expiresAt: d(20),
+            createdAt: d(-10),
+            updatedAt: d(-1),
+        },
+        {
+            id: "link-admin-2",
+            slug: "e4f5gh6",
+            userId: "user-admin-1",
+            campaignId: "camp-2",
+            originalUrl: "http://localhost:3000/campaigns/camp-2",
+            clickCount: 178,
+            uniqueClickCount: 132,
+            conversionCount: 14,
+            isActive: true,
+            isExpired: false,
+            expiresAt: d(10),
+            createdAt: d(-20),
+            updatedAt: d(-2),
+        },
     ];
 
     // ─── Link Events ─────────────────────────────────────────────────────────────
@@ -426,6 +459,39 @@ export function seedMockDb() {
             createdAt: d(-4),
             updatedAt: d(-4),
         },
+        {
+            id: "don-3",
+            userId: "user-lead-1",
+            campaignId: "camp-3",
+            amount: 25000,
+            currency: "NGN",
+            status: "COMPLETED" as unknown as DonationStatus,
+            reference: "TXN003",
+            createdAt: d(-3),
+            updatedAt: d(-3),
+        },
+        {
+            id: "don-4",
+            userId: "user-1",
+            campaignId: "camp-3",
+            amount: 7500,
+            currency: "NGN",
+            status: "COMPLETED" as unknown as DonationStatus,
+            reference: "TXN004",
+            createdAt: d(-2),
+            updatedAt: d(-2),
+        },
+        {
+            id: "don-5",
+            userId: "user-admin-1",
+            campaignId: "camp-3",
+            amount: 50000,
+            currency: "NGN",
+            status: "COMPLETED" as unknown as DonationStatus,
+            reference: "TXN005",
+            createdAt: d(-6),
+            updatedAt: d(-6),
+        },
     ];
 
     // ─── Points Ledger ───────────────────────────────────────────────────────────
@@ -437,20 +503,45 @@ export function seedMockDb() {
         { id: "pt-5", userId: "user-lead-1", campaignId: "camp-1", type: "LEADERSHIP" as unknown as PointType, value: 25, description: "Referral joined campaign", referenceId: "ref-1", createdAt: d(-9) },
         { id: "pt-6", userId: "user-lead-1", type: "CONSISTENCY" as unknown as PointType, value: 25, description: "Weekly streak bonus", createdAt: d(-7) },
         { id: "pt-7", userId: "user-2", campaignId: "camp-1", type: "IMPACT" as unknown as PointType, value: 67, description: "Clicks received on smart link", createdAt: d(-8) },
+        { id: "pt-8", userId: "user-admin-1", campaignId: "camp-1", type: "IMPACT" as unknown as PointType, value: 201, description: "Clicks received on smart link", createdAt: d(-10) },
+        { id: "pt-9", userId: "user-admin-1", campaignId: "camp-2", type: "IMPACT" as unknown as PointType, value: 178, description: "Clicks received on smart link", createdAt: d(-20) },
+        { id: "pt-10", userId: "user-admin-1", type: "RELIABILITY" as unknown as PointType, value: 50, description: "Content reviewed and approved", createdAt: d(-5) },
+        { id: "pt-11", userId: "user-super-1", campaignId: "camp-3", type: "IMPACT" as unknown as PointType, value: 150, description: "Campaign oversight contribution", createdAt: d(-15) },
+        { id: "pt-12", userId: "user-super-1", type: "CONSISTENCY" as unknown as PointType, value: 50, description: "Weekly streak bonus", createdAt: d(-7) },
     ];
 
     // ─── Leaderboard Snapshots ──────────────────────────────────────────────────
     const leaderboardSnapshots: LeaderboardSnapshot[] = [
         { id: "lb-1", userId: "user-lead-1", campaignId: "camp-1", period: "2026-W03", rank: 1, score: 362, createdAt: d(-7) },
         { id: "lb-2", userId: "user-1", campaignId: "camp-1", period: "2026-W03", rank: 2, score: 257, createdAt: d(-7) },
-        { id: "lb-3", userId: "user-2", campaignId: "camp-1", period: "2026-W03", rank: 3, score: 67, createdAt: d(-7) },
+        { id: "lb-3", userId: "user-admin-1", campaignId: "camp-1", period: "2026-W03", rank: 3, score: 201, createdAt: d(-7) },
+        { id: "lb-4", userId: "user-super-1", campaignId: "camp-1", period: "2026-W03", rank: 4, score: 150, createdAt: d(-7) },
+        { id: "lb-5", userId: "user-2", campaignId: "camp-1", period: "2026-W03", rank: 5, score: 67, createdAt: d(-7) },
+        // camp-2 snapshots
+        { id: "lb-6", userId: "user-admin-1", campaignId: "camp-2", period: "2026-W03", rank: 1, score: 178, createdAt: d(-7) },
+        { id: "lb-7", userId: "user-lead-1", campaignId: "camp-2", period: "2026-W03", rank: 2, score: 145, createdAt: d(-7) },
+        { id: "lb-8", userId: "user-1", campaignId: "camp-2", period: "2026-W03", rank: 3, score: 89, createdAt: d(-7) },
+        { id: "lb-9", userId: "user-2", campaignId: "camp-2", period: "2026-W03", rank: 4, score: 55, createdAt: d(-7) },
+        { id: "lb-10", userId: "user-super-1", campaignId: "camp-2", period: "2026-W03", rank: 5, score: 30, createdAt: d(-7) },
+        // camp-3 snapshots
+        { id: "lb-11", userId: "user-super-1", campaignId: "camp-3", period: "2026-W03", rank: 1, score: 200, createdAt: d(-7) },
+        { id: "lb-12", userId: "user-admin-1", campaignId: "camp-3", period: "2026-W03", rank: 2, score: 180, createdAt: d(-7) },
+        { id: "lb-13", userId: "user-lead-1", campaignId: "camp-3", period: "2026-W03", rank: 3, score: 120, createdAt: d(-7) },
+        { id: "lb-14", userId: "user-1", campaignId: "camp-3", period: "2026-W03", rank: 4, score: 70, createdAt: d(-7) },
+        { id: "lb-15", userId: "user-2", campaignId: "camp-3", period: "2026-W03", rank: 5, score: 40, createdAt: d(-7) },
+        // camp-4 snapshots
+        { id: "lb-16", userId: "user-1", campaignId: "camp-4", period: "2026-W03", rank: 1, score: 130, createdAt: d(-3) },
+        { id: "lb-17", userId: "user-lead-1", campaignId: "camp-4", period: "2026-W03", rank: 2, score: 95, createdAt: d(-3) },
+        { id: "lb-18", userId: "user-2", campaignId: "camp-4", period: "2026-W03", rank: 3, score: 60, createdAt: d(-3) },
+        { id: "lb-19", userId: "user-admin-1", campaignId: "camp-4", period: "2026-W03", rank: 4, score: 45, createdAt: d(-3) },
+        { id: "lb-20", userId: "user-super-1", campaignId: "camp-4", period: "2026-W03", rank: 5, score: 20, createdAt: d(-3) },
     ];
 
     // ─── Trust Scores ────────────────────────────────────────────────────────────
     const trustScores: TrustScore[] = users.map((u) => ({
         id: `trust-${u.id}`,
         userId: u.id,
-        score: DEFAULT_TRUST_SCORE,
+        score: u.trustScore,
         flags: [],
         updatedAt: d(-1),
     }));

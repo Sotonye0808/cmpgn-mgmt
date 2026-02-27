@@ -13,20 +13,20 @@ const STAT_CONFIG = [
   {
     key: "totalReferrals" as const,
     label: "Total Referrals",
-    icon: <ICONS.users className="text-amber-400" />,
-    color: "border-l-amber-400",
+    icon: <ICONS.users className="text-ds-chart-4" />,
+    color: "border-l-ds-chart-4",
   },
   {
     key: "activeReferrals" as const,
     label: "Active Referrals",
-    icon: <ICONS.check className="text-green-400" />,
-    color: "border-l-green-400",
+    icon: <ICONS.check className="text-ds-brand-success" />,
+    color: "border-l-ds-brand-success",
   },
   {
     key: "directInvites" as const,
     label: "Direct Invites",
-    icon: <ICONS.links className="text-blue-400" />,
-    color: "border-l-blue-400",
+    icon: <ICONS.links className="text-ds-chart-3" />,
+    color: "border-l-ds-chart-3",
   },
 ];
 
@@ -54,9 +54,9 @@ export default function ReferralStats({
       ))}
 
       {/* Conversion rate card */}
-      <div className="flex flex-col gap-1.5 p-4 bg-ds-surface-elevated border border-ds-border-base rounded-ds-lg border-l-4 border-l-purple-400">
+      <div className="flex flex-col gap-1.5 p-4 bg-ds-surface-elevated border border-ds-border-base rounded-ds-lg border-l-4 border-l-ds-brand-accent">
         <div className="flex items-center gap-2 text-ds-text-subtle text-xs">
-          <ICONS.trend className="text-purple-400" />
+          <ICONS.trend className="text-ds-brand-accent" />
           <span>Conv. Rate</span>
         </div>
         <span className="text-2xl font-bold text-ds-text-primary font-ds-mono">

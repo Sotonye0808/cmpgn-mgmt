@@ -35,7 +35,7 @@ export default function CampaignCard({
   const renderThumbnail = () => {
     if (campaign.mediaType === "IMAGE" && campaign.mediaUrl) {
       return (
-        <div className="relative w-full h-44 bg-gradient-to-br from-ds-brand-accent-subtle to-purple-100 dark:from-ds-brand-accent dark:to-purple-900">
+        <div className="relative w-full h-44 bg-gradient-to-br from-ds-brand-accent-subtle to-ds-surface-elevated">
           <Image
             src={campaign.mediaUrl}
             alt={campaign.title}
@@ -61,7 +61,7 @@ export default function CampaignCard({
       );
     }
     return (
-      <div className="w-full h-44 bg-gradient-to-br from-ds-brand-accent via-purple-500 to-pink-500 flex items-center justify-center">
+      <div className="w-full h-44 bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 flex items-center justify-center">
         <div className="text-center text-white p-6">
           <ICONS.share className="text-5xl mb-3" />
           <p className="text-sm font-semibold line-clamp-2">{campaign.title}</p>

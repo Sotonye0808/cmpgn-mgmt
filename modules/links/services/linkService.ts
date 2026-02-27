@@ -37,9 +37,7 @@ export async function generateLink(input: GenerateLinkInput): Promise<SmartLink>
     const { userId, campaignId, customAlias } = input;
 
     // Check if user already has a link for this campaign
-    const existing = await mockDb.smartLinks.findUnique({
-        where: { userId_campaignId: { userId, campaignId } },
-    });
+    const existing = mockDb.smartLinks.findMany({ where: { userId, campaignId } })[0] ?? null;
     if (existing) return existing;
 
     // Ensure campaign exists and is active

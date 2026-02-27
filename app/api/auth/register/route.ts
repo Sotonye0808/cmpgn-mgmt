@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
+import { BCRYPT_SALT_ROUNDS } from "@/lib/constants";
 import { registerSchema } from "@/lib/schemas/authSchemas";
 import { mockDb } from "@/lib/data/mockDb";
 import { signAccessToken, signRefreshToken, setAuthCookies } from "@/lib/utils/jwt";
@@ -22,7 +23,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse("An account with this email already exists");
         }
 
-        const passwordHash = await bcrypt.hash(password, 10);
+        const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
         const user = await mockDb.transaction(async (tx) => {
             const newUser = tx.users.create({
