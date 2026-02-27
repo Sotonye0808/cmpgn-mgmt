@@ -13,6 +13,7 @@ import {
   Col,
   Divider,
   Tag,
+  message,
 } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import { SETTINGS_PAGE_CONTENT } from "@/config/content";
@@ -22,6 +23,7 @@ import FlaggedUsersTable from "@/modules/trust/components/FlaggedUsersTable";
 import TrustReviewModal from "@/modules/trust/components/TrustReviewModal";
 import { useFlaggedUsers } from "@/modules/trust/hooks/useTrust";
 import { GlobalLeaderboardAdminView } from "@/modules/leaderboard";
+import PageHeader from "@/components/ui/PageHeader";
 
 const { Title, Text } = Typography;
 
@@ -35,9 +37,27 @@ function ProfileSection() {
     : "?";
 
   async function handleSave() {
-    setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    setSaving(false);
+    try {
+      const values = await form.validateFields();
+      setSaving(true);
+      const res = await fetch("/api/users/me", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          firstName: values.firstName,
+          lastName: values.lastName,
+        }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to save");
+      message.success("Profile updated!");
+    } catch (e: unknown) {
+      if (e instanceof Error && e.message !== "failed") {
+        message.error(e.message);
+      }
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (
@@ -253,14 +273,14 @@ export default function SettingsPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Title level={2} style={{ margin: 0 }}>
-          {SETTINGS_PAGE_CONTENT.title}
-        </Title>
-        <Text type="secondary">{SETTINGS_PAGE_CONTENT.subtitle}</Text>
-      </div>
+      <PageHeader
+        title={SETTINGS_PAGE_CONTENT.title}
+        subtitle={SETTINGS_PAGE_CONTENT.subtitle}
+      />
 
-      <Card bordered={false} className="glass-surface">
+      <Card
+        bordered={false}
+        className="bg-ds-surface-elevated border border-ds-border-base">
         <Tabs items={tabItems} defaultActiveKey="profile" />
       </Card>
     </div>

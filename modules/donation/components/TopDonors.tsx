@@ -35,7 +35,7 @@ export default function TopDonors({
   if (!donors.length) return null;
 
   return (
-    <div className="glass-surface rounded-ds-xl p-6">
+    <div className="bg-ds-surface-elevated border border-ds-border-base rounded-ds-xl p-6">
       <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
         {DONATION_PAGE_CONTENT.topDonorsTitle}
       </h3>

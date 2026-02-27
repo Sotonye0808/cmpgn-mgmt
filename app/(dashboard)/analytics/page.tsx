@@ -9,13 +9,17 @@ import KpiBentoGrid from "@/modules/analytics/components/KpiBentoGrid";
 import EngagementTimelineChart from "@/modules/analytics/components/EngagementTimelineChart";
 import TopPerformersTable from "@/modules/analytics/components/TopPerformersTable";
 import AnalyticsSectionRenderer from "@/modules/analytics/components/AnalyticsSectionRenderer";
+import PageHeader from "@/components/ui/PageHeader";
+import GlassCard from "@/components/ui/GlassCard";
 import { Skeleton } from "antd";
 import { ANALYTICS_PAGE_CONTENT } from "@/config/content";
+import { useEngagementTimeline } from "@/modules/engagement/hooks/useEngagement";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
   const { analytics, loading: analyticsLoading } = useUserAnalytics();
   const { overview, loading: overviewLoading } = useOverviewAnalytics();
+  const { timeline, loading: timelineLoading } = useEngagementTimeline(14);
 
   if (!user) return null;
 
@@ -29,15 +33,10 @@ export default function AnalyticsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-ds-text-primary">
-          {ANALYTICS_PAGE_CONTENT.title}
-        </h1>
-        <p className="text-sm text-ds-text-subtle mt-1">
-          {ANALYTICS_PAGE_CONTENT.subtitle}
-        </p>
-      </div>
+      <PageHeader
+        title={ANALYTICS_PAGE_CONTENT.title}
+        subtitle={ANALYTICS_PAGE_CONTENT.subtitle}
+      />
 
       <AnalyticsSectionRenderer
         userRole={userRole}
@@ -60,22 +59,16 @@ export default function AnalyticsPage() {
 
             case "engagement-timeline":
               return (
-                <div className="glass-surface rounded-ds-xl p-6">
+                <GlassCard padding="lg">
                   <h2 className="text-lg font-semibold text-ds-text-primary mb-4">
                     {ANALYTICS_PAGE_CONTENT.engagementTitle}
                   </h2>
-                  {loading ? (
+                  {loading || timelineLoading ? (
                     <Skeleton active paragraph={{ rows: 5 }} />
                   ) : (
-                    <EngagementTimelineChart
-                      data={
-                        analytics?.engagement
-                          ? [] // engagement stats don't carry timeline; provided separately
-                          : []
-                      }
-                    />
+                    <EngagementTimelineChart data={timeline} />
                   )}
-                </div>
+                </GlassCard>
               );
 
             case "top-performers":
@@ -90,7 +83,7 @@ export default function AnalyticsPage() {
             case "platform-overview":
               if (!overview) return null;
               return (
-                <div className="glass-surface rounded-ds-xl p-6">
+                <GlassCard padding="lg">
                   <h2 className="text-lg font-semibold text-ds-text-primary mb-4">
                     {ANALYTICS_PAGE_CONTENT.overviewTitle}
                   </h2>
@@ -126,7 +119,7 @@ export default function AnalyticsPage() {
                       </div>
                     ))}
                   </div>
-                </div>
+                </GlassCard>
               );
 
             default:

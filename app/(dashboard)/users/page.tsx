@@ -3,9 +3,8 @@
 import { useAuth } from "@/hooks/useAuth";
 import { USERS_PAGE_CONTENT } from "@/config/content";
 import { UserManagementPanel } from "@/modules/users";
-import { Empty, Typography } from "antd";
-
-const { Title, Text } = Typography;
+import { Empty } from "antd";
+import PageHeader from "@/components/ui/PageHeader";
 
 export default function UsersPage() {
   const { user, hasRole } = useAuth();
@@ -21,12 +20,10 @@ export default function UsersPage() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <Title level={2} style={{ margin: 0 }}>
-          {USERS_PAGE_CONTENT.title}
-        </Title>
-        <Text type="secondary">{USERS_PAGE_CONTENT.subtitle}</Text>
-      </div>
+      <PageHeader
+        title={USERS_PAGE_CONTENT.title}
+        subtitle={USERS_PAGE_CONTENT.subtitle}
+      />
 
       <UserManagementPanel />
     </div>

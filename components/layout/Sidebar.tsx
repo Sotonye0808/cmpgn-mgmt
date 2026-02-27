@@ -3,41 +3,54 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
-import { Tooltip } from "antd";
+import { Tooltip, Drawer } from "antd";
 import { NAV_ITEMS } from "@/config/navigation";
 import { NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
 import { useRole } from "@/hooks/useRole";
 import { cn } from "@/lib/utils/cn";
 
-export default function Sidebar() {
+interface SidebarProps {
+  /** Controls whether the mobile Drawer is open. Managed by DashboardLayout. */
+  mobileOpen?: boolean;
+  /** Called when the mobile Drawer requests close. */
+  onMobileClose?: () => void;
+}
+
+function SidebarContent({
+  collapsed,
+  onCollapse,
+}: {
+  collapsed: boolean;
+  onCollapse: () => void;
+}) {
   const pathname = usePathname();
   const { filterByRole, role } = useRole();
-  const [collapsed, setCollapsed] = useState(false);
-
   const visibleItems = filterByRole(NAV_ITEMS);
 
   return (
-    <aside
+    <div
       className={cn(
-        "flex flex-col h-screen bg-ds-surface-elevated border-r border-ds-border-base transition-all duration-200 shrink-0",
+        "flex flex-col h-full bg-ds-surface-sidebar border-r border-ds-border-glass transition-all duration-200",
         collapsed ? "w-16" : "w-60",
       )}>
-      {/* Brand */}
-      <div className="flex items-center gap-3 px-4 py-5 border-b border-ds-border-base shrink-0">
-        <div className="w-8 h-8 rounded-ds-lg bg-ds-brand-accent flex items-center justify-center shrink-0">
-          <span className="text-white font-bold text-sm">D</span>
-        </div>
-        {!collapsed && (
-          <div>
-            <div className="font-bold text-ds-text-primary text-sm leading-tight">
-              {NAV_CONTENT.brandName}
-            </div>
-            <div className="text-xs text-ds-text-subtle">
-              {NAV_CONTENT.brandTagline}
-            </div>
+      {/* Brand — glass card treatment */}
+      <div className="px-2 pt-3 pb-2 shrink-0">
+        <div className="flex items-center gap-3 px-3 py-3 rounded-ds-lg glass-surface">
+          <div className="w-8 h-8 rounded-ds-lg bg-ds-brand-accent glow-border flex items-center justify-center shrink-0">
+            <span className="text-white font-bold text-sm">D</span>
           </div>
-        )}
+          {!collapsed && (
+            <div>
+              <div className="font-bold text-ds-text-primary text-sm leading-tight">
+                {NAV_CONTENT.brandName}
+              </div>
+              <div className="text-xs text-ds-text-subtle">
+                {NAV_CONTENT.brandTagline}
+              </div>
+            </div>
+          )}
+        </div>
       </div>
 
       {/* Nav Items */}
@@ -56,8 +69,8 @@ export default function Sidebar() {
                   className={cn(
                     "flex items-center gap-3 px-3 py-2.5 rounded-ds-lg text-sm font-medium transition-all duration-150",
                     isActive
-                      ? "bg-ds-brand-accent-subtle text-ds-brand-accent glow-border"
-                      : "text-ds-text-secondary hover:bg-ds-surface-sunken hover:text-ds-text-primary",
+                      ? "bg-ds-brand-accent-subtle text-ds-brand-accent glow-border border border-ds-border-glass"
+                      : "text-ds-text-secondary hover:bg-ds-brand-accent-subtle/50 hover:text-ds-text-primary hover:glow-border",
                   )}>
                   <Icon className="text-base shrink-0" />
                   {!collapsed && <span className="truncate">{item.label}</span>}
@@ -85,7 +98,7 @@ export default function Sidebar() {
           </div>
         )}
         <button
-          onClick={() => setCollapsed(!collapsed)}
+          onClick={onCollapse}
           className="flex items-center gap-2 text-ds-text-subtle hover:text-ds-brand-accent text-sm transition-colors"
           aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}>
           {collapsed ? (
@@ -96,6 +109,42 @@ export default function Sidebar() {
           {!collapsed && <span>Collapse</span>}
         </button>
       </div>
-    </aside>
+    </div>
+  );
+}
+
+export default function Sidebar({
+  mobileOpen = false,
+  onMobileClose,
+}: SidebarProps) {
+  const [collapsed, setCollapsed] = useState(false);
+
+  return (
+    <>
+      {/* Desktop sidebar — hidden on mobile/tablet */}
+      <aside
+        className={cn("hidden md:flex shrink-0", collapsed ? "w-16" : "w-60")}>
+        <SidebarContent
+          collapsed={collapsed}
+          onCollapse={() => setCollapsed(!collapsed)}
+        />
+      </aside>
+
+      {/* Mobile Drawer — shown only on small screens */}
+      <Drawer
+        open={mobileOpen}
+        onClose={onMobileClose}
+        placement="left"
+        width={240}
+        styles={{ body: { padding: 0 }, header: { display: "none" } }}
+        className="md:hidden">
+        <div className="h-full flex flex-col">
+          <SidebarContent
+            collapsed={false}
+            onCollapse={() => onMobileClose?.()}
+          />
+        </div>
+      </Drawer>
+    </>
   );
 }

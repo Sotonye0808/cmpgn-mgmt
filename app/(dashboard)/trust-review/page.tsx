@@ -5,6 +5,7 @@ import { useFlaggedUsers } from "@/modules/trust/hooks/useTrust";
 import FlaggedUsersTable from "@/modules/trust/components/FlaggedUsersTable";
 import TrustReviewModal from "@/modules/trust/components/TrustReviewModal";
 import { TRUST_PAGE_CONTENT } from "@/config/content";
+import PageHeader from "@/components/ui/PageHeader";
 import { useAuth } from "@/hooks/useAuth";
 import { Empty } from "antd";
 
@@ -27,15 +28,10 @@ export default function TrustReviewPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-ds-text-primary">
-          {TRUST_PAGE_CONTENT.title}
-        </h1>
-        <p className="text-sm text-ds-text-subtle mt-1">
-          {TRUST_PAGE_CONTENT.subtitle}
-        </p>
-      </div>
+      <PageHeader
+        title={TRUST_PAGE_CONTENT.title}
+        subtitle={TRUST_PAGE_CONTENT.subtitle}
+      />
 
       <FlaggedUsersTable
         users={flaggedUsers}

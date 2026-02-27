@@ -1,6 +1,6 @@
 "use client";
 
-import KpiStatCard from "./KpiStatCard";
+import StatCard from "@/components/ui/StatCard";
 import { KPI_CARDS } from "@/modules/analytics/config";
 
 interface Props {
@@ -56,10 +56,12 @@ export default function KpiBentoGrid({
   return (
     <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
       {permitted.map((card) => (
-        <KpiStatCard
+        <StatCard
           key={card.key}
-          config={card}
-          value={getValue(card.key)}
+          label={card.label}
+          value={getValue(card.key) ?? "—"}
+          icon={card.icon}
+          color={card.color}
           loading={loading}
         />
       ))}

@@ -1,7 +1,8 @@
 "use client";
 
-import { Table, Avatar, Skeleton } from "antd";
+import { Avatar, Skeleton } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import DataTable from "@/components/ui/DataTable";
 import { RANK_LEVELS } from "@/config/ranks";
 import { ANALYTICS_PAGE_CONTENT } from "@/config/content";
 
@@ -89,11 +90,11 @@ export default function TopPerformersTable({
   ];
 
   return (
-    <div className="glass-surface rounded-ds-xl p-6">
-      <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
+    <div className="space-y-4">
+      <h3 className="font-semibold text-ds-text-primary text-lg">
         {ANALYTICS_PAGE_CONTENT.performersTitle}
       </h3>
-      <Table<LeaderboardEntry>
+      <DataTable<LeaderboardEntry>
         columns={columns}
         dataSource={performers}
         rowKey="userId"

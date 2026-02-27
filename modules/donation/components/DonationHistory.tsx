@@ -1,7 +1,8 @@
 "use client";
 
-import { Table, Tag, Skeleton, Empty } from "antd";
+import { Tag, Skeleton, Empty } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import DataTable from "@/components/ui/DataTable";
 import { DONATION_PAGE_CONTENT } from "@/config/content";
 
 interface Props {
@@ -90,11 +91,11 @@ export default function DonationHistory({
   void currency; // used via the render fn above; suppress unused warning
 
   return (
-    <div className="glass-surface rounded-ds-xl p-6">
-      <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
+    <div className="space-y-4">
+      <h3 className="font-semibold text-ds-text-primary text-lg">
         {DONATION_PAGE_CONTENT.historyTitle}
       </h3>
-      <Table<Donation>
+      <DataTable<Donation>
         columns={COLUMNS}
         dataSource={donations}
         rowKey="id"

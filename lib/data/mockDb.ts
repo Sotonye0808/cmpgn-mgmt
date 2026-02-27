@@ -14,7 +14,8 @@ type TableName =
     | "donations"
     | "pointsLedger"
     | "leaderboardSnapshots"
-    | "trustScores";
+    | "trustScores"
+    | "notifications";
 
 interface MockTable<T extends { id: string }> {
     findUnique: (args: { where: { id?: string;[key: string]: unknown } }) => T | null;
@@ -100,6 +101,7 @@ class MockDb extends EventEmitter {
     pointsLedger!: MockTable<PointsLedgerEntry> & { _data: PointsLedgerEntry[] };
     leaderboardSnapshots!: MockTable<LeaderboardSnapshot> & { _data: LeaderboardSnapshot[] };
     trustScores!: MockTable<TrustScore> & { _data: TrustScore[] };
+    notifications!: MockTable<AppNotification> & { _data: AppNotification[] };
 
     constructor() {
         super();
@@ -119,6 +121,7 @@ class MockDb extends EventEmitter {
         this.pointsLedger = createTable<PointsLedgerEntry>(seed.pointsLedger);
         this.leaderboardSnapshots = createTable<LeaderboardSnapshot>(seed.leaderboardSnapshots);
         this.trustScores = createTable<TrustScore>(seed.trustScores);
+        this.notifications = createTable<AppNotification>(seed.notifications ?? []);
     }
 
     emit(event: TableName | `${TableName}:changed` | string, ...args: unknown[]): boolean {

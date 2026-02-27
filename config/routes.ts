@@ -4,6 +4,10 @@ export const ROUTES = {
     LOGIN: "/login",
     REGISTER: "/register",
     PUBLIC_LINK: (slug: string) => `/c/${slug}`,
+    ABOUT: "/about",
+    CONTACT: "/contact",
+    PRIVACY: "/privacy",
+    TERMS: "/terms",
 
     // Dashboard
     DASHBOARD: "/dashboard",

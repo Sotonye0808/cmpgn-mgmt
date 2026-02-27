@@ -10,6 +10,7 @@ import {
 } from "recharts";
 import { Skeleton } from "antd";
 import { ANALYTICS_PAGE_CONTENT } from "@/config/content";
+import GlassCard from "@/components/ui/GlassCard";
 
 interface GrowthPoint {
   date: string;
@@ -30,7 +31,7 @@ export default function CampaignGrowthChart({
   if (loading) return <Skeleton active paragraph={{ rows: 4 }} />;
 
   return (
-    <div className="glass-surface rounded-ds-xl p-6">
+    <GlassCard padding="lg">
       <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
         {ANALYTICS_PAGE_CONTENT.growthTitle}
       </h3>
@@ -84,6 +85,6 @@ export default function CampaignGrowthChart({
           />
         </AreaChart>
       </ResponsiveContainer>
-    </div>
+    </GlassCard>
   );
 }

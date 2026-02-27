@@ -1,17 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import {
-  Table,
-  Tag,
-  Select,
-  Button,
-  Input,
-  message,
-  Skeleton,
-  Empty,
-} from "antd";
+import { Tag, Select, Button, Input, message, Skeleton, Empty } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import DataTable from "@/components/ui/DataTable";
 import { USERS_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import type { UserListItem } from "@/modules/users/services/userService";
@@ -111,8 +103,8 @@ export default function UserManagementPanel() {
   return (
     <>
       {contextHolder}
-      <div className="glass-surface rounded-ds-xl p-6">
-        <div className="flex flex-col sm:flex-row gap-3 mb-4">
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3">
           <Input.Search
             placeholder="Search users..."
             value={search}
@@ -135,7 +127,7 @@ export default function UserManagementPanel() {
         ) : users.length === 0 ? (
           <Empty description={USERS_PAGE_CONTENT.emptyState} />
         ) : (
-          <Table<UserListItem>
+          <DataTable<UserListItem>
             columns={columns}
             dataSource={users}
             rowKey="id"

@@ -1,6 +1,14 @@
 @import "tailwindcss";
 
 /* ─────────────────────────────────────────────────────────
+   Tailwind v4 — class-based dark mode
+   next-themes sets class="dark" on <html>, so Tailwind's
+   dark: variant must respond to that class, not the OS
+   media query (which is the v4 default).
+───────────────────────────────────────────────────────── */
+@variant dark (&:where(.dark, .dark *));
+
+/* ─────────────────────────────────────────────────────────
    DESIGN SYSTEM — DMHicc
    Single source of truth for all design tokens
 ───────────────────────────────────────────────────────── */
@@ -75,11 +83,16 @@
   --ds-shadow-xl:
     0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 
+  /* ─── Borders ────────────────────────────────────────── */
+  --ds-border-glass: rgba(255, 255, 255, 0.65);
+
   /* ─── Glow ───────────────────────────────────────────── */
   --ds-glow-accent-soft:
     0 0 0 3px rgba(124, 58, 237, 0.15), 0 0 12px rgba(124, 58, 237, 0.2);
   --ds-glow-accent-strong:
     0 0 0 2px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.3);
+  --ds-glow-nav:
+    0 1px 0 rgba(124, 58, 237, 0.08), 0 4px 32px rgba(0, 0, 0, 0.06);
 
   /* ─── Radius ─────────────────────────────────────────── */
   --ds-radius-sm: 6px;
@@ -108,12 +121,13 @@
   --ds-surface-elevated: #0f1117;
   --ds-surface-sunken: #060709;
   --ds-surface-overlay: rgba(9, 10, 15, 0.95);
-  --ds-surface-glass: rgba(124, 58, 237, 0.06);
+  --ds-surface-glass: rgba(9, 10, 20, 0.6);
 
   /* ─── Borders ────────────────────────────────────────── */
-  --ds-border-base: rgba(255, 255, 255, 0.1);
-  --ds-border-subtle: rgba(255, 255, 255, 0.05);
-  --ds-border-strong: rgba(255, 255, 255, 0.18);
+  --ds-border-base: rgba(255, 255, 255, 0.08);
+  --ds-border-subtle: rgba(255, 255, 255, 0.04);
+  --ds-border-strong: rgba(255, 255, 255, 0.16);
+  --ds-border-glass: rgba(139, 92, 246, 0.22);
 
   /* ─── Text ───────────────────────────────────────────── */
   --ds-text-primary: #f0f0fa;
@@ -141,6 +155,10 @@
     0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
   --ds-shadow-xl:
     0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+
+  --ds-glow-nav:
+    0 1px 0 rgba(139, 92, 246, 0.22), 0 4px 32px rgba(0, 0, 0, 0.5),
+    0 0 80px rgba(139, 92, 246, 0.05);
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -189,18 +207,99 @@
   --color-ds-surface-sidebar: var(--ds-surface-sidebar);
   --color-ds-surface-header: var(--ds-surface-header);
   --color-ds-brand-success-subtle: var(--ds-brand-success-subtle);
+  --color-ds-brand-success: var(--ds-brand-success);
   --color-ds-text-link: var(--ds-text-link);
+  --color-ds-border-glass: var(--ds-border-glass);
 }
 
 /* ─────────────────────────────────────────────────────────
    Utility Classes
 ───────────────────────────────────────────────────────── */
 @layer utilities {
+  /* ── Glass surface — bento cards, analytics blocks, modal headers ── */
   .glass-surface {
-    background: var(--ds-surface-glass);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
-    border: 1px solid var(--ds-border-strong);
+    background: rgba(255, 255, 255, 0.72);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    border: 1px solid rgba(255, 255, 255, 0.7);
+    box-shadow:
+      0 4px 24px -4px rgba(0, 0, 0, 0.08),
+      inset 0 1px 0 rgba(255, 255, 255, 0.9);
+  }
+  .dark .glass-surface {
+    background: rgba(9, 10, 20, 0.55);
+    -webkit-backdrop-filter: blur(16px) saturate(160%);
+    backdrop-filter: blur(16px) saturate(160%);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    box-shadow:
+      0 4px 24px -4px rgba(0, 0, 0, 0.55),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* ── Glass nav — sticky top bars and app headers ── */
+  .glass-nav {
+    background: rgba(248, 249, 251, 0.82);
+    -webkit-backdrop-filter: blur(20px) saturate(200%);
+    backdrop-filter: blur(20px) saturate(200%);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.55);
+    box-shadow:
+      0 1px 0 rgba(0, 0, 0, 0.05),
+      0 4px 24px rgba(0, 0, 0, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 1);
+  }
+  .dark .glass-nav {
+    background: rgba(7, 8, 15, 0.78);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.18);
+    box-shadow:
+      0 1px 0 rgba(139, 92, 246, 0.18),
+      0 8px 40px rgba(0, 0, 0, 0.5),
+      0 0 80px rgba(139, 92, 246, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.04);
+  }
+
+  /* ── Glass footer — page footers ── */
+  .glass-footer {
+    background: rgba(248, 249, 251, 0.82);
+    -webkit-backdrop-filter: blur(16px) saturate(180%);
+    backdrop-filter: blur(16px) saturate(180%);
+    border-top: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow:
+      0 -1px 0 rgba(0, 0, 0, 0.04),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.8);
+  }
+  .dark .glass-footer {
+    background: rgba(7, 8, 15, 0.75);
+    -webkit-backdrop-filter: blur(20px) saturate(160%);
+    backdrop-filter: blur(20px) saturate(160%);
+    border-top: 1px solid rgba(139, 92, 246, 0.15);
+    box-shadow:
+      0 -1px 0 rgba(139, 92, 246, 0.15),
+      0 -8px 40px rgba(0, 0, 0, 0.4),
+      inset 0 -1px 0 rgba(255, 255, 255, 0.025);
+  }
+
+  /* ── Glow edge helpers ── */
+  .glow-edge-b {
+    box-shadow:
+      0 1px 0 rgba(124, 58, 237, 0.25),
+      0 0 24px rgba(124, 58, 237, 0.08);
+  }
+  .dark .glow-edge-b {
+    box-shadow:
+      0 1px 0 rgba(139, 92, 246, 0.4),
+      0 0 32px rgba(139, 92, 246, 0.12);
+  }
+  .glow-edge-t {
+    box-shadow:
+      0 -1px 0 rgba(124, 58, 237, 0.25),
+      0 0 24px rgba(124, 58, 237, 0.08);
+  }
+  .dark .glow-edge-t {
+    box-shadow:
+      0 -1px 0 rgba(139, 92, 246, 0.4),
+      0 0 32px rgba(139, 92, 246, 0.12);
   }
 
   .glow-border {

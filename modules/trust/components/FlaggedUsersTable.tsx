@@ -1,7 +1,8 @@
 "use client";
 
-import { Table, Tag, Button, Empty, Skeleton } from "antd";
+import { Tag, Button, Empty, Skeleton } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import DataTable from "@/components/ui/DataTable";
 import { TRUST_PAGE_CONTENT } from "@/config/content";
 import TrustScoreIndicator from "./TrustScoreIndicator";
 
@@ -78,11 +79,11 @@ export default function FlaggedUsersTable({
   ];
 
   return (
-    <div className="glass-surface rounded-ds-xl p-6">
-      <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
+    <div className="space-y-4">
+      <h3 className="font-semibold text-ds-text-primary text-lg">
         {TRUST_PAGE_CONTENT.title}
       </h3>
-      <Table<TrustFlagRecord>
+      <DataTable<TrustFlagRecord>
         columns={columns}
         dataSource={users}
         rowKey="userId"

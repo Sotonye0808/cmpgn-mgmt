@@ -7,6 +7,7 @@ import { useDonations } from "@/modules/donation/hooks/useDonations";
 import DonationForm from "@/modules/donation/components/DonationForm";
 import DonationHistory from "@/modules/donation/components/DonationHistory";
 import { DONATION_PAGE_CONTENT } from "@/config/content";
+import PageHeader from "@/components/ui/PageHeader";
 import { ROUTES } from "@/config/routes";
 
 export default function DonationsPage() {
@@ -42,15 +43,10 @@ export default function DonationsPage() {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div>
-        <h1 className="text-2xl font-bold text-ds-text-primary">
-          {DONATION_PAGE_CONTENT.title}
-        </h1>
-        <p className="text-sm text-ds-text-subtle mt-1">
-          {DONATION_PAGE_CONTENT.subtitle}
-        </p>
-      </div>
+      <PageHeader
+        title={DONATION_PAGE_CONTENT.title}
+        subtitle={DONATION_PAGE_CONTENT.subtitle}
+      />
 
       <div className="grid lg:grid-cols-3 gap-6">
         {/* Donation Form */}

@@ -16,6 +16,8 @@ interface CampaignModalProps {
   onClose: () => void;
   onShare?: (campaign: Campaign) => void;
   onJoin?: (campaign: Campaign) => void;
+  joinedIds?: Set<string>;
+  joiningId?: string | null;
 }
 
 export default function CampaignModal({
@@ -25,6 +27,8 @@ export default function CampaignModal({
   onClose,
   onShare,
   onJoin,
+  joinedIds,
+  joiningId,
 }: CampaignModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const campaign = campaigns[currentIndex];
@@ -99,11 +103,21 @@ export default function CampaignModal({
             )}
             {onJoin && campaign.status === ("ACTIVE" as string) && (
               <Button
-                variant="primary"
+                variant={joinedIds?.has(campaign.id) ? "ghost" : "primary"}
                 size="small"
-                icon={<ICONS.rocket />}
-                onClick={() => onJoin(campaign)}>
-                Join Campaign
+                icon={
+                  joinedIds?.has(campaign.id) ? (
+                    <ICONS.check />
+                  ) : (
+                    <ICONS.rocket />
+                  )
+                }
+                onClick={() => !joinedIds?.has(campaign.id) && onJoin(campaign)}
+                disabled={
+                  !!joinedIds?.has(campaign.id) || joiningId === campaign.id
+                }
+                loading={joiningId === campaign.id}>
+                {joinedIds?.has(campaign.id) ? "Joined" : "Join Campaign"}
               </Button>
             )}
           </div>

@@ -9,6 +9,7 @@ import CampaignCard from "@/modules/campaign/components/CampaignCard";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes";
 import { DASHBOARD_CONTENT } from "@/config/content";
+import PageHeader from "@/components/ui/PageHeader";
 import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 
@@ -70,18 +71,13 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      {/* Greeting */}
-      <div>
-        <h1 className="text-2xl font-bold text-ds-text-primary">
-          {DASHBOARD_CONTENT.greeting.replace(
-            "{name}",
-            user?.firstName ?? "there",
-          )}
-        </h1>
-        <p className="text-ds-text-secondary mt-1">
-          {DASHBOARD_CONTENT.subtitle}
-        </p>
-      </div>
+      <PageHeader
+        title={DASHBOARD_CONTENT.greeting.replace(
+          "{name}",
+          user?.firstName ?? "there",
+        )}
+        subtitle={DASHBOARD_CONTENT.subtitle}
+      />
 
       {/* KPI Bento Grid */}
       <Row gutter={[16, 16]}>

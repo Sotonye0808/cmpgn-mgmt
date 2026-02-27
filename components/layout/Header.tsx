@@ -1,19 +1,29 @@
 "use client";
 
-import { Avatar, Dropdown } from "antd";
+import { Avatar, Dropdown, Badge } from "antd";
 import type { MenuProps } from "antd";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
+import { useNotifications } from "@/hooks/useNotifications";
+import NotificationDropdown from "@/components/ui/NotificationDropdown";
 
 interface HeaderProps {
   title?: string;
+  onMenuToggle?: () => void;
 }
 
-export default function Header({ title }: HeaderProps) {
+export default function Header({ title, onMenuToggle }: HeaderProps) {
   const { user, logout } = useAuth();
   const router = useRouter();
+  const {
+    unreadCount,
+    notifications,
+    markRead,
+    markAllRead,
+    loading: notifLoading,
+  } = useNotifications();
 
   const handleLogout = async () => {
     await logout();
@@ -27,12 +37,6 @@ export default function Header({ title }: HeaderProps) {
       label: "Profile & Settings",
       onClick: () => router.push(ROUTES.SETTINGS),
     },
-    {
-      key: "settings",
-      icon: <ICONS.settings className="text-base" />,
-      label: "Settings",
-      onClick: () => router.push(ROUTES.SETTINGS),
-    },
     { type: "divider" },
     {
       key: "logout",
@@ -44,18 +48,47 @@ export default function Header({ title }: HeaderProps) {
   ];
 
   return (
-    <header className="h-14 bg-ds-surface-elevated border-b border-ds-border-base flex items-center justify-between px-6 shrink-0">
-      {title && (
-        <h1 className="text-lg font-semibold text-ds-text-primary">{title}</h1>
-      )}
+    <header className="h-14 glass-nav sticky top-0 z-30 flex items-center justify-between px-4 md:px-6 shrink-0">
+      <div className="flex items-center gap-3">
+        {/* Hamburger — mobile only */}
+        {onMenuToggle && (
+          <button
+            onClick={onMenuToggle}
+            aria-label="Open menu"
+            className="md:hidden w-8 h-8 rounded-ds-lg flex items-center justify-center text-ds-text-subtle hover:text-ds-brand-accent hover:bg-ds-surface-sunken transition-all">
+            <ICONS.menu className="text-base" />
+          </button>
+        )}
+        {title && (
+          <h1 className="text-lg font-semibold text-ds-text-primary">
+            {title}
+          </h1>
+        )}
+      </div>
+
       {!title && <div />}
 
       <div className="flex items-center gap-3">
-        <button
-          aria-label="Notifications"
-          className="w-8 h-8 rounded-ds-lg flex items-center justify-center text-ds-text-subtle hover:text-ds-brand-accent hover:bg-ds-surface-sunken transition-all">
-          <ICONS.bell className="text-base" />
-        </button>
+        {/* Notification bell */}
+        <Dropdown
+          dropdownRender={() => (
+            <NotificationDropdown
+              notifications={notifications}
+              loading={notifLoading}
+              onMarkRead={markRead}
+              onMarkAllRead={markAllRead}
+            />
+          )}
+          trigger={["click"]}
+          placement="bottomRight">
+          <button
+            aria-label="Notifications"
+            className="relative w-8 h-8 rounded-ds-lg flex items-center justify-center text-ds-text-subtle hover:text-ds-brand-accent hover:bg-ds-brand-accent-subtle hover:glow-border transition-all">
+            <Badge count={unreadCount} size="small" offset={[2, -2]}>
+              <ICONS.bell className="text-base" />
+            </Badge>
+          </button>
+        </Dropdown>
 
         <Dropdown
           menu={{ items: menuItems }}

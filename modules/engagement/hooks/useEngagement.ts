@@ -56,3 +56,12 @@ export function useEngagement({ campaignId, days = 14 }: UseEngagementOptions = 
 
     return { stats, timeline, loading, error, refetch: fetch };
 }
+
+// Convenience hook for components that only need the timeline (e.g. AnalyticsPage)
+export function useEngagementTimeline(days = 14): {
+    timeline: EngagementTimelinePoint[];
+    loading: boolean;
+} {
+    const { timeline, loading } = useEngagement({ days });
+    return { timeline, loading };
+}

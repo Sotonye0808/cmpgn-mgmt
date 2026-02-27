@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Spin, message, Descriptions, Tag } from "antd";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
@@ -16,24 +17,38 @@ export default function CampaignDetailPage() {
   const router = useRouter();
   const { user } = useAuth();
   const { campaign, loading, error, refetch } = useCampaign(id);
+  const [joined, setJoined] = useState(false);
+  const [joining, setJoining] = useState(false);
 
   const handleJoin = async () => {
-    if (!user) return;
+    if (!user || joined) return;
+    setJoining(true);
     try {
       const res = await fetch(`/api/campaigns/${id}/participants`, {
         method: "POST",
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to join");
+      setJoined(true);
       message.success("Joined campaign!");
       refetch();
     } catch (e: unknown) {
       message.error(e instanceof Error ? e.message : "Failed to join");
+    } finally {
+      setJoining(false);
     }
   };
 
-  const handleShare = () => {
+  const handleShare = async () => {
     const url = window.location.href;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: campaign?.title, url });
+        return;
+      } catch {
+        /* fall through */
+      }
+    }
     navigator.clipboard
       .writeText(url)
       .then(() => message.success("Link copied!"));
@@ -60,27 +75,26 @@ export default function CampaignDetailPage() {
       </Button>
 
       {/* Banner */}
-      <CampaignBanner campaign={campaign} showActions onShare={handleShare} />
+      <CampaignBanner
+        campaign={campaign}
+        showActions
+        onShare={handleShare}
+        onJoin={!isAdmin ? handleJoin : undefined}
+        isJoined={joined}
+        joiningLoading={joining}
+      />
 
-      {/* Actions */}
-      <div className="flex items-center justify-between">
-        {isActive && !isAdmin && (
-          <Button
-            variant="primary"
-            icon={<ICONS.rocket />}
-            onClick={handleJoin}>
-            Join Campaign
-          </Button>
-        )}
-        {isAdmin && (
+      {/* Admin Actions */}
+      {isAdmin && (
+        <div className="flex items-center gap-3">
           <Button
             variant="secondary"
             icon={<ICONS.edit />}
             onClick={() => router.push(ROUTES.CAMPAIGN_EDIT(campaign.id))}>
             Edit Campaign
           </Button>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* Details Card */}
       <Card>
