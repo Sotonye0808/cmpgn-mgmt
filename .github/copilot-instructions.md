@@ -83,12 +83,37 @@ The mock DB:
 - Has a cache layer (`/lib/data/mockCache.ts`) that simulates Redis — TTL-based key-value store with `get`, `set`, `invalidate`
 - Is seeded from deterministic fixture data in `/lib/data/seed.ts`
 - Is accessible from both API routes and hooks — single source of state truth during development
+- Exposes `mockDb.transaction(callback)` for ACID boundary marking — swaps to `prisma.$transaction(callback)` at Phase 14 with no service restructuring
+
+**ACID rules — apply from day one:**
+
+- **Atomicity:** any service function writing to more than one table MUST use `mockDb.transaction()`. No bare multi-step sequential writes across tables.
+- **Consistency:** run Zod validation at the API route boundary AND enforce business rule guards in the service function before any write (e.g. reject join on ARCHIVED campaign).
+- **Isolation:** read-then-write operations (check-then-create) perform both steps inside the same `transaction()` callback.
+- **Durability:** in-memory in dev — intentional; do not write code that assumes persistence across restarts.
 
 ```ts
-// ✅ Correct — service writes to mock DB, cache is invalidated, subscribers notified
+// ✅ Correct — multi-table write uses transaction boundary
+await mockDb.transaction(async (tx) => {
+  const participation = await tx.participations.create(input);
+  await tx.pointsLedger.create({
+    userId,
+    campaignId,
+    type: PointType.IMPACT,
+    value: 10,
+  });
+  mockCache.invalidate(`points:summary:${userId}`);
+  mockDb.emit("participations:changed");
+});
+
+// ✅ Correct — single-table write (no transaction wrapper needed)
 await mockDb.campaigns.create(input);
 mockCache.invalidate("campaigns:list");
 mockDb.emit("campaigns:changed");
+
+// ❌ Wrong — multi-table write with no transaction boundary
+await mockDb.participations.create(input);
+await mockDb.pointsLedger.create(pointsInput); // unguarded — partial state if this throws
 
 // ❌ Wrong — isolated in-memory array per module with no cross-app visibility
 const campaigns: Campaign[] = []; // local to file

@@ -148,7 +148,20 @@ The mock data layer is a **globally instantiated singleton** that mirrors the pr
 - Calls `onChange` (typically a state setter or `router.refresh()`) whenever the table is mutated anywhere in the app
 - Simulates real-time DB subscriptions — components that use this hook re-render immediately after any service writes to `mockDb`
 
-**Phase 14 Production Swap:** The Prisma client replaces `mockDb` and Redis replaces `mockCache`. Only the service layer (`/modules/<domain>/services/`) changes — no components, hooks, or API routes require modification.
+**ACID Compliance Approach**
+
+DMHicc is designed to honour ACID properties structurally from Phase 1 so the production swap requires zero service redesign.
+
+| Property        | Phase 1–13 (mockDb)                                                                                              | Phase 14+ (PostgreSQL)                                   |
+| --------------- | ---------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| **Atomicity**   | `mockDb.transaction(callback)` marks the boundary; runs sequentially, re-throws on error, no rollback            | `prisma.$transaction(callback)` — full rollback on error |
+| **Consistency** | Zod validation at API boundary + business rule guards in service functions before every write                    | Same + Prisma schema-level constraints (unique, FK)      |
+| **Isolation**   | Read-then-write inside single `transaction()` callback minimises race window; Node.js single thread reduces risk | PostgreSQL serialisable transactions where required      |
+| **Durability**  | Intentionally absent — in-memory, reseeds on restart                                                             | PostgreSQL WAL — committed writes survive crashes        |
+
+The key rule: **any service function that writes to more than one table must use `mockDb.transaction()`**, never bare sequential awaits across tables. This is the structural contract that makes the Phase 14 swap mechanical.
+
+**Phase 14 Production Swap:** The Prisma client replaces `mockDb` (each `mockDb.transaction()` call becomes `prisma.$transaction()`), and Redis replaces `mockCache`. Only the service layer (`/modules/<domain>/services/`) changes — no components, hooks, or API routes require modification.
 
 ---
 
