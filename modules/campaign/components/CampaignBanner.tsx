@@ -67,7 +67,7 @@ export default function CampaignBanner({
       );
     }
     return (
-      <div className="w-full h-72 lg:h-96 bg-gradient-to-br from-ds-brand-accent via-purple-500 to-pink-500 flex items-center justify-center text-white p-12">
+      <div className="w-full h-72 lg:h-96 bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 flex items-center justify-center text-white p-12">
         <div className="text-center">
           <h1 className="text-3xl lg:text-4xl font-bold mb-4">
             {campaign.title}

@@ -34,7 +34,7 @@ export default function SmartLinkStats({
       label: "Active Links",
       value: activeLinks,
       icon: "rocket",
-      color: "text-ds-brand-secondary",
+      color: "text-ds-chart-3",
     },
   ];
 

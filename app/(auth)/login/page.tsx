@@ -1,33 +1,55 @@
 "use client";
 
 import { Form, Input, Alert } from "antd";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
-import { AUTH_CONTENT } from "@/config/content";
+import { AUTH_CONTENT, DEV_CREDENTIALS } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
+import Spinner from "@/components/ui/Spinner";
 
-export default function LoginPage() {
+const ROLE_COLORS: Record<string, string> = {
+  SUPER_ADMIN:
+    "bg-ds-status-error/20 text-ds-status-error border-ds-status-error/30",
+  ADMIN:
+    "bg-ds-status-warning/20 text-ds-status-warning border-ds-status-warning/30",
+  TEAM_LEAD: "bg-ds-chart-3/20 text-ds-chart-3 border-ds-chart-3/30",
+  USER: "bg-ds-brand-success/20 text-ds-brand-success border-ds-brand-success/30",
+};
+
+function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const [form] = Form.useForm();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const c = AUTH_CONTENT.login;
+  const isDev =
+    process.env.NEXT_PUBLIC_SHOW_DEV_CREDS === "true" ||
+    process.env.NODE_ENV === "development";
 
   const handleSubmit = async (values: { email: string; password: string }) => {
     setLoading(true);
     setError(null);
     try {
       await login(values.email, values.password);
-      router.push(ROUTES.DASHBOARD);
+      const redirect = searchParams.get("redirect");
+      router.replace(
+        redirect && redirect.startsWith("/") ? redirect : ROUTES.DASHBOARD,
+      );
     } catch (err) {
       setError(err instanceof Error ? err.message : "Login failed");
     } finally {
       setLoading(false);
     }
+  };
+
+  const fillCredentials = (email: string, password: string) => {
+    form.setFieldsValue({ email, password });
   };
 
   return (
@@ -48,7 +70,11 @@ export default function LoginPage() {
         />
       )}
 
-      <Form layout="vertical" onFinish={handleSubmit} requiredMark={false}>
+      <Form
+        form={form}
+        layout="vertical"
+        onFinish={handleSubmit}
+        requiredMark={false}>
         <Form.Item
           label={
             <span className="text-ds-text-secondary text-sm">
@@ -100,6 +126,34 @@ export default function LoginPage() {
           {c.registerLink}
         </Link>
       </p>
+
+      {isDev && (
+        <div className="mt-6 pt-5 border-t border-ds-border-base/50">
+          <p className="text-xs text-ds-text-subtle mb-3 text-center font-medium tracking-wide uppercase">
+            {c.devCredentialsTitle}
+          </p>
+          <div className="grid grid-cols-2 gap-2">
+            {DEV_CREDENTIALS.map((cred) => (
+              <button
+                key={cred.email}
+                type="button"
+                onClick={() => fillCredentials(cred.email, cred.password)}
+                className={`text-left px-3 py-2 rounded-ds-lg border text-xs transition-all hover:scale-[1.02] active:scale-[0.98] cursor-pointer ${ROLE_COLORS[cred.role]}`}>
+                <span className="font-semibold block">{cred.label}</span>
+                <span className="opacity-70 text-[11px]">{cred.email}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<Spinner fullPage tip="Loading login form..." />}>
+      <LoginForm />
+    </Suspense>
   );
 }

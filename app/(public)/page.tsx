@@ -152,16 +152,6 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
-
-      {/* Footer */}
-      <footer className="border-t border-ds-border-base py-8 text-center">
-        <p className="text-sm text-ds-text-subtle">
-          {LANDING_CONTENT.footer.copyright}
-        </p>
-        <p className="text-xs text-ds-text-muted mt-1">
-          {LANDING_CONTENT.footer.tagline}
-        </p>
-      </footer>
     </div>
   );
 }

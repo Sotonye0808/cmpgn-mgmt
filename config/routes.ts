@@ -34,7 +34,6 @@ export const ROUTES = {
     TRUST_REVIEW: "/trust-review",
 
     // Profile / Settings
-    PROFILE: "/profile",
     SETTINGS: "/settings",
 
     // API

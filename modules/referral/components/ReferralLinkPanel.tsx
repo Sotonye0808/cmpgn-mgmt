@@ -74,17 +74,17 @@ export default function ReferralLinkPanel({
             {
               label: "Total Referrals",
               value: stats.totalReferrals,
-              icon: <ICONS.users className="text-amber-500" />,
+              icon: <ICONS.users className="text-ds-chart-4" />,
             },
             {
               label: "Active",
               value: stats.activeReferrals,
-              icon: <ICONS.check className="text-green-500" />,
+              icon: <ICONS.check className="text-ds-brand-success" />,
             },
             {
               label: "Conv. Rate",
               value: `${Math.round(stats.conversionRate * 100)}%`,
-              icon: <ICONS.trend className="text-blue-500" />,
+              icon: <ICONS.trend className="text-ds-chart-3" />,
             },
           ].map((item) => (
             <div

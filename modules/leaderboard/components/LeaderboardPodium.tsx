@@ -20,8 +20,8 @@ const PODIUM_CONFIG = [
     position: 2,
     height: "h-20",
     medal: "🥈",
-    glow: "shadow-gray-400/30",
-    bg: "from-gray-500/20 to-gray-600/10",
+    glow: "shadow-ds-border-strong/40",
+    bg: "from-ds-surface-sunken to-ds-surface-base",
   },
   {
     position: 1,
@@ -34,8 +34,8 @@ const PODIUM_CONFIG = [
     position: 3,
     height: "h-16",
     medal: "🥉",
-    glow: "shadow-orange-400/30",
-    bg: "from-orange-500/15 to-orange-600/10",
+    glow: "shadow-ds-chart-4/30",
+    bg: "from-ds-chart-4/15 to-ds-chart-4/10",
   },
 ];
 
@@ -65,7 +65,7 @@ export default function LeaderboardPodium({
                 size={position === 1 ? 64 : 48}
                 className={cn(
                   "ring-2",
-                  position === 1 ? "ring-yellow-400" : "ring-gray-400",
+                  position === 1 ? "ring-yellow-400" : "ring-ds-border-strong",
                 )}>
                 {entry.firstName[0]}
               </Avatar>

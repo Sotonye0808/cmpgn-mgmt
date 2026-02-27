@@ -4,6 +4,7 @@ import "./globals.css";
 import { ThemeProvider } from "@/providers/ThemeProvider";
 import { AntdProvider } from "@/providers/AntdProvider";
 import { AuthProvider } from "@/providers/AuthProvider";
+import FloatingActions from "@/components/ui/FloatingActions";
 import { LANDING_CONTENT } from "@/config/content";
 
 const inter = Inter({
@@ -34,7 +35,10 @@ export default function RootLayout({
         className={`${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         <ThemeProvider>
           <AntdProvider>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+              {children}
+              <FloatingActions />
+            </AuthProvider>
           </AntdProvider>
         </ThemeProvider>
       </body>

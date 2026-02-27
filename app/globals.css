@@ -59,7 +59,13 @@
   --ds-status-warning: var(--palette-amber-500);
   --ds-status-success: var(--palette-emerald-500);
   --ds-status-info: var(--palette-blue-500);
+  /* ─── Extended surface aliases ────────────────────── */
+  --ds-surface-sidebar: #ffffff;
+  --ds-surface-header: #ffffff;
 
+  /* ─── Extended brand tokens ──────────────────────── */
+  --ds-brand-success-subtle: #ecfdf5;
+  --ds-text-link: var(--palette-violet-500);
   /* ─── Shadows ────────────────────────────────────────── */
   --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
   --ds-shadow-md:
@@ -119,6 +125,14 @@
   /* ─── Brand subtle (dark override) ──────────────────── */
   --ds-brand-accent-subtle: rgba(124, 58, 237, 0.15);
 
+  /* ─── Extended surface aliases (dark) ───────────────── */
+  --ds-surface-sidebar: #080910;
+  --ds-surface-header: #0f1117;
+
+  /* ─── Extended brand tokens (dark) ──────────────────── */
+  --ds-brand-success-subtle: rgba(16, 185, 129, 0.12);
+  --ds-text-link: var(--palette-violet-400);
+
   /* ─── Shadows ────────────────────────────────────────── */
   --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
   --ds-shadow-md:
@@ -166,8 +180,16 @@
   --radius-ds-lg: var(--ds-radius-lg);
   --radius-ds-xl: var(--ds-radius-xl);
   --radius-ds-2xl: var(--ds-radius-2xl);
+  --radius-ds-full: var(--ds-radius-full);
   --font-ds-sans: var(--ds-font-sans);
   --font-ds-mono: var(--ds-font-mono);
+  /* Extended surface aliases */
+  --color-ds-surface-glass: var(--ds-surface-glass);
+  --color-ds-surface-overlay: var(--ds-surface-overlay);
+  --color-ds-surface-sidebar: var(--ds-surface-sidebar);
+  --color-ds-surface-header: var(--ds-surface-header);
+  --color-ds-brand-success-subtle: var(--ds-brand-success-subtle);
+  --color-ds-text-link: var(--ds-text-link);
 }
 
 /* ─────────────────────────────────────────────────────────
@@ -240,12 +262,26 @@ html {
   font-family: var(--ds-font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  scroll-behavior: smooth;
 }
 
 body {
   background-color: var(--ds-surface-base);
   color: var(--ds-text-primary);
   min-height: 100vh;
+  transition:
+    background-color 200ms ease,
+    color 200ms ease;
+}
+
+/* Smooth theme transitions on surfaces, borders, and text */
+*,
+*::before,
+*::after {
+  transition-property:
+    background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 200ms;
+  transition-timing-function: ease;
 }
 
 /* Reduced motion */

@@ -62,7 +62,7 @@ export default function TrustReviewModal({
             type="primary"
             loading={loading === "CLEAR"}
             onClick={() => resolve("CLEAR")}
-            className="bg-green-600 hover:bg-green-700">
+            className="bg-ds-brand-success hover:bg-ds-brand-success-hover">
             {TRUST_PAGE_CONTENT.resolveButton} — Clear all flags &amp; restore
             score
           </Button>

@@ -51,6 +51,8 @@ import {
     InfoCircleOutlined,
     WarningOutlined,
     CheckCircleOutlined,
+    SunOutlined,
+    MoonOutlined,
 } from "@ant-design/icons";
 
 export const ICONS = {
@@ -124,6 +126,10 @@ export const ICONS = {
     trend: ArrowUpOutlined,
     user: UserOutlined,
     trophy: TrophyOutlined,
+
+    // Theme
+    sun: SunOutlined,
+    moon: MoonOutlined,
 } as const;
 
 export type IconKey = keyof typeof ICONS;
