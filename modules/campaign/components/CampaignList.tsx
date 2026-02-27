@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Row, Col, Pagination, Segmented, Empty } from "antd";
+import { Row, Col, Pagination, Segmented, Empty, message } from "antd";
 import { ICONS } from "@/config/icons";
 import Spinner from "@/components/ui/Spinner";
 import CampaignCard from "./CampaignCard";
@@ -12,6 +12,7 @@ import CampaignAdminActions from "./CampaignAdminActions";
 import { useCampaigns } from "../hooks/useCampaigns";
 import { useRouter } from "next/navigation";
 import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/hooks/useAuth";
 
 type ViewMode = "grid" | "stories";
 
@@ -27,11 +28,14 @@ export default function CampaignList({
   showAdminActions = true,
 }: CampaignListProps) {
   const router = useRouter();
+  const { user } = useAuth();
   const [view, setView] = useState<ViewMode>(defaultView);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
   const [page, setPage] = useState(1);
   const [filters, setFilters] = useState<CampaignFilters>({});
+  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+  const [joiningId, setJoiningId] = useState<string | null>(null);
 
   const { campaigns, pagination, loading, error, refetch } = useCampaigns({
     filters,
@@ -51,6 +55,48 @@ export default function CampaignList({
 
   const navigateToCampaign = (campaign: Campaign) => {
     router.push(ROUTES.CAMPAIGN_DETAIL(campaign.id));
+  };
+
+  const handleJoin = async (campaign: Campaign) => {
+    if (!user) {
+      message.warning("Please log in to join a campaign.");
+      return;
+    }
+    if (joinedIds.has(campaign.id)) return;
+    setJoiningId(campaign.id);
+    try {
+      const res = await fetch(`/api/campaigns/${campaign.id}/participants`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to join");
+      setJoinedIds((prev) => new Set(prev).add(campaign.id));
+      message.success(`Joined "${campaign.title}"!`);
+    } catch (e: unknown) {
+      message.error(
+        e instanceof Error ? e.message : "Could not join campaign.",
+      );
+    } finally {
+      setJoiningId(null);
+    }
+  };
+
+  const handleShare = async (campaign: Campaign) => {
+    const url = `${window.location.origin}${ROUTES.CAMPAIGN_DETAIL(campaign.id)}`;
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title: campaign.title, url });
+        return;
+      } catch {
+        // fell through to clipboard fallback
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      message.success("Campaign link copied to clipboard!");
+    } catch {
+      message.error("Could not copy link.");
+    }
   };
 
   return (
@@ -90,7 +136,7 @@ export default function CampaignList({
 
       {/* Error */}
       {error && (
-        <div className="text-ds-status-error text-sm p-4 bg-red-50 dark:bg-red-900/20 rounded-ds-lg">
+        <div className="text-ds-status-error text-sm p-4 bg-ds-status-error/10 rounded-ds-lg">
           {error}
         </div>
       )}
@@ -146,14 +192,10 @@ export default function CampaignList({
         initialIndex={modalStartIndex}
         open={modalOpen}
         onClose={() => setModalOpen(false)}
-        onShare={(c) => {
-          setModalOpen(false);
-          navigateToCampaign(c);
-        }}
-        onJoin={(c) => {
-          setModalOpen(false);
-          navigateToCampaign(c);
-        }}
+        onShare={handleShare}
+        onJoin={handleJoin}
+        joinedIds={joinedIds}
+        joiningId={joiningId}
       />
     </div>
   );

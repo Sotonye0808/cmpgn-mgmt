@@ -53,7 +53,7 @@ export default function EngagementTimelineChart({
         <Line
           type="monotone"
           dataKey="clicks"
-          stroke="#3B82F6"
+          stroke="var(--ds-chart-3)"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
@@ -61,7 +61,7 @@ export default function EngagementTimelineChart({
         <Line
           type="monotone"
           dataKey="shares"
-          stroke="#10B981"
+          stroke="var(--ds-chart-2)"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}
@@ -69,7 +69,7 @@ export default function EngagementTimelineChart({
         <Line
           type="monotone"
           dataKey="conversions"
-          stroke="#7C3AED"
+          stroke="var(--ds-brand-accent)"
           strokeWidth={2}
           dot={false}
           activeDot={{ r: 4 }}

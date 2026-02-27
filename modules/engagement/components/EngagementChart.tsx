@@ -22,9 +22,9 @@ const CHART_LINES: Array<{
   label: string;
   color: string;
 }> = [
-  { key: "clicks", label: "Clicks", color: "#3B82F6" },
-  { key: "shares", label: "Shares", color: "#10B981" },
-  { key: "conversions", label: "Conversions", color: "#8B5CF6" },
+  { key: "clicks", label: "Clicks", color: "var(--ds-chart-3)" },
+  { key: "shares", label: "Shares", color: "var(--ds-chart-2)" },
+  { key: "conversions", label: "Conversions", color: "var(--ds-brand-accent)" },
 ];
 
 export default function EngagementChart({
@@ -51,7 +51,7 @@ export default function EngagementChart({
           margin={{ top: 5, right: 20, left: 0, bottom: 5 }}>
           <CartesianGrid
             strokeDasharray="3 3"
-            stroke="rgba(255,255,255,0.05)"
+            stroke="var(--ds-border-subtle)"
           />
           <XAxis
             dataKey="date"

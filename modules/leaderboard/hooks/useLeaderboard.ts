@@ -38,10 +38,16 @@ export function useLeaderboard({
             const qs = new URLSearchParams({ filter, page: String(page), pageSize: String(pageSize) });
             if (campaignId) qs.set("campaignId", campaignId);
 
+            // When filter is "individual" and no campaignId is provided, fall back to global.
+            // Calling /api/leaderboard/campaigns/global would result in zero results (no campaign
+            // with id "global" exists). Campaign-scoped individual rankings are driven by J2.
+            const listUrl =
+                filter === "global" || !campaignId
+                    ? `/api/leaderboard/global?${qs}`
+                    : `/api/leaderboard/campaigns/${campaignId}?${qs}`;
+
             const [listRes, myRankRes] = await Promise.all([
-                filter === "global"
-                    ? window.fetch(`/api/leaderboard/global?${qs}`)
-                    : window.fetch(`/api/leaderboard/campaigns/${campaignId ?? "global"}?${qs}`),
+                window.fetch(listUrl),
                 window.fetch(`/api/leaderboard/me?${campaignId ? `campaignId=${campaignId}` : ""}`),
             ]);
 

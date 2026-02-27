@@ -3,7 +3,7 @@
 import { Progress } from "antd";
 import { ICONS } from "@/config/icons";
 import { formatNumber } from "@/lib/utils/format";
-import { cn } from "@/lib/utils/cn";
+import GlassCard from "@/components/ui/GlassCard";
 
 interface MyRankCardProps {
   rankInfo: UserRankInfo;
@@ -19,7 +19,7 @@ export default function MyRankCard({
   className,
 }: MyRankCardProps) {
   return (
-    <div className={cn("glass-surface rounded-ds-xl p-5", className)}>
+    <GlassCard padding="md" className={className}>
       <div className="flex items-center gap-2 mb-4">
         <ICONS.trophy className="text-ds-brand-accent" />
         <span className="text-sm font-medium text-ds-text-secondary">
@@ -60,6 +60,6 @@ export default function MyRankCard({
       <p className="text-xs text-ds-text-subtle mt-3 text-center">
         {rankInfo.position} of {totalParticipants} participants
       </p>
-    </div>
+    </GlassCard>
   );
 }

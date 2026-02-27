@@ -8,16 +8,19 @@ import LeaderboardTable from "@/modules/leaderboard/components/LeaderboardTable"
 import LeaderboardPodium from "@/modules/leaderboard/components/LeaderboardPodium";
 import LeaderboardFilters from "@/modules/leaderboard/components/LeaderboardFilters";
 import MyRankCard from "@/modules/leaderboard/components/MyRankCard";
+import PageHeader from "@/components/ui/PageHeader";
 import Spinner from "@/components/ui/Spinner";
 import { LEADERBOARD_PAGE_CONTENT } from "@/config/content";
 
 export default function LeaderboardPage() {
   const { user } = useAuth();
   const [filter, setFilter] = useState<LeaderboardFilter>("global");
+  const [campaignId, setCampaignId] = useState<string | undefined>();
   const [page, setPage] = useState(1);
 
   const { entries, myRank, total, loading } = useLeaderboard({
     filter,
+    campaignId,
     page,
     pageSize: 20,
   });
@@ -25,23 +28,21 @@ export default function LeaderboardPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div>
-          <h1 className="text-2xl font-bold text-ds-text-primary">
-            {LEADERBOARD_PAGE_CONTENT.title}
-          </h1>
-          <p className="text-sm text-ds-text-subtle mt-1">
-            {LEADERBOARD_PAGE_CONTENT.subtitle}
-          </p>
-        </div>
-        <LeaderboardFilters
-          value={filter}
-          onChange={(f) => {
-            setFilter(f);
-            setPage(1);
-          }}
-        />
-      </div>
+      <PageHeader
+        title={LEADERBOARD_PAGE_CONTENT.title}
+        subtitle={LEADERBOARD_PAGE_CONTENT.subtitle}
+        actions={
+          <LeaderboardFilters
+            value={filter}
+            campaignId={campaignId}
+            onChange={(f, cId) => {
+              setFilter(f);
+              setCampaignId(cId);
+              setPage(1);
+            }}
+          />
+        }
+      />
 
       {/* My Rank Card */}
       {myRank && user && (

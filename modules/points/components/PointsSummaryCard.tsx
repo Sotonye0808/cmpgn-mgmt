@@ -3,6 +3,7 @@
 import { Tooltip } from "antd";
 import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
+import GlassCard from "@/components/ui/GlassCard";
 
 interface PointsSummaryCardProps {
   summary: PointsSummary;
@@ -23,7 +24,7 @@ const POINT_TYPES: Array<{
     key: "impact",
     label: "Impact Points",
     abbr: "IP",
-    color: "#3B82F6",
+    color: "var(--ds-chart-3)",
     description:
       "Earned from clicks, shares, and conversions your link generates",
   },
@@ -31,21 +32,21 @@ const POINT_TYPES: Array<{
     key: "consistency",
     label: "Consistency Points",
     abbr: "CP",
-    color: "#10B981",
+    color: "var(--ds-brand-success)",
     description: "Earned from daily and weekly activity streaks",
   },
   {
     key: "leadership",
     label: "Leadership Points",
     abbr: "LP",
-    color: "#F59E0B",
+    color: "var(--ds-chart-4)",
     description: "Earned from referrals, team milestones, and mentoring",
   },
   {
     key: "reliability",
     label: "Reliability Points",
     abbr: "RP",
-    color: "#8B5CF6",
+    color: "var(--ds-brand-accent)",
     description: "Earned from meeting goals and accurate reporting",
   },
 ];
@@ -55,7 +56,7 @@ export default function PointsSummaryCard({
   className,
 }: PointsSummaryCardProps) {
   return (
-    <div className={cn("glass-surface rounded-ds-xl p-5 space-y-4", className)}>
+    <GlassCard padding="md" className={cn("space-y-4", className)}>
       {/* Total */}
       <div className="text-center">
         <p className="text-xs text-ds-text-subtle uppercase tracking-wider mb-1">
@@ -88,6 +89,6 @@ export default function PointsSummaryCard({
           </Tooltip>
         ))}
       </div>
-    </div>
+    </GlassCard>
   );
 }

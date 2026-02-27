@@ -20,6 +20,9 @@ interface CampaignBannerProps {
   };
   showActions?: boolean;
   onShare?: () => void;
+  onJoin?: () => void;
+  isJoined?: boolean;
+  joiningLoading?: boolean;
   className?: string;
 }
 
@@ -28,6 +31,9 @@ export default function CampaignBanner({
   createdBy,
   showActions = true,
   onShare,
+  onJoin,
+  isJoined,
+  joiningLoading,
   className,
 }: CampaignBannerProps) {
   const goalPercent =
@@ -224,13 +230,26 @@ export default function CampaignBanner({
           </div>
 
           {showActions && (
-            <Button
-              variant="secondary"
-              icon={<ICONS.share />}
-              onClick={onShare}
-              size="small">
-              Share
-            </Button>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="secondary"
+                icon={<ICONS.share />}
+                onClick={onShare}
+                size="small">
+                Share
+              </Button>
+              {onJoin && isActive && (
+                <Button
+                  variant={isJoined ? "ghost" : "primary"}
+                  icon={isJoined ? <ICONS.check /> : <ICONS.rocket />}
+                  onClick={onJoin}
+                  size="small"
+                  disabled={isJoined || joiningLoading}
+                  loading={joiningLoading}>
+                  {isJoined ? "Joined" : "Join Campaign"}
+                </Button>
+              )}
+            </div>
           )}
         </div>
       </div>

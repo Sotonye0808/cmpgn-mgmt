@@ -1,3 +1,5 @@
+export { };
+
 declare global {
     // ─── Enums ──────────────────────────────────────────────────────────────────
     const enum UserRole {
@@ -460,6 +462,24 @@ declare global {
         label: string;
         allowedRoles: string[];
     }
-}
 
-export { };
+    // ─── Notifications ───────────────────────────────────────────────────────────
+
+    type NotificationType =
+        | "CAMPAIGN_UPDATE"
+        | "REFERRAL_JOINED"
+        | "POINTS_EARNED"
+        | "TRUST_FLAG"
+        | "SYSTEM";
+
+    interface AppNotification {
+        id: string;
+        userId: string;
+        type: NotificationType;
+        title: string;
+        body: string;
+        isRead: boolean;
+        link?: string;
+        createdAt: string;
+    }
+}

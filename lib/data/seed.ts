@@ -546,6 +546,89 @@ export function seedMockDb() {
         updatedAt: d(-1),
     }));
 
+    // ─── Notifications ───────────────────────────────────────────────────────────
+    const notifications: AppNotification[] = [
+        {
+            id: "notif-1",
+            userId: "user-1",
+            type: "CAMPAIGN_UPDATE",
+            title: "Easter Harvest Drive updated",
+            body: "The Easter Harvest Drive 2026 campaign has a new milestone — 347 participants and counting!",
+            isRead: false,
+            link: "/campaigns/camp-1",
+            createdAt: d(-1),
+        },
+        {
+            id: "notif-2",
+            userId: "user-1",
+            type: "REFERRAL_JOINED",
+            title: "Your referral joined a campaign",
+            body: "Tunde Babatunde joined the Easter Harvest Drive using your smart link.",
+            isRead: false,
+            link: "/campaigns/camp-1",
+            createdAt: d(-2),
+        },
+        {
+            id: "notif-3",
+            userId: "user-1",
+            type: "POINTS_EARNED",
+            title: "You earned 25 points",
+            body: "You received 25 Leadership points for a successful referral on Easter Harvest Drive.",
+            isRead: true,
+            link: "/leaderboard",
+            createdAt: d(-3),
+        },
+        {
+            id: "notif-4",
+            userId: "user-lead-1",
+            type: "CAMPAIGN_UPDATE",
+            title: "Youth Ignite Conference is live",
+            body: "Youth Ignite Conference campaign is now active. Start sharing to reach your goal.",
+            isRead: false,
+            link: "/campaigns/camp-4",
+            createdAt: d(-1),
+        },
+        {
+            id: "notif-5",
+            userId: "user-lead-1",
+            type: "POINTS_EARNED",
+            title: "Weekly streak bonus earned",
+            body: "You maintained a 7-day activity streak and earned 25 Consistency points.",
+            isRead: false,
+            link: "/leaderboard",
+            createdAt: d(-2),
+        },
+        {
+            id: "notif-6",
+            userId: "user-admin-1",
+            type: "TRUST_FLAG",
+            title: "Trust flag needs review",
+            body: "A new trust flag has been submitted for review. Check the Trust Review dashboard.",
+            isRead: false,
+            link: "/trust-review",
+            createdAt: d(-1),
+        },
+        {
+            id: "notif-7",
+            userId: "user-admin-1",
+            type: "CAMPAIGN_UPDATE",
+            title: "Community Giving Initiative milestone",
+            body: "The Community Giving Initiative has reached 37% of its donation goal — ₦187,350 raised.",
+            isRead: true,
+            link: "/campaigns/camp-3",
+            createdAt: d(-3),
+        },
+        {
+            id: "notif-8",
+            userId: "user-admin-1",
+            type: "SYSTEM",
+            title: "Platform update deployed",
+            body: "DMHicc has been updated with new analytics and leaderboard features. Explore what's new.",
+            isRead: true,
+            createdAt: d(-5),
+        },
+    ];
+
     return {
         users,
         campaigns,
@@ -557,5 +640,6 @@ export function seedMockDb() {
         pointsLedger,
         leaderboardSnapshots,
         trustScores,
+        notifications,
     };
 }

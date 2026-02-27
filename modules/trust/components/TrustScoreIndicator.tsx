@@ -10,10 +10,12 @@ interface Props {
   compact?: boolean;
 }
 
+// Using AntD semantic aliases so ConfigProvider darkAlgorithm/defaultAlgorithm
+// handles contrast automatically — no hardcoded hex that bypasses theme context.
 function scoreColor(score: number): string {
-  if (score >= 80) return "#10B981"; // green
-  if (score >= 50) return "#F59E0B"; // amber
-  return "#EF4444"; // red
+  if (score >= 80) return "success";
+  if (score >= 50) return "warning";
+  return "error";
 }
 
 function scoreLabel(score: number): string {

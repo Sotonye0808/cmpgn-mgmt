@@ -1,0 +1,53 @@
+import { NextRequest } from "next/server";
+import { z } from "zod";
+import { requireAuth } from "@/lib/middleware/auth";
+import {
+    successResponse,
+    badRequestResponse,
+    handleApiError,
+} from "@/lib/utils/api";
+import { mockDb } from "@/lib/data/mockDb";
+
+const updateProfileSchema = z.object({
+    firstName: z.string().min(1, "First name is required").max(50),
+    lastName: z.string().min(1, "Last name is required").max(50),
+});
+
+export async function GET() {
+    try {
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
+        const user = mockDb.users.findUnique({ where: { id: auth.user.id } });
+        return successResponse(user);
+    } catch (err) {
+        return handleApiError(err);
+    }
+}
+
+export async function PATCH(request: NextRequest) {
+    try {
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
+        const user = auth.user;
+
+        const body = await request.json();
+        const parsed = updateProfileSchema.safeParse(body);
+        if (!parsed.success) {
+            return badRequestResponse(parsed.error.errors[0].message);
+        }
+
+        const updated = mockDb.users.update({
+            where: { id: user.id },
+            data: {
+                firstName: parsed.data.firstName,
+                lastName: parsed.data.lastName,
+                updatedAt: new Date().toISOString(),
+            },
+        });
+
+        mockDb.emit("users:changed");
+        return successResponse(updated);
+    } catch (err) {
+        return handleApiError(err);
+    }
+}

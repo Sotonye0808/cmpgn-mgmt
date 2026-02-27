@@ -1,11 +1,13 @@
 import { NextRequest } from "next/server";
+import { z } from "zod";
 import {
     successResponse,
     handleApiError,
     paginatedResponse,
+    badRequestResponse,
 } from "@/lib/utils/api";
 import { requireAuth } from "@/lib/middleware/auth";
-import { getLinksByUser, getLinksByCampaign } from "@/modules/links/services/linkService";
+import { getLinksByUser, getLinksByCampaign, generateLink } from "@/modules/links/services/linkService";
 
 // GET /api/smart-links?campaignId=... or ?userId=...
 export async function GET(request: NextRequest) {
@@ -27,6 +29,36 @@ export async function GET(request: NextRequest) {
         // Default: return the current user's links
         const links = await getLinksByUser(user.id);
         return successResponse(links);
+    } catch (err) {
+        return handleApiError(err);
+    }
+}
+
+const generateLinkSchema = z.object({
+    campaignId: z.string().min(1, "Campaign ID is required"),
+    customAlias: z.string().min(3).max(20).optional(),
+});
+
+// POST /api/smart-links — generate (or return existing) smart link for a campaign
+export async function POST(request: NextRequest) {
+    try {
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
+        const user = auth.user;
+
+        const body = await request.json();
+        const parsed = generateLinkSchema.safeParse(body);
+        if (!parsed.success) {
+            return badRequestResponse(parsed.error.errors[0].message);
+        }
+
+        const link = await generateLink({
+            userId: user.id,
+            campaignId: parsed.data.campaignId,
+            customAlias: parsed.data.customAlias,
+        });
+
+        return successResponse(link, 201);
     } catch (err) {
         return handleApiError(err);
     }
