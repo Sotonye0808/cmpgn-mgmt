@@ -1,0 +1,261 @@
+@import "tailwindcss";
+
+/* ─────────────────────────────────────────────────────────
+   DESIGN SYSTEM — DMHicc
+   Single source of truth for all design tokens
+───────────────────────────────────────────────────────── */
+
+:root {
+  /* ─── Palette ────────────────────────────────────────── */
+  --palette-violet-50: #f5f3ff;
+  --palette-violet-100: #ede9fe;
+  --palette-violet-200: #ddd6fe;
+  --palette-violet-300: #c4b5fd;
+  --palette-violet-400: #a78bfa;
+  --palette-violet-500: #7c3aed;
+  --palette-violet-600: #6d28d9;
+  --palette-violet-700: #5b21b6;
+  --palette-violet-900: #2e1065;
+
+  --palette-emerald-500: #10b981;
+  --palette-emerald-600: #059669;
+
+  --palette-red-500: #ef4444;
+  --palette-red-600: #dc2626;
+  --palette-amber-500: #f59e0b;
+  --palette-blue-500: #3b82f6;
+  --palette-pink-500: #ec4899;
+  --palette-purple-500: #a855f7;
+
+  /* ─── Brand ──────────────────────────────────────────── */
+  --ds-brand-accent: var(--palette-violet-500);
+  --ds-brand-accent-hover: var(--palette-violet-600);
+  --ds-brand-accent-subtle: var(--palette-violet-50);
+  --ds-brand-success: var(--palette-emerald-500);
+  --ds-brand-success-hover: var(--palette-emerald-600);
+
+  /* ─── Surfaces ───────────────────────────────────────── */
+  --ds-surface-base: #f8f9fb;
+  --ds-surface-elevated: #ffffff;
+  --ds-surface-sunken: #f1f3f5;
+  --ds-surface-overlay: rgba(255, 255, 255, 0.95);
+  --ds-surface-glass: rgba(255, 255, 255, 0.7);
+
+  /* ─── Borders ────────────────────────────────────────── */
+  --ds-border-base: #e5e7eb;
+  --ds-border-subtle: #f3f4f6;
+  --ds-border-strong: #d1d5db;
+
+  /* ─── Text ───────────────────────────────────────────── */
+  --ds-text-primary: #111827;
+  --ds-text-secondary: #374151;
+  --ds-text-subtle: #6b7280;
+  --ds-text-disabled: #9ca3af;
+  --ds-text-inverse: #ffffff;
+
+  /* ─── Status ─────────────────────────────────────────── */
+  --ds-status-error: var(--palette-red-500);
+  --ds-status-error-hover: var(--palette-red-600);
+  --ds-status-warning: var(--palette-amber-500);
+  --ds-status-success: var(--palette-emerald-500);
+  --ds-status-info: var(--palette-blue-500);
+
+  /* ─── Shadows ────────────────────────────────────────── */
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --ds-shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.07), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+  --ds-shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.08), 0 4px 6px -4px rgba(0, 0, 0, 0.05);
+  --ds-shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+
+  /* ─── Glow ───────────────────────────────────────────── */
+  --ds-glow-accent-soft:
+    0 0 0 3px rgba(124, 58, 237, 0.15), 0 0 12px rgba(124, 58, 237, 0.2);
+  --ds-glow-accent-strong:
+    0 0 0 2px rgba(124, 58, 237, 0.4), 0 0 20px rgba(124, 58, 237, 0.3);
+
+  /* ─── Radius ─────────────────────────────────────────── */
+  --ds-radius-sm: 6px;
+  --ds-radius-md: 8px;
+  --ds-radius-lg: 12px;
+  --ds-radius-xl: 20px;
+  --ds-radius-2xl: 24px;
+  --ds-radius-full: 9999px;
+
+  /* ─── Fonts ──────────────────────────────────────────── */
+  --ds-font-sans:
+    "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  --ds-font-mono: "JetBrains Mono", "Fira Code", "Cascadia Code", monospace;
+
+  /* ─── Charts ─────────────────────────────────────────── */
+  --ds-chart-1: var(--palette-violet-500);
+  --ds-chart-2: var(--palette-emerald-500);
+  --ds-chart-3: var(--palette-blue-500);
+  --ds-chart-4: var(--palette-amber-500);
+  --ds-chart-5: var(--palette-pink-500);
+}
+
+.dark {
+  /* ─── Surfaces ───────────────────────────────────────── */
+  --ds-surface-base: #080910;
+  --ds-surface-elevated: #0f1117;
+  --ds-surface-sunken: #060709;
+  --ds-surface-overlay: rgba(9, 10, 15, 0.95);
+  --ds-surface-glass: rgba(124, 58, 237, 0.06);
+
+  /* ─── Borders ────────────────────────────────────────── */
+  --ds-border-base: rgba(255, 255, 255, 0.1);
+  --ds-border-subtle: rgba(255, 255, 255, 0.05);
+  --ds-border-strong: rgba(255, 255, 255, 0.18);
+
+  /* ─── Text ───────────────────────────────────────────── */
+  --ds-text-primary: #f0f0fa;
+  --ds-text-secondary: #c5c5d8;
+  --ds-text-subtle: #8888a0;
+  --ds-text-disabled: #555568;
+  --ds-text-inverse: #080910;
+
+  /* ─── Brand subtle (dark override) ──────────────────── */
+  --ds-brand-accent-subtle: rgba(124, 58, 237, 0.15);
+
+  /* ─── Shadows ────────────────────────────────────────── */
+  --ds-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --ds-shadow-md:
+    0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.3);
+  --ds-shadow-lg:
+    0 10px 15px -3px rgba(0, 0, 0, 0.6), 0 4px 6px -4px rgba(0, 0, 0, 0.4);
+  --ds-shadow-xl:
+    0 20px 25px -5px rgba(0, 0, 0, 0.7), 0 8px 10px -6px rgba(0, 0, 0, 0.5);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Tailwind v4 Token Exposure
+───────────────────────────────────────────────────────── */
+@theme inline {
+  --color-ds-brand-accent: var(--ds-brand-accent);
+  --color-ds-brand-accent-hover: var(--ds-brand-accent-hover);
+  --color-ds-brand-accent-subtle: var(--ds-brand-accent-subtle);
+  --color-ds-brand-success: var(--ds-brand-success);
+  --color-ds-surface-base: var(--ds-surface-base);
+  --color-ds-surface-elevated: var(--ds-surface-elevated);
+  --color-ds-surface-sunken: var(--ds-surface-sunken);
+  --color-ds-border-base: var(--ds-border-base);
+  --color-ds-border-subtle: var(--ds-border-subtle);
+  --color-ds-border-strong: var(--ds-border-strong);
+  --color-ds-text-primary: var(--ds-text-primary);
+  --color-ds-text-secondary: var(--ds-text-secondary);
+  --color-ds-text-subtle: var(--ds-text-subtle);
+  --color-ds-text-disabled: var(--ds-text-disabled);
+  --color-ds-text-inverse: var(--ds-text-inverse);
+  --color-ds-status-error: var(--ds-status-error);
+  --color-ds-status-warning: var(--ds-status-warning);
+  --color-ds-status-success: var(--ds-status-success);
+  --color-ds-status-info: var(--ds-status-info);
+  --color-ds-chart-1: var(--ds-chart-1);
+  --color-ds-chart-2: var(--ds-chart-2);
+  --color-ds-chart-3: var(--ds-chart-3);
+  --color-ds-chart-4: var(--ds-chart-4);
+  --color-ds-chart-5: var(--ds-chart-5);
+  --shadow-ds-sm: var(--ds-shadow-sm);
+  --shadow-ds-md: var(--ds-shadow-md);
+  --shadow-ds-lg: var(--ds-shadow-lg);
+  --shadow-ds-xl: var(--ds-shadow-xl);
+  --radius-ds-sm: var(--ds-radius-sm);
+  --radius-ds-md: var(--ds-radius-md);
+  --radius-ds-lg: var(--ds-radius-lg);
+  --radius-ds-xl: var(--ds-radius-xl);
+  --radius-ds-2xl: var(--ds-radius-2xl);
+  --font-ds-sans: var(--ds-font-sans);
+  --font-ds-mono: var(--ds-font-mono);
+}
+
+/* ─────────────────────────────────────────────────────────
+   Utility Classes
+───────────────────────────────────────────────────────── */
+@layer utilities {
+  .glass-surface {
+    background: var(--ds-surface-glass);
+    -webkit-backdrop-filter: blur(12px);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--ds-border-strong);
+  }
+
+  .glow-border {
+    box-shadow: var(--ds-glow-accent-soft);
+  }
+
+  .glow-border-strong {
+    box-shadow: var(--ds-glow-accent-strong);
+  }
+
+  .scrollbar-hide {
+    /* scrollbar-width: not supported in Chrome < 121, Safari — ::-webkit-scrollbar fallback below covers those */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  .font-ds-mono {
+    font-family: var(--ds-font-mono);
+  }
+
+  /* Dynamic color utilities — powered by --_dc CSS custom property */
+  .text-dynamic {
+    color: var(--_dc);
+  }
+
+  .bg-dynamic {
+    background-color: var(--_dc);
+  }
+
+  .bg-dynamic-muted {
+    background-color: color-mix(in srgb, var(--_dc) 10%, transparent);
+  }
+
+  .border-l-dynamic {
+    border-left-color: var(--_dc);
+  }
+
+  .border-l-3 {
+    border-left-width: 3px;
+  }
+
+  .ring-dynamic {
+    background: var(--_dc-ring);
+  }
+}
+
+/* ─────────────────────────────────────────────────────────
+   Base Reset
+───────────────────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: var(--ds-font-sans);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--ds-surface-base);
+  color: var(--ds-text-primary);
+  min-height: 100vh;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
