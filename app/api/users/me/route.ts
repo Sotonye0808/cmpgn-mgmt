@@ -11,6 +11,7 @@ import { mockDb } from "@/lib/data/mockDb";
 const updateProfileSchema = z.object({
     firstName: z.string().min(1, "First name is required").max(50),
     lastName: z.string().min(1, "Last name is required").max(50),
+    profilePicture: z.string().url("Must be a valid URL").optional(),
 });
 
 export async function GET() {
@@ -41,6 +42,9 @@ export async function PATCH(request: NextRequest) {
             data: {
                 firstName: parsed.data.firstName,
                 lastName: parsed.data.lastName,
+                ...(parsed.data.profilePicture !== undefined && {
+                    profilePicture: parsed.data.profilePicture,
+                }),
                 updatedAt: new Date().toISOString(),
             },
         });

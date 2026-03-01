@@ -1,0 +1,290 @@
+Analytics gaps: Service computes user/campaign analytics but has zero team/group coverage. No donation detail analytics endpoint. ANALYTICS_SECTIONS has platform-overview but no donation breakdown, no team performance section.
+
+Users page: Just a management table — no /users/[id] profile route exists anywhere.
+
+Audit trails: Zero implementation. No CampaignEvent type, no history table, no status-change tracking anywhere.
+
+Donation analytics: getCampaignFundraisingStats returns basic totals only. No time-series, no breakdown by status, no user-by-user donation view for admins.
+
+Final Refined Plan — DMHicc Pre-Execution Audit
+Track Changes From Previous Revision
+Area	Previous	Final
+Analytics	F = just public stats (2 tasks)	F now covers the full analytics expansion (7 tasks)
+User profiles	Not planned	New Track I — 4 tasks
+Campaign audit trail	Not planned	New Track J — 3 tasks
+Donation analytics	E covers form/verification only	E6–E7 added for deep analytics
+Total: 42 tasks across 10 tracks
+
+Track H — Light Mode Fix (2 tasks)
+Task	Action
+H1	Sidebar.tsx brand "D" text-white → text-ds-text-inverse
+H2	layout.tsx same fix
+Track A — Role & Permission Guards (4 tasks)
+A1 — changeUserRole service guard
+Receive actorRole as parameter. Enforce:
+
+ADMIN actors: may only assign USER or TEAM_LEAD; reject if target is currently ADMIN or SUPER_ADMIN; reject if requested role is ADMIN or SUPER_ADMIN
+SUPER_ADMIN actors: unrestricted
+A2 — Role API route (route.ts)
+Change requireRole(["SUPER_ADMIN"]) → requireRole(["ADMIN","SUPER_ADMIN"]). Extract actorRole from getAuthenticatedUser() and forward to service.
+
+A3 — UserManagementPanel UI guard
+
+Row where target is ADMIN/SUPER_ADMIN: render Tag only (no dropdown) unless current user is SUPER_ADMIN
+Dropdown options for ADMIN actors: USER, TEAM_LEAD only
+A4 — Confirm campaign edit access
+Verify requireRole(["ADMIN","SUPER_ADMIN"]) already covers both — no code change needed; document confirmed.
+
+Track B — Teams, Groups & Invite Links (10 tasks)
+B1 — Types (global.d.ts)
+
+interface Group { id; name; description?; teamIds: string[]; maxTeams: 4; createdAt }
+interface Team { id; name; groupId; teamLeadId?: string; memberIds: string[]; maxMembers: 10; createdAt }
+interface TeamInviteLink { id; token; teamId; targetRole: "MEMBER"|"TEAM_LEAD"; createdById; usedCount; maxUses; expiresAt?; isActive; createdAt }
+
+// Extend:
+LeaderboardFilter = "individual" | "global" | "team" | "group"
+User.teamId?: string
+
+B2 — MockDb tables
+Add groups, teams, teamInviteLinks to mockDb.ts.
+
+B3 — Seed data
+2 groups ("Alpha Division", "Omega Division"), 4 teams (2 per group). One team intentionally has no teamLeadId. Seed users assigned teamId. teamInviteLinks — 2 seed invite tokens.
+
+B4 — modules/teams/ service
+
+createGroup(data, actorRole) — requires ADMIN/SUPER_ADMIN; max 4 teams check
+createTeam(data, actorRole) — assigns to group, optional teamLeadId
+addMemberToTeam(teamId, userId) — max 10 cap, mockDb.transaction(); also sets user.teamId
+removeMemberFromTeam(teamId, userId) — clears user.teamId
+setTeamLead(teamId, userId?) — set or unset; no error if undefined
+generateInviteLink(teamId, targetRole, createdById, maxUses?) — returns URL token
+consumeInviteLink(token, userId) — validates active/not-expired/cap, calls addMemberToTeam or setTeamLead
+B5 — API routes (9 routes)
+GET/POST /api/teams, GET /api/teams/[id], POST /api/teams/[id]/members, DELETE /api/teams/[id]/members/[uid], POST /api/teams/[id]/lead, GET/POST /api/groups, POST /api/teams/[id]/invite, GET /api/invite/[token] (public), POST /api/invite/[token]/join
+
+B6 — Leaderboard service extension
+computeTeamRankings() and computeGroupRankings() in leaderboardService.ts; route in getLeaderboard(filter).
+
+B7 — Leaderboard UI
+
+LeaderboardFilters.tsx — add Teams + Groups to FILTER_OPTIONS
+useLeaderboard.ts — route team/group to new API endpoints
+LeaderboardTable.tsx — team/group row variant (shows team name, group name, member count)
+New endpoints: GET /api/leaderboard/teams, GET /api/leaderboard/groups
+B8 — Team page overhaul (page.tsx)
+
+SUPER_ADMIN: Group management + cross-group team management
+ADMIN: Team management for their scope, invite link generation per team (as MEMBER or TEAM_LEAD)
+TEAM_LEAD: Own team panel (member list with stats, personal link generator)
+USER: Own team card (name, rank, members) + personal invite link button
+B9 — Invite public page (page.tsx)
+Server component. Resolves token → shows team name, target role, remaining capacity. Join CTA if authenticated; redirect to /register?invite=[token] if not.
+
+B10 — Registration invite flow
+After successful account creation in authService.ts, check for invite query param → auto-call consumeInviteLink(token, newUserId). Show "team is full" on invite page before registration CTA to prevent confusion.
+
+Track C — Media Upload (3 tasks)
+C1 — MediaUploadField component
+Tabbed: Upload (Ant Design Dragger, disabled with "Cloudinary coming soon" overlay — structure slots for Cloudinary.upload() call) + URL (active text input). Outputs string | null via onChange.
+
+C2 — Replace mediaUrl input in campaign create/edit form with <MediaUploadField>.
+
+C3 — SubmitProofModal screenshot field → <MediaUploadField>; fix ProofCard object-cover + empty URL fallback.
+
+Track D — Avatars (3 tasks)
+D1 — config/avatars.ts
+CURATED_AVATARS: 16 deterministic DiceBear pixel-art URLs (8 masculine / 8 feminine seeds, varied skin/hair, military accessories applied via DiceBear params). AVATAR_BUILDER_CONFIG: style, skinColor, hairColor, accessories (cap/beret/helmet/glasses/none), background swatches.
+
+D2 — AvatarPicker component
+Two tabs: Presets (16-grid, click to select) + Customize (param dropdowns + live preview image). onChange: (url: string) => void.
+
+D3 — Wire up
+Register page (optional avatar step), profile settings page, seed users get assigned curated URLs. All avatar display sites (LeaderboardTable, user profile, Sidebar user block) use profilePicture with initials fallback.
+
+Track E — Donation Overhaul (7 tasks)
+E1 — Types extension
+
+interface BankAccount { id; accountName; accountNumber; bankName; currency: "NGN"|"USD"|"GBP"; isActive; sortOrder }
+
+// Extend Donation:
+proofScreenshotUrl?; verifiedById?; verifiedAt?; notes?; bankAccountId?
+
+// DonationStatus additions:
+RECEIVED = "RECEIVED"   // payment visible, not verified
+VERIFIED = "VERIFIED"   // admin confirmed
+REJECTED = "REJECTED"   // rejected with reason
+
+// Extend Campaign:
+bankAccountIds?: string[]
+
+E2 — config/bankAccounts.ts
+BANK_ACCOUNTS: BankAccount[] — 2–3 accounts (NGN primary, USD secondary). getAccountsForCampaign(campaign) helper: returns campaign-specific accounts if bankAccountIds set, else all active globals.
+
+E3 — Seed update
+bankAccountIds on 2 seed campaigns; seed 3–4 donations with RECEIVED/VERIFIED status.
+
+E4 — DonationForm 3-step rebuild
+Step 1: Amount selection (preset tiles + custom). Step 2: Bank details (cards per account with one-click copy). Step 3: Proof upload (<MediaUploadField>) + notes + submit.
+
+E5 — DonationVerificationPanel
+Table of donations filtered PENDING|RECEIVED. Admin actions: Mark Received → Mark Verified → Reject (with reason input). Inline proof screenshot preview. Gated allowedRoles: [ADMIN, SUPER_ADMIN].
+
+E6 — Donation API updates
+
+POST /api/donations — accept proofScreenshotUrl, bankAccountId, notes
+PATCH /api/donations/[id]/verify — requires ADMIN|SUPER_ADMIN; accepts { action: "receive"|"verify"|"reject", reason? }
+E7 — Mounting
+Mount DonationVerificationPanel in donations page (admin section) + campaign detail admin view.
+
+Track F — Analytics Expansion (7 tasks)
+F1 — Public stats: live computed
+In page.tsx server component, compute: totalLinks, totalClicks, totalUsers, activeCampaigns. Pass to stats bar. Fallback: if value is 0, render aspirational string with faint (est.) label.
+
+F2 — Team/Group analytics in analyticsService.ts
+New functions:
+
+getTeamAnalytics(teamId) — aggregate member points, engagement, referrals, rank
+getGroupAnalytics(groupId) — aggregate team scores, top team, member count
+Cache with analytics:team:[teamId] / analytics:group:[groupId] keys.
+F3 — Donation analytics service (donationService.ts or analyticsService.ts)
+New functions:
+
+getDonationAnalytics(scope: "campaign"|"user", id: string) — returns: total raised, count, status breakdown, timeline (by day/week), top donors (campaign), average amount, currency breakdown
+getPlatformDonationOverview() — aggregate across all campaigns (SUPER_ADMIN-level)
+F4 — New analytics API routes
+
+GET /api/analytics/teams/[id] — requires TEAM_LEAD+
+GET /api/analytics/groups/[id] — requires ADMIN+
+GET /api/analytics/donations/campaigns/[id] — requires ADMIN+ (deep donation breakdown per campaign)
+GET /api/analytics/donations/users/[id] — requires ADMIN+ (user donation history + status breakdown)
+GET /api/analytics/donations/overview — requires SUPER_ADMIN (platform-wide)
+F5 — Analytics config additions (config.ts)
+New KPI_CARDS entries:
+
+teamRank (TEAM_LEAD+) — team's current leaderboard position
+teamMembers (TEAM_LEAD+) — active member count
+donationsRaised (ADMIN+) — total verified donations
+pendingVerification (ADMIN+) — count of RECEIVED/PENDING donations needing action
+New ANALYTICS_SECTIONS entries:
+
+team-performance (TEAM_LEAD+) — team KPIs + member table
+donation-analytics (ADMIN+) — campaign donation breakdown with time-series
+donation-overview (SUPER_ADMIN) — platform-wide donation funnel
+F6 — Analytics page rendering (page.tsx)
+Connect new sections to data. useAnalytics hook needs team/donation endpoints wired in.
+
+F7 — User analytics: donation detail
+In getUserAnalytics(), expand donations summary from { total, count } to { total, count, byStatus, lastDonation, campaigns: [{ id, title, amount }] } — used in user's own analytics view and admin user view.
+
+Track I — User Profile (Admin View) (4 tasks)
+I1 — Types
+
+interface UserProfileView {
+  user: User
+  analytics: UserAnalytics
+  donations: Donation[]
+  participations: CampaignParticipation[]
+  referrals: { given: number; received: number }
+  team?: Team
+  trustScore?: TrustScore
+}
+
+I2 — getUserProfile(userId, actorRole) service
+Aggregates all user data from mockDb tables. Requires ADMIN|SUPER_ADMIN to access any user; users can access their own. ADMIN cannot view other ADMIN/SUPER_ADMIN profiles (privilege boundary).
+
+I3 — API route
+GET /api/users/[id]/profile — requires ADMIN|SUPER_ADMIN; returns UserProfileView.
+
+I4 — User profile page (page.tsx)
+Role-aware, single route. Sections:
+
+Identity block — name, email, role badge, avatar, join date, team + group affiliation, trust score
+KPI strip — total points, rank, links shared, donations, referrals
+Donation history tab — full table with status column, amount, campaign, proof thumbnail (click to expand), admin verify/reject actions inline
+Campaign participation tab — campaigns joined, smart link performance per campaign
+Activity timeline — recent link events, points earned, donations, referrals — chronological feed
+Access: only ADMIN|SUPER_ADMIN; ADMIN cannot view ADMIN/SUPER_ADMIN profiles (same privilege ceiling as role assignment)
+Link from UserManagementPanel[ table rows → ](http://_vscodecontentref_/77)users/[id] (view icon button).
+
+Track J — Campaign Audit Trails (3 tasks)
+J1 — Types + MockDb table
+
+interface CampaignAuditEvent {
+  id; campaignId;
+  actorId; actorRole: UserRole;
+  eventType: CampaignAuditEventType;
+  before?: Partial<Campaign>;
+  after?: Partial<Campaign>;
+  note?: string;
+  createdAt: string;
+}
+
+const enum CampaignAuditEventType {
+  CREATED = "CREATED",
+  STATUS_CHANGED = "STATUS_CHANGED",
+  FIELDS_UPDATED = "FIELDS_UPDATED",
+  PARTICIPANT_JOINED = "PARTICIPANT_JOINED",
+  DONATION_RECEIVED = "DONATION_RECEIVED",
+  GOAL_REACHED = "GOAL_REACHED",
+  ENDED = "ENDED",
+}
+
+Add campaignAuditEvents table to mockDb.ts. Seed 4–5 audit events per seed campaign.
+
+J2 — Audit event emission
+In campaignService.ts, emit CampaignAuditEvent on: create, status change, field update. In donationService.ts, emit DONATION_RECEIVED event (inside existing mockDb.transaction()). In campaignParticipation flow, emit PARTICIPANT_JOINED.
+
+GET /api/campaigns/[id]/audit — requires ADMIN|SUPER_ADMIN — returns paginated audit log.
+
+J3 — CampaignAuditLog component
+Timeline-style Ant Design Timeline component, grouped by day. Each entry shows: actor avatar, event type badge, field diff (before/after for FIELDS_UPDATED), timestamp. Mounted in campaign detail page as admin-only tab/section.
+
+Track G — How It Works / FAQ (1 task)
+G1 — content.ts
+
+Add 2 new HOW_IT_WORKS_STEPS: "Make Your Contribution" (bank details + proof upload flow) + "Submit Your Proof" (screenshot/link)
+Update step count label
+5 new FAQ_ITEMS: donation flow, proof requirements, admin verification timeline, supported currencies, team invite links
+Complete Task Summary
+Track	Tasks	Count
+H — Light Mode	H1, H2	2
+A — Role Guards	A1–A4	4
+B — Teams/Groups/Invites	B1–B10	10
+C — Media Upload	C1–C3	3
+D — Avatars	D1–D3	3
+E — Donation Overhaul	E1–E7	7
+F — Analytics Expansion	F1–F7	7
+I — User Profile Views	I1–I4	4
+J — Campaign Audit Trails	J1–J3	3
+G — Content Updates	G1	1
+Total		44
+Execution Order
+H  →  A                          (fixes first, zero dependencies)
+B1 → B2 → B3                    (types → DB → seed, must be sequential)
+B4 → B5                          (service before routes)
+B6 → B7 → B8                    (leaderboard logic before UI)
+B9 → B10                         (invite page before auth flow)
+C, D  →  parallel-eligible       (no interdependencies)
+E1 → E2 → E3 → E4 → E5 → E6 → E7  (sequential within track)
+F1  →  independent               (public stats, no deps)
+F2 → F3 → F4 → F5 → F6 → F7    (after B completes for team data)
+I1 → I2 → I3 → I4               (sequential)
+J1 → J2 → J3                    (sequential)
+G  →  last (content only)
+Plan is now final. Confirm to begin execution with Track H → A → B.
+
+To-do current state
+on F having completed E and all above
+
+New prompt before making production ready:
+- The Footer on the dashboard pages should have links to public pages (either add to what's there or replace). Also I noticed the year '2026' is hardcoded in config. You should know better than that. It should be dynamically gotten from current year. If you can have it in a way it's done and still in the config, good, if not since it's mainly for the Footer(s) it can be entered directly (i.e. the function/method)
+Consider even using just one footer and just not making it fixed on the dashboard pages
+- some tables seem to have some data clipped when on small screens (I noticed it on leaderboard table). Since I presume all tables use the reusable table component we developed, perhaps we forgot to make it scrollable so that even on small screens the full data is observable. 
+- Also, the action and details div where views, shares, share button and all fall under in the view of a campaign probably needs the flex styling reviewed so on smaller screens it still looks okay
+- Additionally, I hope viewing of teams and groups also shows their stats and member stats since the user and team tables I'm currently seeing (this was from before we implemented the plan) aren't showing user stats like we see in the leaderboard page and there's no user specific section in the analytics
+- Additionally, clicking on a 'user' anywhere whether in table or leaderboard should lead to their user page. if user is self, profile page. Consider either restricting access to view user details by role, or simply restrict viewed content by role
+- When editing campaigns, there's no way to edit the target audience. I find it strange since there's that field in the create campaign page. I would've assumed the same component would be used for both since we have a dynamic approach. IT appears there isn't though so resolve it with a dynamic, universal and mode aware (add or edit) for conditional handling (e.g validation, etc). Additionally, while resolving that, enhance the campaign audience tag options in the campaign modules' config
+- Minor styling consideration, tables, loading skeletons, empty states, tables and divs in view, basically lots of content should be centered properly across the application
+As usual, analyze, audit and then present a plan for us to execute

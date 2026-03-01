@@ -36,7 +36,7 @@ export const NAV_ITEMS: NavItem[] = [
     },
     {
         key: "links",
-        label: "My Smart Links",
+        label: "My Ammunition",
         href: ROUTES.SMART_LINKS,
         icon: "links",
         allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
@@ -53,6 +53,13 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Donations",
         href: ROUTES.DONATIONS,
         icon: "donations",
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "proofs",
+        label: "Proof of Deployment",
+        href: ROUTES.PROOFS,
+        icon: "proofs",
         allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
     {

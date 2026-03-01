@@ -33,3 +33,14 @@ export function formatPercent(value: number, total: number): string {
     if (total === 0) return "0%";
     return `${Math.round((value / total) * 100)}%`;
 }
+
+/**
+ * Returns a human-readable smart link title.
+ * Uses campaignTitle when available; otherwise falls back to "Link · {slug}".
+ */
+export function formatLinkTitle(
+    campaignTitle: string | undefined,
+    slug: string,
+): string {
+    return campaignTitle ?? `Link \u00b7 ${slug}`;
+}

@@ -5,11 +5,15 @@ import { Tooltip, message } from "antd";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { ICONS } from "@/config/icons";
-import { formatRelative, formatNumber } from "@/lib/utils/format";
+import {
+  formatRelative,
+  formatNumber,
+  formatLinkTitle,
+} from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 
 interface SmartLinkCardProps {
-  link: SmartLink;
+  link: SmartLink & { campaignTitle?: string };
   onGenerate?: () => Promise<void>;
   className?: string;
 }
@@ -20,6 +24,7 @@ export default function SmartLinkCard({
   className,
 }: SmartLinkCardProps) {
   const [copied, setCopied] = useState(false);
+  const [shared, setShared] = useState(false);
 
   const baseUrl =
     typeof window !== "undefined"
@@ -27,6 +32,7 @@ export default function SmartLinkCard({
       : (process.env.NEXT_PUBLIC_BASE_URL ?? "");
 
   const fullUrl = `${baseUrl}/c/${link.slug}`;
+  const title = formatLinkTitle(link.campaignTitle, link.slug);
 
   const handleCopy = async () => {
     try {
@@ -37,6 +43,23 @@ export default function SmartLinkCard({
     } catch {
       message.error("Failed to copy");
     }
+  };
+
+  const handleShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({ title, url: fullUrl });
+        setShared(true);
+        setTimeout(() => setShared(false), 2000);
+        return;
+      } catch {
+        /* fall through to clipboard */
+      }
+    }
+    await navigator.clipboard.writeText(fullUrl);
+    setShared(true);
+    message.success("Link copied to clipboard!");
+    setTimeout(() => setShared(false), 2000);
   };
 
   const isExpired = link.expiresAt && new Date(link.expiresAt) < new Date();
@@ -53,7 +76,7 @@ export default function SmartLinkCard({
           <div className="flex items-center gap-2">
             <ICONS.links className="text-ds-brand-accent" />
             <span className="text-sm font-semibold text-ds-text-primary">
-              Your Smart Link
+              {title}
             </span>
           </div>
           <span
@@ -72,11 +95,18 @@ export default function SmartLinkCard({
           <span className="text-sm font-ds-mono text-ds-text-secondary truncate flex-1">
             {fullUrl}
           </span>
-          <Tooltip title={copied ? "Copied!" : "Copy"}>
+          <Tooltip title={copied ? "Copied!" : "Copy link"}>
             <button
               onClick={handleCopy}
               className="text-ds-brand-accent hover:text-ds-brand-accent-hover shrink-0">
               {copied ? <ICONS.success /> : <ICONS.copy />}
+            </button>
+          </Tooltip>
+          <Tooltip title={shared ? "Shared!" : "Share link"}>
+            <button
+              onClick={handleShare}
+              className="text-ds-brand-accent hover:text-ds-brand-accent-hover shrink-0">
+              <ICONS.share />
             </button>
           </Tooltip>
         </div>

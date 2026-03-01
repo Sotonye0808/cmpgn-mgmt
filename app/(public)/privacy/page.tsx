@@ -1,4 +1,5 @@
 import { PRIVACY_PAGE_CONTENT } from "@/config/content";
+import PublicPageHero from "@/components/ui/PublicPageHero";
 
 export const metadata = {
   title: PRIVACY_PAGE_CONTENT.meta.title,
@@ -24,19 +25,12 @@ type PrivacySection = {
 export default function PrivacyPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="max-w-3xl mx-auto px-6 pt-20 pb-10">
-        <p className="text-sm font-semibold text-ds-brand-accent uppercase tracking-wider mb-3">
-          {PRIVACY_PAGE_CONTENT.hero.eyebrow}
-        </p>
-        <h1 className="text-4xl font-extrabold text-ds-text-primary tracking-tight mb-3">
-          {PRIVACY_PAGE_CONTENT.hero.headline}
-        </h1>
-        <p className="text-sm text-ds-text-subtle">
-          {PRIVACY_PAGE_CONTENT.hero.effectiveDate}
-        </p>
-      </section>
-
+      <PublicPageHero
+        eyebrow={PRIVACY_PAGE_CONTENT.hero.eyebrow}
+        headline={PRIVACY_PAGE_CONTENT.hero.headline}
+        subheadline={PRIVACY_PAGE_CONTENT.hero.effectiveDate}
+        align="left"
+      />
       <section className="max-w-3xl mx-auto px-6 pb-20">
         {/* Intro */}
         <p className="text-ds-text-secondary leading-relaxed mb-10 border-b border-ds-border-base pb-8">

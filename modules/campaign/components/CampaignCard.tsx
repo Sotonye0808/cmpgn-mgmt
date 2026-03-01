@@ -2,6 +2,7 @@
 
 import { Tooltip, Progress, Card as AntCard } from "antd";
 import Card from "@/components/ui/Card";
+import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { ICONS } from "@/config/icons";
 import Image from "next/image";
@@ -14,6 +15,10 @@ interface CampaignCardProps {
   campaign: Campaign;
   showStats?: boolean;
   onView?: (campaign: Campaign) => void;
+  onJoin?: (campaign: Campaign) => void;
+  onShare?: (campaign: Campaign) => void;
+  isJoined?: boolean;
+  isJoining?: boolean;
   className?: string;
 }
 
@@ -21,6 +26,10 @@ export default function CampaignCard({
   campaign,
   showStats = true,
   onView,
+  onJoin,
+  onShare,
+  isJoined,
+  isJoining,
   className,
 }: CampaignCardProps) {
   const isExpired = campaign.endDate && new Date(campaign.endDate) < new Date();
@@ -115,7 +124,9 @@ export default function CampaignCard({
             <span className="line-clamp-1 text-ds-text-primary">
               {campaign.title}
             </span>
-            <StatusBadge status={campaign.status as string} />
+            <span className="shrink-0 self-start mt-0.5">
+              <StatusBadge status={campaign.status as string} />
+            </span>
           </div>
         }
         description={
@@ -177,6 +188,45 @@ export default function CampaignCard({
                     {a}
                   </Tag>
                 ))}
+              </div>
+            )}
+
+            {/* Action row — stopPropagation so card click doesn't also fire */}
+            {(onJoin || onView || onShare) && (
+              <div
+                className="flex items-center justify-between gap-2 pt-2 mt-1 border-t border-ds-border-base"
+                onClick={(e) => e.stopPropagation()}>
+                {onView && (
+                  <button
+                    type="button"
+                    onClick={() => onView(campaign)}
+                    className="flex items-center gap-1 text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors">
+                    <ICONS.right className="text-[10px]" />
+                    View Campaign
+                  </button>
+                )}
+                <div className="flex items-center gap-1.5 ml-auto">
+                  {onShare && (
+                    <button
+                      type="button"
+                      onClick={() => onShare(campaign)}
+                      className="flex items-center gap-1 text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
+                      <ICONS.share className="text-xs" />
+                    </button>
+                  )}
+                  {onJoin && campaign.status === ("ACTIVE" as string) && (
+                    <Button
+                      variant={isJoined ? "ghost" : "primary"}
+                      size="small"
+                      icon={isJoined ? <ICONS.check /> : <ICONS.rocket />}
+                      onClick={() => { if (!isJoined && !isJoining) onJoin(campaign); }}
+                      disabled={isJoined || isJoining}
+                      loading={isJoining}
+                      className="!py-0 !h-7 !text-xs !leading-none shrink-0">
+                      {isJoined ? "Joined" : "Join"}
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
           </div>

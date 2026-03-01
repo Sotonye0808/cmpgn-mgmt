@@ -64,6 +64,7 @@ export function seedMockDb() {
             profilePicture: "https://picsum.photos/seed/user1/100/100",
             trustScore: 87,
             isActive: true,
+            weaponsOfChoice: ["FACEBOOK", "WHATSAPP", "INSTAGRAM"] as unknown as SocialPlatform[],
             createdAt: d(-45),
             updatedAt: d(-4),
         },
@@ -77,6 +78,7 @@ export function seedMockDb() {
             profilePicture: "https://picsum.photos/seed/user2/100/100",
             trustScore: 72,
             isActive: true,
+            weaponsOfChoice: ["TWITTER_X", "TIKTOK"] as unknown as SocialPlatform[],
             createdAt: d(-40),
             updatedAt: d(-5),
         },
@@ -291,6 +293,94 @@ export function seedMockDb() {
             participantCount: 2891,
             createdAt: d(-125),
             updatedAt: d(-90),
+        },
+        // ─── Mega Campaign ──────────────────────────────────────────────────────
+        {
+            id: "camp-mega-1",
+            title: "Operation Harvest 2026",
+            description: "The flagship mega mission combining outreach, giving, and digital mobilization into one unified operation.",
+            content: "Operation Harvest 2026 is the year's biggest campaign. Multiple sub-missions feed into this mega operation. All donations, recruits, and engagement roll up to the parent.",
+            media: [],
+            mediaType: "IMAGE" as unknown as CampaignMediaType,
+            mediaUrl: "https://picsum.photos/seed/mega1/800/400",
+            thumbnailUrl: "https://picsum.photos/seed/mega1/400/200",
+            ctaText: "Join the Operation",
+            ctaUrl: "https://harvesters.org/harvest2026",
+            createdById: "user-super-1",
+            status: "ACTIVE" as unknown as CampaignStatus,
+            goalType: "PARTICIPANTS" as unknown as GoalType,
+            goalTarget: 25000,
+            goalCurrent: 5230,
+            startDate: d(-30),
+            endDate: d(90),
+            targetAudience: ["All Members"],
+            publishedAt: d(-30),
+            viewCount: 32000,
+            clickCount: 18500,
+            shareCount: 7200,
+            likeCount: 9100,
+            participantCount: 5230,
+            isMegaCampaign: true,
+            createdAt: d(-35),
+            updatedAt: d(-1),
+        },
+        {
+            id: "camp-sub-1",
+            title: "Operation Harvest — Digital Blitz",
+            description: "The digital outreach arm of Operation Harvest 2026. Deploy ammunition across every platform.",
+            content: "Share the harvest message digitally. Use your ammunition on every platform you have access to.",
+            media: [],
+            mediaType: "IMAGE" as unknown as CampaignMediaType,
+            mediaUrl: "https://picsum.photos/seed/sub1/800/400",
+            thumbnailUrl: "https://picsum.photos/seed/sub1/400/200",
+            ctaText: "Deploy Now",
+            ctaUrl: "https://harvesters.org/harvest2026/digital",
+            createdById: "user-admin-1",
+            status: "ACTIVE" as unknown as CampaignStatus,
+            goalType: "SHARES" as unknown as GoalType,
+            goalTarget: 10000,
+            goalCurrent: 3100,
+            startDate: d(-25),
+            endDate: d(90),
+            targetAudience: ["Youth", "Young Adults", "All Members"],
+            publishedAt: d(-25),
+            viewCount: 14200,
+            clickCount: 8300,
+            shareCount: 3100,
+            likeCount: 4200,
+            participantCount: 2100,
+            parentCampaignId: "camp-mega-1",
+            createdAt: d(-27),
+            updatedAt: d(-1),
+        },
+        {
+            id: "camp-sub-2",
+            title: "Operation Harvest — Giving Initiative",
+            description: "The fundraising arm of Operation Harvest 2026. Every donation fuels the mission.",
+            content: "Support the harvest with your giving. All donations go directly to community outreach projects.",
+            media: [],
+            mediaType: "IMAGE" as unknown as CampaignMediaType,
+            mediaUrl: "https://picsum.photos/seed/sub2/800/400",
+            thumbnailUrl: "https://picsum.photos/seed/sub2/400/200",
+            ctaText: "Give Now",
+            ctaUrl: "https://harvesters.org/harvest2026/give",
+            createdById: "user-admin-1",
+            status: "ACTIVE" as unknown as CampaignStatus,
+            goalType: "DONATIONS" as unknown as GoalType,
+            goalTarget: 1000000,
+            goalCurrent: 342500,
+            startDate: d(-20),
+            endDate: d(90),
+            targetAudience: ["All Members", "Donors"],
+            publishedAt: d(-20),
+            viewCount: 9800,
+            clickCount: 5400,
+            shareCount: 2100,
+            likeCount: 3100,
+            participantCount: 1540,
+            parentCampaignId: "camp-mega-1",
+            createdAt: d(-22),
+            updatedAt: d(-2),
         },
     ];
 
@@ -546,6 +636,58 @@ export function seedMockDb() {
         updatedAt: d(-1),
     }));
 
+    // ─── View Proofs (Proof of Deployment) ───────────────────────────────────────
+    const viewProofs: ViewProof[] = [
+        {
+            id: "proof-1",
+            userId: "user-1",
+            campaignId: "camp-1",
+            smartLinkId: "link-1-1",
+            platform: "FACEBOOK" as unknown as SocialPlatform,
+            screenshotUrl: "https://picsum.photos/seed/proof1/400/700",
+            status: "APPROVED" as unknown as ViewProofStatus,
+            reviewedById: "user-admin-1",
+            reviewedAt: d(-3),
+            createdAt: d(-5),
+            updatedAt: d(-3),
+        },
+        {
+            id: "proof-2",
+            userId: "user-1",
+            campaignId: "camp-1",
+            smartLinkId: "link-1-1",
+            platform: "WHATSAPP" as unknown as SocialPlatform,
+            screenshotUrl: "https://picsum.photos/seed/proof2/400/700",
+            status: "PENDING" as unknown as ViewProofStatus,
+            createdAt: d(-2),
+            updatedAt: d(-2),
+        },
+        {
+            id: "proof-3",
+            userId: "user-2",
+            campaignId: "camp-1",
+            smartLinkId: "link-2-1",
+            platform: "TWITTER_X" as unknown as SocialPlatform,
+            screenshotUrl: "https://picsum.photos/seed/proof3/400/700",
+            status: "APPROVED" as unknown as ViewProofStatus,
+            reviewedById: "user-admin-1",
+            reviewedAt: d(-1),
+            createdAt: d(-4),
+            updatedAt: d(-1),
+        },
+        {
+            id: "proof-4",
+            userId: "user-lead-1",
+            campaignId: "camp-mega-1",
+            smartLinkId: "link-lead-1",
+            platform: "INSTAGRAM" as unknown as SocialPlatform,
+            screenshotUrl: "https://picsum.photos/seed/proof4/400/700",
+            status: "PENDING" as unknown as ViewProofStatus,
+            createdAt: d(-1),
+            updatedAt: d(-1),
+        },
+    ];
+
     // ─── Notifications ───────────────────────────────────────────────────────────
     const notifications: AppNotification[] = [
         {
@@ -629,6 +771,157 @@ export function seedMockDb() {
         },
     ];
 
+    // ─── Groups & Teams ────────────────────────────────────────────────────────
+
+    const groups: Group[] = [
+        {
+            id: "group-1",
+            name: "Alpha Division",
+            description: "Primary digital mobilization division — highest performing teams.",
+            teamIds: ["team-1", "team-2"],
+            maxTeams: 4,
+            createdAt: d(-55),
+            updatedAt: d(-1),
+        },
+        {
+            id: "group-2",
+            name: "Omega Division",
+            description: "Second wave mobilization force — social media specialists.",
+            teamIds: ["team-3", "team-4"],
+            maxTeams: 4,
+            createdAt: d(-50),
+            updatedAt: d(-2),
+        },
+    ];
+
+    const teams: Team[] = [
+        {
+            id: "team-1",
+            name: "WhatsApp Warriors",
+            groupId: "group-1",
+            teamLeadId: "user-lead-1",
+            memberIds: ["user-lead-1", "user-1", "user-2"],
+            maxMembers: 10,
+            createdAt: d(-50),
+            updatedAt: d(-1),
+        },
+        {
+            id: "team-2",
+            name: "Instagram Squad",
+            groupId: "group-1",
+            teamLeadId: undefined, // intentionally no lead
+            memberIds: [],
+            maxMembers: 10,
+            createdAt: d(-45),
+            updatedAt: d(-3),
+        },
+        {
+            id: "team-3",
+            name: "TikTok Vanguard",
+            groupId: "group-2",
+            teamLeadId: undefined,
+            memberIds: [],
+            maxMembers: 10,
+            createdAt: d(-40),
+            updatedAt: d(-2),
+        },
+        {
+            id: "team-4",
+            name: "Twitter Blitz",
+            groupId: "group-2",
+            teamLeadId: undefined,
+            memberIds: [],
+            maxMembers: 10,
+            createdAt: d(-35),
+            updatedAt: d(-1),
+        },
+    ];
+
+    // Assign teamId to users that belong to teams
+    for (const user of users) {
+        if (user.id === "user-lead-1" || user.id === "user-1" || user.id === "user-2") {
+            user.teamId = "team-1";
+        }
+    }
+
+    const teamInviteLinks: TeamInviteLink[] = [
+        {
+            id: "invite-1",
+            token: "alpha-warriors-join",
+            teamId: "team-1",
+            targetRole: "MEMBER",
+            createdById: "user-lead-1",
+            usedCount: 0,
+            maxUses: 7, // 10 max - 3 current members = 7 slots
+            isActive: true,
+            createdAt: d(-10),
+        },
+        {
+            id: "invite-2",
+            token: "insta-squad-lead",
+            teamId: "team-2",
+            targetRole: "TEAM_LEAD",
+            createdById: "user-admin-1",
+            usedCount: 0,
+            maxUses: 1,
+            isActive: true,
+            createdAt: d(-8),
+        },
+    ];
+
+    // ─── Campaign Audit Events ───────────────────────────────────────────────────
+
+    const campaignAuditEvents: CampaignAuditEvent[] = [
+        {
+            id: "audit-1",
+            campaignId: "camp-1",
+            actorId: "user-admin-1",
+            actorRole: "ADMIN",
+            eventType: "CREATED" as unknown as CampaignAuditEventType,
+            after: { title: "Easter Harvest Drive 2026", status: "DRAFT" },
+            createdAt: d(-12),
+        },
+        {
+            id: "audit-2",
+            campaignId: "camp-1",
+            actorId: "user-admin-1",
+            actorRole: "ADMIN",
+            eventType: "STATUS_CHANGED" as unknown as CampaignAuditEventType,
+            before: { status: "DRAFT" },
+            after: { status: "ACTIVE" },
+            note: "Campaign launched for Easter",
+            createdAt: d(-10),
+        },
+        {
+            id: "audit-3",
+            campaignId: "camp-1",
+            actorId: "user-1",
+            actorRole: "USER",
+            eventType: "PARTICIPANT_JOINED" as unknown as CampaignAuditEventType,
+            note: "Adaeze Okafor joined the campaign",
+            createdAt: d(-9),
+        },
+        {
+            id: "audit-4",
+            campaignId: "camp-1",
+            actorId: "user-2",
+            actorRole: "USER",
+            eventType: "DONATION_RECEIVED" as unknown as CampaignAuditEventType,
+            after: { amount: 5000, currency: "NGN" },
+            note: "Tunde Babatunde donated ₦5,000",
+            createdAt: d(-7),
+        },
+        {
+            id: "audit-5",
+            campaignId: "camp-2",
+            actorId: "user-admin-1",
+            actorRole: "ADMIN",
+            eventType: "CREATED" as unknown as CampaignAuditEventType,
+            after: { title: "Digital Outreach January", status: "DRAFT" },
+            createdAt: d(-55),
+        },
+    ];
+
     return {
         users,
         campaigns,
@@ -641,5 +934,10 @@ export function seedMockDb() {
         leaderboardSnapshots,
         trustScores,
         notifications,
+        viewProofs,
+        groups,
+        teams,
+        teamInviteLinks,
+        campaignAuditEvents,
     };
 }

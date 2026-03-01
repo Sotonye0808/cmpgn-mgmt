@@ -52,6 +52,9 @@ declare global {
         COMPLETED = "COMPLETED",
         FAILED = "FAILED",
         REFUNDED = "REFUNDED",
+        RECEIVED = "RECEIVED",
+        VERIFIED = "VERIFIED",
+        REJECTED = "REJECTED",
     }
 
     const enum TrustFlag {
@@ -59,6 +62,32 @@ declare global {
         ABNORMAL_CLICKS = "ABNORMAL_CLICKS",
         SUSPICIOUS_DEVICE = "SUSPICIOUS_DEVICE",
         RATE_LIMITED = "RATE_LIMITED",
+    }
+
+    const enum SocialPlatform {
+        FACEBOOK = "FACEBOOK",
+        INSTAGRAM = "INSTAGRAM",
+        TWITTER_X = "TWITTER_X",
+        TIKTOK = "TIKTOK",
+        YOUTUBE = "YOUTUBE",
+        WHATSAPP = "WHATSAPP",
+        SNAPCHAT = "SNAPCHAT",
+    }
+
+    const enum ViewProofStatus {
+        PENDING = "PENDING",
+        APPROVED = "APPROVED",
+        REJECTED = "REJECTED",
+    }
+
+    const enum CampaignAuditEventType {
+        CREATED = "CREATED",
+        STATUS_CHANGED = "STATUS_CHANGED",
+        FIELDS_UPDATED = "FIELDS_UPDATED",
+        PARTICIPANT_JOINED = "PARTICIPANT_JOINED",
+        DONATION_RECEIVED = "DONATION_RECEIVED",
+        GOAL_REACHED = "GOAL_REACHED",
+        ENDED = "ENDED",
     }
 
     // ─── Core Entities ───────────────────────────────────────────────────────────
@@ -71,8 +100,10 @@ declare global {
         lastName: string;
         role: UserRole;
         profilePicture?: string;
+        teamId?: string;
         trustScore: number;
         isActive: boolean;
+        weaponsOfChoice?: SocialPlatform[];
         createdAt: string;
         updatedAt: string;
     }
@@ -123,6 +154,11 @@ declare global {
         shareCount: number;
         likeCount?: number;
         participantCount?: number;
+        // Mega campaign support
+        isMegaCampaign?: boolean;
+        parentCampaignId?: string;
+        // Donation config
+        bankAccountIds?: string[];
         createdAt: string;
         updatedAt: string;
     }
@@ -185,6 +221,11 @@ declare global {
         currency: string;
         status: DonationStatus;
         reference: string;
+        bankAccountId?: string;
+        proofScreenshotUrl?: string;
+        verifiedById?: string;
+        verifiedAt?: string;
+        notes?: string;
         createdAt: string;
         updatedAt: string;
     }
@@ -229,6 +270,23 @@ declare global {
         updatedAt: string;
     }
 
+    // ─── View Proofs (Proof of Deployment) ───────────────────────────────────────
+
+    interface ViewProof {
+        id: string;
+        userId: string;
+        campaignId: string;
+        smartLinkId: string;
+        platform: SocialPlatform;
+        screenshotUrl: string;
+        status: ViewProofStatus;
+        reviewedById?: string;
+        reviewedAt?: string;
+        notes?: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+
     // ─── Input Types ─────────────────────────────────────────────────────────────
 
     interface CreateCampaignInput {
@@ -250,6 +308,8 @@ declare global {
         metaDescription?: string;
         metaImage?: string;
         publishImmediately?: boolean;
+        isMegaCampaign?: boolean;
+        parentCampaignId?: string;
     }
 
     interface UpdateCampaignInput {
@@ -271,6 +331,8 @@ declare global {
         metaDescription?: string;
         metaImage?: string;
         status?: CampaignStatus;
+        isMegaCampaign?: boolean;
+        parentCampaignId?: string;
     }
 
     interface RegisterInput {
@@ -283,6 +345,17 @@ declare global {
     interface LoginInput {
         email: string;
         password: string;
+    }
+
+    interface CreateViewProofInput {
+        campaignId: string;
+        smartLinkId: string;
+        platform: SocialPlatform;
+        screenshotUrl: string;
+    }
+
+    interface UpdateWeaponsOfChoiceInput {
+        weaponsOfChoice: SocialPlatform[];
     }
 
     // ─── Filters & Pagination ────────────────────────────────────────────────────
@@ -368,7 +441,7 @@ declare global {
         campaignId?: string;
     }
 
-    type LeaderboardFilter = "individual" | "global";
+    type LeaderboardFilter = "individual" | "global" | "team" | "group";
 
     interface UserRankInfo {
         position: number;
@@ -481,5 +554,118 @@ declare global {
         isRead: boolean;
         link?: string;
         createdAt: string;
+    }
+
+    // ─── Teams & Groups ──────────────────────────────────────────────────────────
+
+    interface Group {
+        id: string;
+        name: string;
+        description?: string;
+        teamIds: string[];
+        maxTeams: number;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    interface Team {
+        id: string;
+        name: string;
+        groupId: string;
+        teamLeadId?: string;
+        memberIds: string[];
+        maxMembers: number;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    interface TeamInviteLink {
+        id: string;
+        token: string;
+        teamId: string;
+        targetRole: "MEMBER" | "TEAM_LEAD";
+        createdById: string;
+        usedCount: number;
+        maxUses: number;
+        expiresAt?: string;
+        isActive: boolean;
+        createdAt: string;
+    }
+
+    interface TeamLeaderboardEntry {
+        teamId: string;
+        teamName: string;
+        groupName: string;
+        memberCount: number;
+        score: number;
+        rank: number;
+    }
+
+    interface GroupLeaderboardEntry {
+        groupId: string;
+        groupName: string;
+        teamCount: number;
+        memberCount: number;
+        score: number;
+        rank: number;
+    }
+
+    // ─── Bank Accounts ───────────────────────────────────────────────────────────
+
+    interface BankAccount {
+        id: string;
+        accountName: string;
+        accountNumber: string;
+        bankName: string;
+        currency: "NGN" | "USD" | "GBP";
+        isActive: boolean;
+        sortOrder: number;
+    }
+
+    // ─── Campaign Audit ──────────────────────────────────────────────────────────
+
+    interface CampaignAuditEvent {
+        id: string;
+        campaignId: string;
+        actorId: string;
+        actorRole: string;
+        eventType: CampaignAuditEventType;
+        before?: Record<string, unknown>;
+        after?: Record<string, unknown>;
+        note?: string;
+        createdAt: string;
+    }
+
+    // ─── User Profile (Admin View) ──────────────────────────────────────────────
+
+    interface UserProfileView {
+        user: User;
+        analytics: UserAnalytics;
+        donations: Donation[];
+        participations: CampaignParticipation[];
+        referrals: { given: number; received: number };
+        team?: Team;
+        group?: Group;
+        trustScore?: TrustScore;
+    }
+
+    // ─── Donation Analytics ──────────────────────────────────────────────────────
+
+    interface DonationAnalytics {
+        totalRaised: number;
+        totalCount: number;
+        byStatus: Record<string, { count: number; amount: number }>;
+        timeline: { date: string; amount: number; count: number }[];
+        topDonors: { userId: string; firstName: string; lastName: string; total: number }[];
+        averageAmount: number;
+        byCurrency: Record<string, { count: number; amount: number }>;
+    }
+
+    // ─── Extended Donation Input ─────────────────────────────────────────────────
+
+    interface CreateDonationInputExtended extends CreateDonationInput {
+        bankAccountId?: string;
+        proofScreenshotUrl?: string;
+        notes?: string;
     }
 }

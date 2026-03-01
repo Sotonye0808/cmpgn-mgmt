@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Spin, message, Descriptions, Tag } from "antd";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
@@ -11,6 +11,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/config/routes";
 import { formatDate } from "@/lib/utils/format";
 import Card from "@/components/ui/Card";
+import SubmitProofModal from "@/modules/proofs/components/SubmitProofModal";
 
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -19,6 +20,20 @@ export default function CampaignDetailPage() {
   const { campaign, loading, error, refetch } = useCampaign(id);
   const [joined, setJoined] = useState(false);
   const [joining, setJoining] = useState(false);
+  const [submitProofOpen, setSubmitProofOpen] = useState(false);
+
+  // Initialise `joined` from persisted participations once user is known
+  useEffect(() => {
+    if (!user || !id) return;
+    fetch(ROUTES.API.CAMPAIGNS.JOINED)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json?.data?.campaignIds && Array.isArray(json.data.campaignIds)) {
+          if ((json.data.campaignIds as string[]).includes(id)) setJoined(true);
+        }
+      })
+      .catch(() => { /* silent */ });
+  }, [user, id]);
 
   const handleJoin = async () => {
     if (!user || joined) return;
@@ -30,8 +45,35 @@ export default function CampaignDetailPage() {
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to join");
       setJoined(true);
-      message.success("Joined campaign!");
       refetch();
+
+      // Generate smart link and copy to clipboard; stay on page
+      let copiedLink = false;
+      try {
+        const linkRes = await fetch("/api/smart-links", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ campaignId: id }),
+        });
+        if (linkRes.ok) {
+          const linkJson = await linkRes.json();
+          const slug = linkJson.data?.slug;
+          if (slug) {
+            await navigator.clipboard.writeText(
+              `${window.location.origin}/c/${slug}`,
+            );
+            copiedLink = true;
+          }
+        }
+      } catch {
+        /* silent */
+      }
+
+      message.success(
+        copiedLink
+          ? "Joined! Your tracking link has been copied to clipboard."
+          : "Successfully joined campaign!",
+      );
     } catch (e: unknown) {
       message.error(e instanceof Error ? e.message : "Failed to join");
     } finally {
@@ -40,18 +82,34 @@ export default function CampaignDetailPage() {
   };
 
   const handleShare = async () => {
-    const url = window.location.href;
+    // Get/create the user’s tracking link for this campaign first
+    let trackingUrl = window.location.href;
+    try {
+      const linkRes = await fetch("/api/smart-links", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ campaignId: id }),
+      });
+      if (linkRes.ok) {
+        const linkJson = await linkRes.json();
+        const slug = linkJson.data?.slug;
+        if (slug) trackingUrl = `${window.location.origin}/c/${slug}`;
+      }
+    } catch {
+      /* fall through to plain URL */
+    }
+
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: campaign?.title, url });
+        await navigator.share({ title: campaign?.title, url: trackingUrl });
         return;
       } catch {
         /* fall through */
       }
     }
     navigator.clipboard
-      .writeText(url)
-      .then(() => message.success("Link copied!"));
+      .writeText(trackingUrl)
+      .then(() => message.success("Tracking link copied!"));
   };
 
   if (loading)
@@ -96,6 +154,18 @@ export default function CampaignDetailPage() {
         </div>
       )}
 
+      {/* Submit Proof — available to all users on active campaigns */}
+      {isActive && (
+        <div className="flex items-center gap-3">
+          <Button
+            variant="primary"
+            icon={<ICONS.camera />}
+            onClick={() => setSubmitProofOpen(true)}>
+            Submit Proof of Deployment
+          </Button>
+        </div>
+      )}
+
       {/* Details Card */}
       <Card>
         <Descriptions
@@ -134,6 +204,12 @@ export default function CampaignDetailPage() {
           )}
         </Descriptions>
       </Card>
+
+      <SubmitProofModal
+        open={submitProofOpen}
+        onClose={() => setSubmitProofOpen(false)}
+        initialCampaignId={id}
+      />
     </div>
   );
 }

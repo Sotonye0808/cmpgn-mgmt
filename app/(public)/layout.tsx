@@ -1,4 +1,3 @@
-import { LANDING_CONTENT } from "@/config/content";
 import { NAV_CONTENT } from "@/config/content";
 import Link from "next/link";
 import { ROUTES } from "@/config/routes";
@@ -34,16 +33,19 @@ export default function PublicLayout({
 
           <div className="flex items-center gap-3">
             <Link
+              href={ROUTES.HOW_IT_WORKS}
+              className="text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
+              How It Works
+            </Link>
+            <Link
               href={ROUTES.LOGIN}
               className="text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
-              {LANDING_CONTENT.hero.cta === "Get Started"
-                ? "Sign In"
-                : "Sign In"}
+              Sign In
             </Link>
             <Link
               href={ROUTES.REGISTER}
               className="px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
-              Get Started
+              Enlist Now
             </Link>
           </div>
         </div>

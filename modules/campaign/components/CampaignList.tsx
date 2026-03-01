@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Row, Col, Pagination, Segmented, Empty, message } from "antd";
 import { ICONS } from "@/config/icons";
 import Spinner from "@/components/ui/Spinner";
@@ -37,6 +37,19 @@ export default function CampaignList({
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
   const [joiningId, setJoiningId] = useState<string | null>(null);
 
+  // Seed joinedIds from server on mount (persisted participations)
+  useEffect(() => {
+    if (!user) return;
+    fetch(ROUTES.API.CAMPAIGNS.JOINED)
+      .then((r) => r.json())
+      .then((json) => {
+        if (json?.data?.campaignIds && Array.isArray(json.data.campaignIds)) {
+          setJoinedIds(new Set<string>(json.data.campaignIds));
+        }
+      })
+      .catch(() => { /* silent — fall through to empty */ });
+  }, [user]);
+
   const { campaigns, pagination, loading, error, refetch } = useCampaigns({
     filters,
     page,
@@ -71,7 +84,34 @@ export default function CampaignList({
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to join");
       setJoinedIds((prev) => new Set(prev).add(campaign.id));
-      message.success(`Joined "${campaign.title}"!`);
+
+      // Generate smart link and copy to clipboard
+      let copiedLink = false;
+      try {
+        const linkRes = await fetch(ROUTES.API.SMART_LINKS.BASE, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ campaignId: campaign.id }),
+        });
+        if (linkRes.ok) {
+          const linkJson = await linkRes.json();
+          const slug = linkJson.data?.slug;
+          if (slug) {
+            await navigator.clipboard.writeText(
+              `${window.location.origin}/c/${slug}`,
+            );
+            copiedLink = true;
+          }
+        }
+      } catch {
+        /* silent — clipboard failure shouldn't block join */
+      }
+
+      message.success(
+        copiedLink
+          ? `Joined "${campaign.title}"! Tracking link copied.`
+          : `Joined "${campaign.title}"!`,
+      );
     } catch (e: unknown) {
       message.error(
         e instanceof Error ? e.message : "Could not join campaign.",
@@ -82,18 +122,34 @@ export default function CampaignList({
   };
 
   const handleShare = async (campaign: Campaign) => {
-    const url = `${window.location.origin}${ROUTES.CAMPAIGN_DETAIL(campaign.id)}`;
+    // Always resolve to user's smart link first; fall back to plain campaign URL
+    let shareUrl = `${window.location.origin}${ROUTES.CAMPAIGN_DETAIL(campaign.id)}`;
+    try {
+      const linkRes = await fetch(ROUTES.API.SMART_LINKS.BASE, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ campaignId: campaign.id }),
+      });
+      if (linkRes.ok) {
+        const linkJson = await linkRes.json();
+        const slug = linkJson.data?.slug;
+        if (slug) shareUrl = `${window.location.origin}/c/${slug}`;
+      }
+    } catch {
+      /* fall through to plain URL */
+    }
+
     if (typeof navigator !== "undefined" && navigator.share) {
       try {
-        await navigator.share({ title: campaign.title, url });
+        await navigator.share({ title: campaign.title, url: shareUrl });
         return;
       } catch {
         // fell through to clipboard fallback
       }
     }
     try {
-      await navigator.clipboard.writeText(url);
-      message.success("Campaign link copied to clipboard!");
+      await navigator.clipboard.writeText(shareUrl);
+      message.success("Tracking link copied to clipboard!");
     } catch {
       message.error("Could not copy link.");
     }
@@ -166,7 +222,14 @@ export default function CampaignList({
         <Row gutter={[16, 16]}>
           {campaigns.map((campaign) => (
             <Col key={campaign.id} xs={24} sm={12} lg={8}>
-              <CampaignCard campaign={campaign} onView={navigateToCampaign} />
+              <CampaignCard
+                campaign={campaign}
+                onView={navigateToCampaign}
+                onJoin={handleJoin}
+                onShare={handleShare}
+                isJoined={joinedIds.has(campaign.id)}
+                isJoining={joiningId === campaign.id}
+              />
             </Col>
           ))}
         </Row>

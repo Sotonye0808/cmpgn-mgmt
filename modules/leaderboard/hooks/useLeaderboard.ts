@@ -8,6 +8,8 @@ interface UseLeaderboardOptions {
     filter?: LeaderboardFilter;
     page?: number;
     pageSize?: number;
+    /** Number of days to look back. 0 = all time. */
+    days?: number;
 }
 
 interface UseLeaderboardReturn {
@@ -24,6 +26,7 @@ export function useLeaderboard({
     filter = "individual",
     page = 1,
     pageSize = 20,
+    days,
 }: UseLeaderboardOptions = {}): UseLeaderboardReturn {
     const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
     const [myRank, setMyRank] = useState<UserRankInfo | null>(null);
@@ -37,14 +40,21 @@ export function useLeaderboard({
         try {
             const qs = new URLSearchParams({ filter, page: String(page), pageSize: String(pageSize) });
             if (campaignId) qs.set("campaignId", campaignId);
+            if (days !== undefined) qs.set("days", String(days));
 
             // When filter is "individual" and no campaignId is provided, fall back to global.
             // Calling /api/leaderboard/campaigns/global would result in zero results (no campaign
             // with id "global" exists). Campaign-scoped individual rankings are driven by J2.
-            const listUrl =
-                filter === "global" || !campaignId
-                    ? `/api/leaderboard/global?${qs}`
-                    : `/api/leaderboard/campaigns/${campaignId}?${qs}`;
+            let listUrl: string;
+            if (filter === "team") {
+                listUrl = `/api/leaderboard/team?${qs}`;
+            } else if (filter === "group") {
+                listUrl = `/api/leaderboard/group?${qs}`;
+            } else if (filter === "global" || !campaignId) {
+                listUrl = `/api/leaderboard/global?${qs}`;
+            } else {
+                listUrl = `/api/leaderboard/campaigns/${campaignId}?${qs}`;
+            }
 
             const [listRes, myRankRes] = await Promise.all([
                 window.fetch(listUrl),
@@ -65,7 +75,7 @@ export function useLeaderboard({
         } finally {
             setLoading(false);
         }
-    }, [campaignId, filter, page, pageSize]);
+    }, [campaignId, filter, page, pageSize, days]);
 
     useEffect(() => { fetch(); }, [fetch]);
     useMockDbSubscription("leaderboardSnapshots", fetch);

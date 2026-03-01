@@ -65,7 +65,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
         const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });
         const refreshToken = signRefreshToken({ sub: user.id, email: user.email, role: user.role as string });
-        await setAuthCookies(accessToken, refreshToken);
+        await setAuthCookies(accessToken, refreshToken, true); // new signups stay logged in
 
         return successResponse(authUser, 201);
     } catch (error) {

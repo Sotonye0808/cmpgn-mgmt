@@ -44,14 +44,38 @@ export async function listUsers(
     }));
 }
 
+// ─── Role Guard Constants ─────────────────────────────────────────────────────
+
+const PROTECTED_ROLES: string[] = ["ADMIN", "SUPER_ADMIN"];
+const ADMIN_ASSIGNABLE_ROLES: string[] = ["USER", "TEAM_LEAD"];
+
 // ─── Change User Role ─────────────────────────────────────────────────────────
 
 export async function changeUserRole(
     userId: string,
-    newRole: string
+    newRole: string,
+    actorId?: string,
+    actorRole?: string
 ): Promise<UserListItem> {
     const user = mockDb.users.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
+
+    // Privilege ceiling: only SUPER_ADMIN can modify ADMIN/SUPER_ADMIN users
+    // or assign ADMIN/SUPER_ADMIN roles
+    if (actorRole && actorRole !== "SUPER_ADMIN") {
+        const targetCurrentRole = user.role as unknown as string;
+        if (PROTECTED_ROLES.includes(targetCurrentRole)) {
+            throw new Error("Insufficient permissions to modify this user's role");
+        }
+        if (!ADMIN_ASSIGNABLE_ROLES.includes(newRole)) {
+            throw new Error("Insufficient permissions to assign this role");
+        }
+    }
+
+    // Prevent self-demotion for SUPER_ADMIN
+    if (actorId === userId && actorRole === "SUPER_ADMIN" && newRole !== "SUPER_ADMIN") {
+        throw new Error("Cannot demote your own SUPER_ADMIN role");
+    }
 
     const updated = mockDb.users.update({
         where: { id: userId },

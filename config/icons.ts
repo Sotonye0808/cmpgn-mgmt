@@ -53,6 +53,16 @@ import {
     CheckCircleOutlined,
     SunOutlined,
     MoonOutlined,
+    FacebookOutlined,
+    InstagramOutlined,
+    TwitterOutlined,
+    YoutubeOutlined,
+    WhatsAppOutlined,
+    CameraOutlined,
+    VideoCameraOutlined,
+    PictureOutlined,
+    CrownOutlined,
+    AimOutlined,
 } from "@ant-design/icons";
 
 export const ICONS = {
@@ -67,6 +77,7 @@ export const ICONS = {
     users: UserOutlined,
     settings: SettingOutlined,
     trust: SafetyOutlined,
+    proofs: FileImageOutlined,
 
     // Actions
     add: PlusOutlined,
@@ -121,6 +132,7 @@ export const ICONS = {
     // Org
     department: ApartmentOutlined,
     campus: BankOutlined,
+    bank: BankOutlined,
 
     // Aliases
     trend: ArrowUpOutlined,
@@ -130,6 +142,21 @@ export const ICONS = {
     // Theme
     sun: SunOutlined,
     moon: MoonOutlined,
+
+    // Social Platforms (Weapons of Choice)
+    facebook: FacebookOutlined,
+    instagram: InstagramOutlined,
+    twitterX: TwitterOutlined,
+    youtube: YoutubeOutlined,
+    whatsapp: WhatsAppOutlined,
+    tiktok: VideoCameraOutlined, // AntD has no TikTok icon — using VideoCameraOutlined
+    snapchat: CameraOutlined,    // AntD has no Snapchat icon — using CameraOutlined
+
+    // Additional
+    camera: CameraOutlined,
+    picture: PictureOutlined,
+    crown: CrownOutlined,
+    aim: AimOutlined,
 } as const;
 
 export type IconKey = keyof typeof ICONS;

@@ -9,6 +9,7 @@ import { ICONS } from "@/config/icons";
 import {
   CAMPAIGN_GOAL_OPTIONS,
   CAMPAIGN_MEDIA_OPTIONS,
+  CAMPAIGN_AUDIENCE_TAGS
 } from "@/modules/campaign/config";
 import { CAMPAIGN_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
@@ -142,7 +143,7 @@ export default function NewCampaignPage() {
           </div>
 
           <Form.Item label="Target Audience" name="targetAudience">
-            <Select mode="tags" placeholder="Add audience tags..." />
+            <Select mode="tags" placeholder="Add audience tags..." options={[...CAMPAIGN_AUDIENCE_TAGS]} />
           </Form.Item>
 
           <div className="flex items-center justify-end gap-3 pt-2">

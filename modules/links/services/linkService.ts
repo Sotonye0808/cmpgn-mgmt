@@ -3,6 +3,9 @@ import { mockCache } from "@/lib/data/mockCache";
 import { generateSlug } from "@/lib/utils/slug";
 import { CACHE_TTL_CAMPAIGN_LIST as CACHE_TTL_SHORT } from "@/lib/constants";
 
+// View model: SmartLink enriched with campaign title (lookup-only, not stored)
+export type SmartLinkView = SmartLink & { campaignTitle?: string };
+
 // Service inputs/outputs
 interface GenerateLinkInput {
     userId: string;
@@ -20,6 +23,21 @@ interface GetLinksOptions {
 interface IncrementClickInput {
     slug: string;
     referrerId?: string;
+    /** IP address for fingerprint dedup */
+    ipAddress?: string;
+    /** User-agent string for fingerprint dedup */
+    userAgent?: string;
+    /** True when the dedup cookie for this slug was already set on the visitor */
+    cookieSeen?: boolean;
+}
+
+/** djb2-style non-cryptographic hash — sufficient for click dedup fingerprinting */
+function simpleHash(s: string): string {
+    let h = 5381;
+    for (let i = 0; i < s.length; i++) {
+        h = ((h << 5) + h) ^ s.charCodeAt(i);
+    }
+    return (h >>> 0).toString(16);
 }
 
 interface LogEventInput {
@@ -92,22 +110,43 @@ export async function getLinkBySlug(slug: string): Promise<SmartLink | null> {
 }
 
 // ─── Get links (by user or campaign) ────────────────────────────────────────
-export async function getLinksByUser(userId: string): Promise<SmartLink[]> {
+export async function getLinksByUser(userId: string): Promise<SmartLinkView[]> {
     const cacheKey = `smartlinks:user:${userId}`;
-    const cached = mockCache.get<SmartLink[]>(cacheKey);
+    const cached = mockCache.get<SmartLinkView[]>(cacheKey);
     if (cached) return cached;
 
     const links = await mockDb.smartLinks.findMany({ where: { userId } });
-    mockCache.set(cacheKey, links, CACHE_TTL_SHORT);
-    return links;
+
+    // Enrich with campaign titles via a single batched lookup
+    const campaignIds = [...new Set(links.map((l) => l.campaignId))];
+    const allCampaigns = await mockDb.campaigns.findMany();
+    const campaigns = allCampaigns.filter((c) => campaignIds.includes(c.id));
+    const titleMap = new Map(campaigns.map((c) => [c.id, c.title]));
+    const views: SmartLinkView[] = links.map((l) => ({
+        ...l,
+        campaignTitle: titleMap.get(l.campaignId),
+    }));
+
+    mockCache.set(cacheKey, views, CACHE_TTL_SHORT);
+    return views;
 }
 
 export async function getLinksByCampaign(options: GetLinksOptions) {
     const { campaignId, page = 1, pageSize = 10 } = options;
     const all = await mockDb.smartLinks.findMany(campaignId ? { where: { campaignId } } : {});
-    const total = all.length;
+
+    // Enrich with campaign title
+    const campaign = campaignId
+        ? await mockDb.campaigns.findUnique({ where: { id: campaignId } })
+        : null;
+    const views: SmartLinkView[] = all.map((l) => ({
+        ...l,
+        campaignTitle: campaign?.title,
+    }));
+
+    const total = views.length;
     const start = (page - 1) * pageSize;
-    const data = all.slice(start, start + pageSize);
+    const data = views.slice(start, start + pageSize);
     return {
         data,
         meta: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
@@ -116,7 +155,7 @@ export async function getLinksByCampaign(options: GetLinksOptions) {
 
 // ─── Increment click + log event ──────────────────────────────────────────────
 export async function incrementClick(input: IncrementClickInput): Promise<SmartLink> {
-    const { slug } = input;
+    const { slug, ipAddress, userAgent, cookieSeen } = input;
 
     const link = await mockDb.smartLinks.findUnique({ where: { slug } });
     if (!link) throw new Error("Link not found");
@@ -125,11 +164,21 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
         throw new Error("Link has expired");
     }
 
+    // Fingerprint-based unique click deduplication (24h TTL)
+    const fingerprint = simpleHash((ipAddress ?? "") + (userAgent ?? ""));
+    const seenKey = `seen:${link.id}:${fingerprint}`;
+    const alreadySeen = !!mockCache.get<boolean>(seenKey) || !!cookieSeen;
+    if (!alreadySeen) {
+        mockCache.set(seenKey, true, 86_400); // 24 h
+    }
+
     const updatedLink = await mockDb.smartLinks.update({
         where: { id: link.id },
         data: {
             clickCount: link.clickCount + 1,
-            uniqueClickCount: link.uniqueClickCount + 1, // simplified: no real dedup in mock
+            uniqueClickCount: alreadySeen
+                ? link.uniqueClickCount
+                : link.uniqueClickCount + 1,
             updatedAt: new Date().toISOString(),
         },
     });

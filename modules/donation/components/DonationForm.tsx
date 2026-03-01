@@ -1,9 +1,27 @@
 "use client";
 
-import { useState } from "react";
-import { Form, InputNumber, Select, Input, Button, message } from "antd";
+import { useState, useMemo } from "react";
+import {
+  Form,
+  InputNumber,
+  Select,
+  Input,
+  Button,
+  message,
+  Card,
+  Typography,
+} from "antd";
 import { DONATION_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
+import {
+  ACTIVE_BANK_ACCOUNTS,
+  getBankAccountsByCurrency,
+  formatBankAccountLabel,
+} from "@/config/bankAccounts";
+import MediaUpload from "@/components/ui/MediaUpload";
+import { ICONS } from "@/config/icons";
+
+const { Text } = Typography;
 
 interface Props {
   campaigns: { id: string; title: string }[];
@@ -16,6 +34,8 @@ interface FormValues {
   amount: number;
   currency: string;
   message?: string;
+  bankAccountId?: string;
+  proofScreenshotUrl?: string;
 }
 
 export default function DonationForm({
@@ -26,6 +46,19 @@ export default function DonationForm({
   const [form] = Form.useForm<FormValues>();
   const [submitting, setSubmitting] = useState(false);
   const [msgApi, contextHolder] = message.useMessage();
+  const selectedCurrency = Form.useWatch("currency", form) ?? "NGN";
+
+  const bankOptions = useMemo(() => {
+    return getBankAccountsByCurrency(selectedCurrency).map((a) => ({
+      value: a.id,
+      label: formatBankAccountLabel(a),
+    }));
+  }, [selectedCurrency]);
+
+  const selectedBankId = Form.useWatch("bankAccountId", form);
+  const selectedBank = ACTIVE_BANK_ACCOUNTS.find(
+    (a) => a.id === selectedBankId,
+  );
 
   const handleSubmit = async (values: FormValues) => {
     setSubmitting(true);
@@ -107,6 +140,57 @@ export default function DonationForm({
               />
             </Form.Item>
           </div>
+
+          {/* Bank Account Selection */}
+          <Form.Item
+            name="bankAccountId"
+            label="Bank Account (for offline payment)"
+            tooltip="Select the bank account you transferred to">
+            <Select
+              placeholder="Select bank account"
+              allowClear
+              options={bankOptions}
+              notFoundContent="No accounts for this currency"
+            />
+          </Form.Item>
+
+          {/* Bank details display */}
+          {selectedBank && (
+            <Card
+              size="small"
+              className="mb-4 bg-ds-surface-base border-ds-border-subtle">
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <ICONS.bank className="text-ds-brand-accent" />
+                  <Text strong className="text-ds-text-primary">
+                    {selectedBank.bankName}
+                  </Text>
+                </div>
+                <Text className="text-ds-text-secondary block">
+                  Account: {selectedBank.accountNumber}
+                </Text>
+                <Text className="text-ds-text-secondary block">
+                  Name: {selectedBank.accountName}
+                </Text>
+              </div>
+            </Card>
+          )}
+
+          {/* Proof of Payment Upload */}
+          {selectedBankId && (
+            <Form.Item
+              name="proofScreenshotUrl"
+              label="Proof of Payment"
+              tooltip="Upload a screenshot of your transfer receipt">
+              <MediaUpload
+                accept="image/*"
+                maxSizeMb={5}
+                onChange={(url) =>
+                  form.setFieldValue("proofScreenshotUrl", url)
+                }
+              />
+            </Form.Item>
+          )}
 
           <Form.Item name="message" label={DONATION_PAGE_CONTENT.messageLabel}>
             <Input.TextArea

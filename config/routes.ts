@@ -8,6 +8,7 @@ export const ROUTES = {
     CONTACT: "/contact",
     PRIVACY: "/privacy",
     TERMS: "/terms",
+    HOW_IT_WORKS: "/how-it-works",
 
     // Dashboard
     DASHBOARD: "/dashboard",
@@ -33,6 +34,12 @@ export const ROUTES = {
     // Team
     TEAM: "/team",
 
+    // Invites
+    INVITE: (token: string) => `/invite/${token}`,
+
+    // Proofs
+    PROOFS: "/proofs",
+
     // Admin
     USERS: "/users",
     TRUST_REVIEW: "/trust-review",
@@ -47,11 +54,13 @@ export const ROUTES = {
             LOGIN: "/api/auth/login",
             LOGOUT: "/api/auth/logout",
             ME: "/api/auth/me",
+            REFRESH: "/api/auth/refresh",
         },
         CAMPAIGNS: {
             BASE: "/api/campaigns",
             DETAIL: (id: string) => `/api/campaigns/${id}`,
             PARTICIPANTS: (id: string) => `/api/campaigns/${id}/participants`,
+            JOINED: "/api/campaigns/joined",
         },
         SMART_LINKS: {
             BASE: "/api/smart-links",
@@ -62,6 +71,8 @@ export const ROUTES = {
             ME: "/api/engagement/me",
             CAMPAIGN: (id: string) => `/api/engagement/campaigns/${id}`,
             TIMELINE: "/api/engagement/timeline",
+            PROOFS: "/api/engagement/proofs",
+            PROOF_REVIEW: (id: string) => `/api/engagement/proofs/${id}/review`,
         },
         REFERRALS: {
             ME: "/api/referrals/me",
@@ -76,14 +87,20 @@ export const ROUTES = {
             BASE: "/api/leaderboard",
             ME: "/api/leaderboard/me",
             GLOBAL: "/api/leaderboard/global",
+            TEAM: "/api/leaderboard/team",
+            GROUP: "/api/leaderboard/group",
             SNAPSHOT: "/api/leaderboard/snapshot",
             CAMPAIGN: (id: string) => `/api/leaderboard/campaigns/${id}`,
         },
         DONATIONS: {
             BASE: "/api/donations",
             ME: "/api/donations/me",
+            ADMIN: "/api/donations/admin",
+            ANALYTICS: "/api/donations/analytics",
             CAMPAIGN: (id: string) => `/api/donations/campaigns/${id}`,
             DETAIL: (id: string) => `/api/donations/${id}`,
+            VERIFY: (id: string) => `/api/donations/${id}/verify`,
+            PROOF: (id: string) => `/api/donations/${id}/proof`,
         },
         TRUST: {
             ME: "/api/trust/me",
@@ -97,7 +114,24 @@ export const ROUTES = {
         },
         USERS: {
             BASE: "/api/users",
+            ME: "/api/users/me",
             ROLE: (id: string) => `/api/users/${id}/role`,
+            WEAPONS: "/api/users/weapons",
+        },
+        UPLOAD: "/api/upload",
+        TEAMS: {
+            BASE: "/api/teams",
+            DETAIL: (id: string) => `/api/teams/${id}`,
+            MEMBERS: (id: string) => `/api/teams/${id}/members`,
+            LEAD: (id: string) => `/api/teams/${id}/lead`,
+            INVITE: (id: string) => `/api/teams/${id}/invite`,
+        },
+        GROUPS: {
+            BASE: "/api/groups",
+        },
+        INVITE: {
+            PREVIEW: (token: string) => `/api/invite/${token}`,
+            JOIN: (token: string) => `/api/invite/${token}/join`,
         },
     },
 } as const;

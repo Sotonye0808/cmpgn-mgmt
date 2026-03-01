@@ -47,6 +47,107 @@ export async function computeRankings(campaignId?: string): Promise<LeaderboardE
     return entries;
 }
 
+// ─── Team Leaderboard ─────────────────────────────────────────────────────────
+export async function getTeamLeaderboard(
+    campaignId?: string,
+    page = 1,
+    pageSize = 20,
+): Promise<{ data: TeamLeaderboardEntry[]; total: number }> {
+    const cacheKey = campaignId
+        ? `leaderboard:team:${campaignId}`
+        : "leaderboard:team:global";
+
+    const cached = mockCache.get<TeamLeaderboardEntry[]>(cacheKey);
+    if (cached) {
+        const start = (page - 1) * pageSize;
+        return { data: cached.slice(start, start + pageSize), total: cached.length };
+    }
+
+    const teams = mockDb.teams.findMany();
+    const entries: TeamLeaderboardEntry[] = [];
+
+    for (const team of teams) {
+        let totalScore = 0;
+        for (const memberId of team.memberIds) {
+            const summary = await getPointsSummary(memberId, campaignId);
+            totalScore += summary.total;
+        }
+
+        const group = mockDb.groups.findUnique({ where: { id: team.groupId } });
+        entries.push({
+            teamId: team.id,
+            teamName: team.name,
+            groupName: group?.name ?? "Unknown",
+            memberCount: team.memberIds.length,
+            score: totalScore,
+            rank: 0,
+        });
+    }
+
+    entries.sort((a, b) => b.score - a.score);
+    entries.forEach((e, i) => { e.rank = i + 1; });
+
+    mockCache.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
+
+    const total = entries.length;
+    const start = (page - 1) * pageSize;
+    return { data: entries.slice(start, start + pageSize), total };
+}
+
+// ─── Group Leaderboard ────────────────────────────────────────────────────────
+export async function getGroupLeaderboard(
+    campaignId?: string,
+    page = 1,
+    pageSize = 20,
+): Promise<{ data: GroupLeaderboardEntry[]; total: number }> {
+    const cacheKey = campaignId
+        ? `leaderboard:group:${campaignId}`
+        : "leaderboard:group:global";
+
+    const cached = mockCache.get<GroupLeaderboardEntry[]>(cacheKey);
+    if (cached) {
+        const start = (page - 1) * pageSize;
+        return { data: cached.slice(start, start + pageSize), total: cached.length };
+    }
+
+    const groups = mockDb.groups.findMany();
+    const entries: GroupLeaderboardEntry[] = [];
+
+    for (const group of groups) {
+        const groupTeams = mockDb.teams.findMany().filter(
+            (t) => group.teamIds.includes(t.id)
+        );
+        let totalScore = 0;
+        let totalMembers = 0;
+
+        for (const team of groupTeams) {
+            totalMembers += team.memberIds.length;
+            for (const memberId of team.memberIds) {
+                const summary = await getPointsSummary(memberId, campaignId);
+                totalScore += summary.total;
+            }
+        }
+
+        entries.push({
+            groupId: group.id,
+            groupName: group.name,
+            teamCount: groupTeams.length,
+            memberCount: totalMembers,
+            score: totalScore,
+            rank: 0,
+        });
+    }
+
+    entries.sort((a, b) => b.score - a.score);
+    entries.forEach((e, i) => { e.rank = i + 1; });
+
+    mockCache.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
+
+    const total = entries.length;
+    const start = (page - 1) * pageSize;
+    return { data: entries.slice(start, start + pageSize), total };
+}
+
 // ─── Get leaderboard (cached snapshot fallback to computed) ───────────────────
 export async function getLeaderboard(
     filter: LeaderboardFilter,

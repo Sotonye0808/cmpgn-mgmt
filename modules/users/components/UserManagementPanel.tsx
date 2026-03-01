@@ -6,6 +6,7 @@ import type { ColumnsType } from "antd/es/table";
 import DataTable from "@/components/ui/DataTable";
 import { USERS_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/hooks/useAuth";
 import type { UserListItem } from "@/modules/users/services/userService";
 
 const ROLE_COLORS: Record<string, string> = {
@@ -16,13 +17,27 @@ const ROLE_COLORS: Record<string, string> = {
 };
 
 const ALL_ROLES = ["USER", "TEAM_LEAD", "ADMIN", "SUPER_ADMIN"];
+const ADMIN_ASSIGNABLE_ROLES = ["USER", "TEAM_LEAD"];
+const PROTECTED_ROLES = ["ADMIN", "SUPER_ADMIN"];
 
 export default function UserManagementPanel() {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<UserListItem[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string | undefined>();
   const [msgApi, contextHolder] = message.useMessage();
+
+  const isSuperAdmin =
+    (currentUser?.role as unknown as string) === "SUPER_ADMIN";
+
+  const getAssignableRoles = (): string[] =>
+    isSuperAdmin ? ALL_ROLES : ADMIN_ASSIGNABLE_ROLES;
+
+  const canEditRole = (targetRole: string): boolean => {
+    if (isSuperAdmin) return true;
+    return !PROTECTED_ROLES.includes(targetRole);
+  };
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
@@ -88,15 +103,18 @@ export default function UserManagementPanel() {
     {
       title: USERS_PAGE_CONTENT.actionsLabel,
       key: "actions",
-      render: (_, rec) => (
-        <Select
-          size="small"
-          value={rec.role}
-          style={{ width: 130 }}
-          options={ALL_ROLES.map((r) => ({ value: r, label: r }))}
-          onChange={(val) => changeRole(rec.id, val)}
-        />
-      ),
+      render: (_, rec) =>
+        canEditRole(rec.role) ? (
+          <Select
+            size="small"
+            value={rec.role}
+            style={{ width: 130 }}
+            options={getAssignableRoles().map((r) => ({ value: r, label: r }))}
+            onChange={(val) => changeRole(rec.id, val)}
+          />
+        ) : (
+          <Tag color={ROLE_COLORS[rec.role] ?? "default"}>{rec.role}</Tag>
+        ),
     },
   ];
 

@@ -55,3 +55,10 @@ export const CAMPAIGN_MEDIA_OPTIONS = [
     { label: "Text Only", value: "TEXT" },
     { label: "Link", value: "LINK" },
 ] as const;
+
+export const CAMPAIGN_AUDIENCE_TAGS = [
+    { label: "General", value: "GENERAL" },
+    { label: "Youth", value: "YOUTH" },
+    { label: "Tech Enthusiasts", value: "TECH_ENTHUSIASTS" },
+    { label: "Gamers", value: "GAMERS" },
+] as const;

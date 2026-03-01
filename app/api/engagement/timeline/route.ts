@@ -11,7 +11,9 @@ export async function GET(request: NextRequest) {
 
         const sp = request.nextUrl.searchParams;
         const campaignId = sp.get("campaignId") ?? undefined;
-        const days = Math.min(90, Math.max(7, parseInt(sp.get("days") ?? "14", 10)));
+        const raw = parseInt(sp.get("days") ?? "14", 10);
+        // 0 = all-time; otherwise clamp to 7–90
+        const days = raw === 0 ? 0 : Math.min(90, Math.max(7, raw));
 
         const timeline = await getEngagementTimeline(user.id, campaignId, days);
         return successResponse(timeline);

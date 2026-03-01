@@ -1,5 +1,6 @@
 import { CONTACT_PAGE_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
+import PublicPageHero from "@/components/ui/PublicPageHero";
 
 export const metadata = {
   title: CONTACT_PAGE_CONTENT.meta.title,
@@ -9,19 +10,11 @@ export const metadata = {
 export default function ContactPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 pt-20 pb-14 text-center">
-        <p className="text-sm font-semibold text-ds-brand-accent uppercase tracking-wider mb-4">
-          {CONTACT_PAGE_CONTENT.hero.eyebrow}
-        </p>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-ds-text-primary leading-tight tracking-tight mb-6">
-          {CONTACT_PAGE_CONTENT.hero.headline}
-        </h1>
-        <p className="text-lg text-ds-text-secondary max-w-2xl mx-auto">
-          {CONTACT_PAGE_CONTENT.hero.subheadline}
-        </p>
-      </section>
-
+      <PublicPageHero
+        eyebrow={CONTACT_PAGE_CONTENT.hero.eyebrow}
+        headline={CONTACT_PAGE_CONTENT.hero.headline}
+        subheadline={CONTACT_PAGE_CONTENT.hero.subheadline}
+      />
       {/* Channels grid */}
       <section className="max-w-4xl mx-auto px-6 pb-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

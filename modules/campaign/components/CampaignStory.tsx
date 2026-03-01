@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Badge } from "antd";
+import { Avatar } from "antd";
 import { ICONS } from "@/config/icons";
 import Image from "next/image";
 import { formatRelative } from "@/lib/utils/format";
@@ -113,12 +113,11 @@ export default function CampaignStory({
             </Avatar>
           </div>
 
-          {/* Status Badges */}
+          {/* "LIVE" chip — overlays the bottom-center of the circle like a notification badge */}
           {!isExpired && campaign.status === "ACTIVE" && (
-            <Badge
-              count="Live"
-              className="absolute bottom-0 right-0 [&_.ant-badge-count]:text-xs [&_.ant-badge-count]:px-2 [&_.ant-badge-count]:bg-ds-brand-success/80"
-            />
+            <span className="absolute bottom-0 left-1/2 -translate-x-1/2 translate-y-1/3 px-2 py-0.5 bg-ds-brand-success text-white text-[9px] font-bold rounded-full border-2 border-ds-surface-elevated whitespace-nowrap z-10 leading-none pointer-events-none">
+              LIVE
+            </span>
           )}
           {isExpired && (
             <div className="absolute bottom-0 right-0 w-6 h-6 bg-ds-text-subtle rounded-full flex items-center justify-center border-2 border-ds-surface-elevated">

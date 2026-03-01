@@ -1,6 +1,8 @@
 import { ABOUT_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import Link from "next/link";
+import PublicPageHero from "@/components/ui/PublicPageHero";
+import PublicStatsBar from "@/components/ui/PublicStatsBar";
 
 export const metadata = {
   title: ABOUT_PAGE_CONTENT.meta.title,
@@ -10,36 +12,13 @@ export const metadata = {
 export default function AboutPage() {
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="max-w-4xl mx-auto px-6 pt-20 pb-16 text-center">
-        <p className="text-sm font-semibold text-ds-brand-accent uppercase tracking-wider mb-4">
-          {ABOUT_PAGE_CONTENT.hero.eyebrow}
-        </p>
-        <h1 className="text-4xl md:text-5xl font-extrabold text-ds-text-primary leading-tight tracking-tight mb-6">
-          {ABOUT_PAGE_CONTENT.hero.headline}
-        </h1>
-        <p className="text-lg text-ds-text-secondary max-w-2xl mx-auto">
-          {ABOUT_PAGE_CONTENT.hero.subheadline}
-        </p>
-      </section>
+      <PublicPageHero
+        eyebrow={ABOUT_PAGE_CONTENT.hero.eyebrow}
+        headline={ABOUT_PAGE_CONTENT.hero.headline}
+        subheadline={ABOUT_PAGE_CONTENT.hero.subheadline}
+      />
 
-      {/* Stats row */}
-      <section className="border-y border-ds-border-base py-10 bg-ds-surface-elevated/40">
-        <div className="max-w-4xl mx-auto px-6">
-          <div className="grid grid-cols-3 gap-6 text-center">
-            {ABOUT_PAGE_CONTENT.stats.map((stat) => (
-              <div key={stat.key}>
-                <div className="text-3xl font-extrabold text-ds-brand-accent font-ds-mono">
-                  {stat.value}
-                </div>
-                <div className="text-sm text-ds-text-subtle mt-1">
-                  {stat.label}
-                </div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <PublicStatsBar stats={ABOUT_PAGE_CONTENT.stats} cols={3} />
 
       {/* Body sections */}
       <section className="max-w-3xl mx-auto px-6 py-16 space-y-12">

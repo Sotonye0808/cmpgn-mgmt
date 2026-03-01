@@ -1,4 +1,8 @@
 /relics
+
+# mock db persistence
+/.data
+
 # dependencies
 /node_modules
 /.pnp

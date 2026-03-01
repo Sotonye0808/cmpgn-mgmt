@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { useRouter } from "next/navigation";
 import { Progress } from "antd";
 import UIModal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
@@ -8,6 +9,7 @@ import StatusBadge from "@/components/ui/StatusBadge";
 import { ICONS } from "@/config/icons";
 import Image from "next/image";
 import { cn } from "@/lib/utils/cn";
+import { ROUTES } from "@/config/routes";
 
 interface CampaignModalProps {
   campaigns: Campaign[];
@@ -32,6 +34,7 @@ export default function CampaignModal({
 }: CampaignModalProps) {
   const [currentIndex, setCurrentIndex] = useState(initialIndex);
   const campaign = campaigns[currentIndex];
+  const router = useRouter();
 
   useEffect(() => {
     setCurrentIndex(initialIndex);
@@ -101,6 +104,13 @@ export default function CampaignModal({
                 Share
               </Button>
             )}
+            <Button
+              variant="ghost"
+              size="small"
+              icon={<ICONS.right />}
+              onClick={() => { onClose(); router.push(ROUTES.CAMPAIGN_DETAIL(campaign.id)); }}>
+              View Page
+            </Button>
             {onJoin && campaign.status === ("ACTIVE" as string) && (
               <Button
                 variant={joinedIds?.has(campaign.id) ? "ghost" : "primary"}

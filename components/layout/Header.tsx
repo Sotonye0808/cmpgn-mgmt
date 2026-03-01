@@ -1,6 +1,6 @@
 "use client";
 
-import { Avatar, Dropdown, Badge } from "antd";
+import { Avatar, Dropdown, Badge, Tooltip } from "antd";
 import type { MenuProps } from "antd";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -69,6 +69,19 @@ export default function Header({ title, onMenuToggle }: HeaderProps) {
       {!title && <div />}
 
       <div className="flex items-center gap-3">
+        {/* Refresh data */}
+        <Tooltip title="Refresh data">
+          <button
+            aria-label="Refresh data"
+            onClick={() => {
+              router.refresh();
+              window.dispatchEvent(new CustomEvent("dmhicc:refresh"));
+            }}
+            className="w-8 h-8 rounded-ds-lg flex items-center justify-center text-ds-text-subtle hover:text-ds-brand-accent hover:bg-ds-brand-accent-subtle hover:glow-border transition-all">
+            <ICONS.refresh className="text-base" />
+          </button>
+        </Tooltip>
+
         {/* Notification bell */}
         <Dropdown
           dropdownRender={() => (

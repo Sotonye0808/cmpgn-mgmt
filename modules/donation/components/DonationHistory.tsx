@@ -25,9 +25,12 @@ function formatCurrency(amount: number, currency = "NGN"): string {
 function statusColor(status: string): string {
   const map: Record<string, string> = {
     COMPLETED: "green",
+    VERIFIED: "green",
     PENDING: "orange",
+    RECEIVED: "blue",
+    REJECTED: "red",
     FAILED: "red",
-    REFUNDED: "blue",
+    REFUNDED: "purple",
   };
   return map[status] ?? "default";
 }

@@ -10,6 +10,7 @@ import LeaderboardFilters from "@/modules/leaderboard/components/LeaderboardFilt
 import MyRankCard from "@/modules/leaderboard/components/MyRankCard";
 import PageHeader from "@/components/ui/PageHeader";
 import Spinner from "@/components/ui/Spinner";
+import PeriodSelector, { type Period } from "@/components/ui/PeriodSelector";
 import { LEADERBOARD_PAGE_CONTENT } from "@/config/content";
 
 export default function LeaderboardPage() {
@@ -17,12 +18,14 @@ export default function LeaderboardPage() {
   const [filter, setFilter] = useState<LeaderboardFilter>("global");
   const [campaignId, setCampaignId] = useState<string | undefined>();
   const [page, setPage] = useState(1);
+  const [days, setDays] = useState<Period>(30);
 
   const { entries, myRank, total, loading } = useLeaderboard({
     filter,
     campaignId,
     page,
     pageSize: 20,
+    days,
   });
 
   return (
@@ -32,15 +35,25 @@ export default function LeaderboardPage() {
         title={LEADERBOARD_PAGE_CONTENT.title}
         subtitle={LEADERBOARD_PAGE_CONTENT.subtitle}
         actions={
-          <LeaderboardFilters
-            value={filter}
-            campaignId={campaignId}
-            onChange={(f, cId) => {
-              setFilter(f);
-              setCampaignId(cId);
-              setPage(1);
-            }}
-          />
+          <div className="flex items-center gap-3">
+            <LeaderboardFilters
+              value={filter}
+              campaignId={campaignId}
+              onChange={(f, cId) => {
+                setFilter(f);
+                setCampaignId(cId);
+                setPage(1);
+              }}
+            />
+            <PeriodSelector
+              value={days}
+              onChange={(v) => {
+                setDays(v);
+                setPage(1);
+              }}
+              label="Period:"
+            />
+          </div>
         }
       />
 

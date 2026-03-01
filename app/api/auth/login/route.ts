@@ -19,7 +19,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse(result.error.errors[0].message);
         }
 
-        const { email, password } = result.data;
+        const { email, password, rememberMe } = result.data;
 
         const user = mockDb.users.findUnique({ where: { email } });
         if (!user) {
@@ -44,9 +44,10 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             profilePicture: user.profilePicture,
         };
 
-        const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });
-        const refreshToken = signRefreshToken({ sub: user.id, email: user.email, role: user.role as string });
-        await setAuthCookies(accessToken, refreshToken);
+        const tokenPayload = { sub: user.id, email: user.email, role: user.role as string, rem: rememberMe };
+        const accessToken = signAccessToken(tokenPayload);
+        const refreshToken = signRefreshToken(tokenPayload);
+        await setAuthCookies(accessToken, refreshToken, rememberMe);
 
         return successResponse(authUser);
     } catch (error) {

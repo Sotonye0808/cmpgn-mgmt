@@ -13,17 +13,15 @@ export async function getUserEngagement(
     const cached = mockCache.get<EngagementStats>(cacheKey);
     if (cached) return cached;
 
-    const allEvents = await mockDb.linkEvents.findMany({
-        where: campaignId ? { userId } : { userId },
+    // Events are attributed to users via their smart links, not a userId field.
+    // Resolve user's link IDs first, then filter events by those IDs.
+    const userLinks = await mockDb.smartLinks.findMany({
+        where: campaignId ? { userId, campaignId } : { userId },
     });
+    const linkIds = new Set(userLinks.map((l) => l.id));
 
-    // filter by campaign if given
-    let events = allEvents;
-    if (campaignId) {
-        const userLinks = await mockDb.smartLinks.findMany({ where: { userId, campaignId } });
-        const linkIds = new Set(userLinks.map((l) => l.id));
-        events = allEvents.filter((e) => e.linkId && linkIds.has(e.linkId));
-    }
+    const allEvents = await mockDb.linkEvents.findMany({});
+    const events = allEvents.filter((e) => e.linkId && linkIds.has(e.linkId));
 
     const stats: EngagementStats = {
         userId,
@@ -81,19 +79,29 @@ export async function getEngagementTimeline(
     campaignId?: string,
     days = 14,
 ): Promise<EngagementTimelinePoint[]> {
-    const allEvents = await mockDb.linkEvents.findMany({ where: { userId } });
-
-    let events = allEvents;
-    if (campaignId) {
-        const userLinks = await mockDb.smartLinks.findMany({ where: { userId, campaignId } });
-        const linkIds = new Set(userLinks.map((l) => l.id));
-        events = allEvents.filter((e) => e.linkId && linkIds.has(e.linkId));
-    }
+    // LinkEvent has no userId field — join through smartLinks to get the user's linkIds
+    const userLinks = await mockDb.smartLinks.findMany(
+        campaignId ? { where: { userId, campaignId } } : { where: { userId } },
+    );
+    const linkIds = new Set(userLinks.map((l) => l.id));
+    const allEvents = await mockDb.linkEvents.findMany();
+    const events = allEvents.filter((e) => e.linkId && linkIds.has(e.linkId));
 
     const now = new Date();
     const points: EngagementTimelinePoint[] = [];
 
-    for (let i = days - 1; i >= 0; i--) {
+    // days=0 means "all time" — generate points back to the earliest event
+    const windowSize = days === 0
+        ? (() => {
+            if (events.length === 0) return 30;
+            const earliest = events.reduce((min, e) =>
+                e.createdAt < min ? e.createdAt : min, events[0].createdAt);
+            const diffMs = now.getTime() - new Date(earliest).getTime();
+            return Math.max(7, Math.ceil(diffMs / 86_400_000));
+        })()
+        : days;
+
+    for (let i = windowSize - 1; i >= 0; i--) {
         const day = new Date(now);
         day.setDate(day.getDate() - i);
         const dateStr = day.toISOString().slice(0, 10);
