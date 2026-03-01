@@ -190,3 +190,84 @@ export async function getOverviewAnalytics(): Promise<OverviewAnalytics> {
     mockCache.set(cacheKey, result, CACHE_TTL_ANALYTICS);
     return result;
 }
+
+// ─── Team Analytics ──────────────────────────────────────────────────────────
+
+export interface TeamAnalytics {
+    teamId: string;
+    teamName: string;
+    memberCount: number;
+    totalPoints: number;
+    totalDonations: number;
+    averagePointsPerMember: number;
+    topMembers: { userId: string; firstName: string; lastName: string; score: number }[];
+}
+
+export async function getTeamAnalytics(teamId: string): Promise<TeamAnalytics | null> {
+    const cacheKey = `analytics:team:${teamId}`;
+    const cached = mockCache.get<TeamAnalytics>(cacheKey);
+    if (cached) return cached;
+
+    const team = mockDb.teams._data.find((t) => t.id === teamId);
+    if (!team) return null;
+
+    const memberIds = team.memberIds;
+
+    // Points per member
+    const memberPoints = memberIds.map((uid) => {
+        const points = mockDb.pointsLedger._data
+            .filter((p) => p.userId === uid)
+            .reduce((s, p) => s + p.value, 0);
+        const user = mockDb.users._data.find((u) => u.id === uid);
+        return {
+            userId: uid,
+            firstName: user?.firstName ?? "Unknown",
+            lastName: user?.lastName ?? "",
+            score: points,
+        };
+    });
+
+    const totalPoints = memberPoints.reduce((s, m) => s + m.score, 0);
+
+    const totalDonations = mockDb.donations._data
+        .filter(
+            (d) =>
+                memberIds.includes(d.userId) &&
+                (d.status === "COMPLETED" || d.status === "VERIFIED")
+        )
+        .reduce((s, d) => s + d.amount, 0);
+
+    const teamAnalytics: TeamAnalytics = {
+        teamId,
+        teamName: team.name,
+        memberCount: memberIds.length,
+        totalPoints,
+        totalDonations,
+        averagePointsPerMember:
+            memberIds.length > 0 ? totalPoints / memberIds.length : 0,
+        topMembers: memberPoints.sort((a, b) => b.score - a.score).slice(0, 5),
+    };
+
+    mockCache.set(cacheKey, teamAnalytics, CACHE_TTL_ANALYTICS);
+    return teamAnalytics;
+}
+
+// ─── All Teams Summary (Admin) ───────────────────────────────────────────────
+
+export async function getAllTeamsAnalytics(): Promise<TeamAnalytics[]> {
+    const cacheKey = "analytics:teams:all";
+    const cached = mockCache.get<TeamAnalytics[]>(cacheKey);
+    if (cached) return cached;
+
+    const teams = mockDb.teams._data;
+    const results: TeamAnalytics[] = [];
+
+    for (const team of teams) {
+        const analytics = await getTeamAnalytics(team.id);
+        if (analytics) results.push(analytics);
+    }
+
+    results.sort((a, b) => b.totalPoints - a.totalPoints);
+    mockCache.set(cacheKey, results, CACHE_TTL_ANALYTICS);
+    return results;
+}
