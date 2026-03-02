@@ -42,6 +42,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             lastName: user.lastName,
             role: user.role,
             profilePicture: user.profilePicture,
+            whatsappNumber: user.whatsappNumber,
         };
 
         const tokenPayload = { sub: user.id, email: user.email, role: user.role as string, rem: rememberMe };

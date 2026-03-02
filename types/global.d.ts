@@ -100,6 +100,7 @@ declare global {
         lastName: string;
         role: UserRole;
         profilePicture?: string;
+        whatsappNumber?: string;
         teamId?: string;
         trustScore: number;
         isActive: boolean;
@@ -115,6 +116,7 @@ declare global {
         lastName: string;
         role: UserRole;
         profilePicture?: string;
+        whatsappNumber?: string;
     }
 
     interface CampaignMedia {

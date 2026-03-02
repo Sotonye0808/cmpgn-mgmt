@@ -12,11 +12,7 @@ export default function AuthLayout({
       {/* Ambient background glow — gives glass surfaces something to blur against */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,58,237,0.1) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(124,58,237,0.07) 0%, transparent 60%)",
-        }}
+        className="pointer-events-none fixed inset-0 -z-10 ambient-glow-auth"
       />
 
       {/* Centred card area */}

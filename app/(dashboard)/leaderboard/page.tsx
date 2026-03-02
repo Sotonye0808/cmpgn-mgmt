@@ -75,7 +75,7 @@ export default function LeaderboardPage() {
           {/* Podium (top 3) */}
           {entries.length >= 3 && (
             <>
-              <LeaderboardPodium entries={entries} />
+              <LeaderboardPodium entries={entries} currentUserId={user?.id} />
               <Divider className="my-0" />
             </>
           )}

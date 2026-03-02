@@ -105,6 +105,7 @@ export default function SmartLinkCard({
           <Tooltip title={shared ? "Shared!" : "Share link"}>
             <button
               onClick={handleShare}
+              aria-label="Share link"
               className="text-ds-brand-accent hover:text-ds-brand-accent-hover shrink-0">
               <ICONS.share />
             </button>

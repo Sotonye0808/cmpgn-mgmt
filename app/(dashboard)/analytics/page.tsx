@@ -21,6 +21,8 @@ import { ANALYTICS_PAGE_CONTENT } from "@/config/content";
 import { useEngagementTimeline } from "@/modules/engagement/hooks/useEngagement";
 import PeriodSelector, { type Period } from "@/components/ui/PeriodSelector";
 import ProofReviewPanel from "@/modules/proofs/components/ProofReviewPanel";
+import TeamAnalyticsSection from "@/modules/analytics/components/TeamAnalyticsSection";
+import DonationAnalyticsSection from "@/modules/analytics/components/DonationAnalyticsSection";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
@@ -286,6 +288,12 @@ export default function AnalyticsPage() {
 
             case "proofs-overview":
               return <ProofReviewPanel campaigns={campaigns ?? []} />;
+
+            case "team-analytics":
+              return <TeamAnalyticsSection />;
+
+            case "donation-analytics":
+              return <DonationAnalyticsSection />;
 
             default:
               return null;

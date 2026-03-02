@@ -7,13 +7,13 @@ import {
     Form,
     Input,
     Select,
-    Table,
-    Tag,
     message,
     Empty,
 } from "antd";
 import { ICONS } from "@/config/icons";
 import TeamCard from "./TeamCard";
+import TeamMemberStatsTable from "./TeamMemberStatsTable";
+import type { TeamMemberStat } from "../services/teamService";
 
 interface Props {
     teams: Team[];
@@ -29,32 +29,23 @@ export default function TeamManagementPanel({
 
     const [createModalOpen, setCreateModalOpen] = useState(false);
     const [detailTeamId, setDetailTeamId] = useState<string | null>(null);
-    const [detailMembers, setDetailMembers] = useState<
-        Array<{ id: string; firstName: string; lastName: string; role: string; profilePicture?: string }>
-    >([]);
+    const [detailStats, setDetailStats] = useState<TeamMemberStat[]>([]);
+    const [detailLoading, setDetailLoading] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
 
-    // Fetch team detail when selected
+    // Fetch member stats when a team is selected
     useEffect(() => {
         if (!detailTeamId) return;
+        setDetailLoading(true);
         window
-            .fetch(`/api/teams/${detailTeamId}`)
+            .fetch(`/api/teams/${detailTeamId}/stats`)
             .then((r) => r.json())
             .then((json) => {
-                if (json.data?.members) {
-                    setDetailMembers(
-                        json.data.members.map((m: Record<string, unknown>) => ({
-                            id: m.id as string,
-                            firstName: m.firstName as string,
-                            lastName: m.lastName as string,
-                            role: m.role as string,
-                            profilePicture: m.profilePicture as string | undefined,
-                        }))
-                    );
-                }
+                if (json.data) setDetailStats(json.data as TeamMemberStat[]);
             })
-            .catch(() => message.error("Failed to load team details"));
+            .catch(() => message.error("Failed to load team stats"))
+            .finally(() => setDetailLoading(false));
     }, [detailTeamId]);
 
     const handleCreateTeam = async (values: {
@@ -200,61 +191,16 @@ export default function TeamManagementPanel({
                 open={!!detailTeamId}
                 onCancel={() => {
                     setDetailTeamId(null);
-                    setDetailMembers([]);
+                    setDetailStats([]);
                 }}
                 footer={null}
                 width={600}
             >
                 {detailTeamId && (
-                    <Table
-                        rowKey="id"
-                        dataSource={detailMembers}
-                        pagination={false}
-                        columns={[
-                            {
-                                title: "Name",
-                                key: "name",
-                                render: (_, r) => (
-                                    <span className="text-ds-text-primary">
-                                        {r.firstName} {r.lastName}
-                                    </span>
-                                ),
-                            },
-                            {
-                                title: "Role",
-                                dataIndex: "role",
-                                render: (role: string) => (
-                                    <Tag
-                                        color={
-                                            role === "TEAM_LEAD"
-                                                ? "gold"
-                                                : "default"
-                                        }
-                                    >
-                                        {role}
-                                    </Tag>
-                                ),
-                            },
-                            {
-                                title: "Actions",
-                                key: "actions",
-                                render: (_, r) => (
-                                    <Button
-                                        type="link"
-                                        danger
-                                        size="small"
-                                        onClick={() =>
-                                            handleRemoveMember(
-                                                detailTeamId,
-                                                r.id
-                                            )
-                                        }
-                                    >
-                                        Remove
-                                    </Button>
-                                ),
-                            },
-                        ]}
+                    <TeamMemberStatsTable
+                        stats={detailStats}
+                        loading={detailLoading}
+                        onRemove={(userId) => handleRemoveMember(detailTeamId, userId)}
                     />
                 )}
             </Modal>

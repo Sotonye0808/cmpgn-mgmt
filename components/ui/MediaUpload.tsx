@@ -1,8 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, Button, message, Image } from "antd";
-import type { UploadFile, UploadChangeParam } from "antd/es/upload";
+import { Upload, message, Image } from "antd";
 import { ICONS } from "@/config/icons";
 import { cn } from "@/lib/utils/cn";
 

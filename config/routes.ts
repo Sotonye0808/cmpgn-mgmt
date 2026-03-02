@@ -42,6 +42,7 @@ export const ROUTES = {
 
     // Admin
     USERS: "/users",
+    USER_DETAIL: (id: string) => `/users/${id}`,
     TRUST_REVIEW: "/trust-review",
 
     // Profile / Settings
@@ -61,6 +62,7 @@ export const ROUTES = {
             DETAIL: (id: string) => `/api/campaigns/${id}`,
             PARTICIPANTS: (id: string) => `/api/campaigns/${id}/participants`,
             JOINED: "/api/campaigns/joined",
+            AUDIT: (id: string) => `/api/campaigns/${id}/audit`,
         },
         SMART_LINKS: {
             BASE: "/api/smart-links",
@@ -116,6 +118,7 @@ export const ROUTES = {
             BASE: "/api/users",
             ME: "/api/users/me",
             ROLE: (id: string) => `/api/users/${id}/role`,
+            PROFILE: (id: string) => `/api/users/${id}/profile`,
             WEAPONS: "/api/users/weapons",
         },
         UPLOAD: "/api/upload",
@@ -125,6 +128,7 @@ export const ROUTES = {
             MEMBERS: (id: string) => `/api/teams/${id}/members`,
             LEAD: (id: string) => `/api/teams/${id}/lead`,
             INVITE: (id: string) => `/api/teams/${id}/invite`,
+            STATS: (id: string) => `/api/teams/${id}/stats`,
         },
         GROUPS: {
             BASE: "/api/groups",

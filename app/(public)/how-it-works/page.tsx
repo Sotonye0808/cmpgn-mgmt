@@ -71,17 +71,17 @@ export default function HowItWorksPage() {
                 )}
                 {/* Status circle */}
                 <div
-                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3 shrink-0"
-                  style={{ backgroundColor: stage.color }}>
+                  className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3 shrink-0 bg-dynamic"
+                  style={{ '--_dc': stage.color } as React.CSSProperties}>
                   {stage.step}
                 </div>
                 {/* Status badge */}
                 <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full mb-2"
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full mb-2 text-dynamic"
                   style={{
-                    color: stage.color,
+                    '--_dc': stage.color,
                     backgroundColor: `${stage.color}1A`,
-                  }}>
+                  } as React.CSSProperties}>
                   {stage.statusLabel}
                 </span>
                 <h3 className="font-semibold text-ds-text-primary mb-1">

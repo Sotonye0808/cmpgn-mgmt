@@ -24,6 +24,7 @@ export async function getAuthenticatedUser(): Promise<AuthUser | null> {
             lastName: user.lastName,
             role: user.role,
             profilePicture: user.profilePicture,
+            whatsappNumber: user.whatsappNumber,
         };
     } catch {
         return null;

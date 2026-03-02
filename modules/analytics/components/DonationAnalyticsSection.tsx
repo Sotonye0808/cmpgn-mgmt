@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { Skeleton, Tag, Progress } from "antd";
+import Link from "next/link";
 import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
@@ -153,9 +154,11 @@ export default function DonationAnalyticsSection() {
                 <span className="text-sm font-bold text-ds-brand-accent w-6 text-center">
                   #{idx + 1}
                 </span>
-                <span className="flex-1 text-sm text-ds-text-primary">
+                <Link
+                  href={ROUTES.USER_DETAIL(donor.userId)}
+                  className="flex-1 text-sm text-ds-text-primary hover:text-ds-brand-accent transition-colors">
                   {donor.firstName} {donor.lastName}
-                </span>
+                </Link>
                 <span className="font-semibold text-ds-brand-accent font-ds-mono text-sm">
                   {formatCurrency(donor.total)}
                 </span>

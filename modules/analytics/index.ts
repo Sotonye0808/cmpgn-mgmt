@@ -8,3 +8,6 @@ export { default as EngagementTimelineChart } from "./components/EngagementTimel
 export { default as TopPerformersTable } from "./components/TopPerformersTable";
 export { default as CampaignGrowthChart } from "./components/CampaignGrowthChart";
 export { default as AnalyticsSectionRenderer } from "./components/AnalyticsSectionRenderer";
+export { default as TeamAnalyticsSection } from "./components/TeamAnalyticsSection";
+export { default as DonationAnalyticsSection } from "./components/DonationAnalyticsSection";
+export { getTeamAnalytics, getAllTeamsAnalytics } from "./services/analyticsService";

@@ -35,7 +35,7 @@ export default function Footer() {
               {DASHBOARD_FOOTER_CONTENT.developer.name}
             </a>
           </div>
-          <div>{DASHBOARD_FOOTER_CONTENT.legal}</div>
+          <div>© {new Date().getFullYear()} {DASHBOARD_FOOTER_CONTENT.legal.entity}</div>
         </div>
       </div>
     </footer>

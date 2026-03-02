@@ -357,8 +357,11 @@ export const DASHBOARD_FOOTER_CONTENT = {
         { key: "analytics", label: "Analytics", href: "/analytics" },
         { key: "donations", label: "Donations", href: "/donations" },
         { key: "settings", label: "Settings", href: "/settings" },
+        { key: "about", label: "About", href: "/about" },
+        { key: "privacy", label: "Privacy", href: "/privacy" },
+        { key: "terms", label: "Terms", href: "/terms" },
     ],
-    legal: "© 2026 DMHicc",
+    legal: { entity: "DMHicc" },
 } as const;
 
 export const PUBLIC_FOOTER_CONTENT = {
@@ -393,7 +396,7 @@ export const PUBLIC_FOOTER_CONTENT = {
         },
     ],
     legal: {
-        copyright: "© 2026 Harvesters International Christian Centre. DMHicc Platform.",
+        copyright: { entity: "Harvesters International Christian Centre. DMHicc Platform." },
         rights: "All rights reserved.",
     },
     developer: {
@@ -468,23 +471,23 @@ export const CONTACT_PAGE_CONTENT = {
             key: "email",
             icon: "mail" as const,
             label: "Email Support",
-            value: "support@dmhicc.org",
+            value: "churchministry@harvestersng.org",
             description: "For account issues, access requests, and general enquiries.",
-            action: { label: "Send Email", href: "mailto:support@dmhicc.org" },
+            action: { label: "Send Email", href: "mailto:churchministry@harvestersng.org" },
         },
         {
             key: "admin",
             icon: "settings" as const,
             label: "Platform Administration",
-            value: "admin@dmhicc.org",
+            value: "sdagogo@harvestersng.org",
             description: "For campaign creation, role management, and admin matters.",
-            action: { label: "Contact Admin", href: "mailto:admin@dmhicc.org" },
+            action: { label: "Contact Admin", href: "mailto:sdagogo@harvestersng.org" },
         },
         {
             key: "church",
             icon: "team" as const,
             label: "Harvesters ICC",
-            value: "info@harvesters.org.ng",
+            value: "churchministry@harvestersng.org",
             description: "For church-related enquiries and partnership matters.",
             action: { label: "Visit Website", href: "https://harvesters.org.ng" },
         },
@@ -733,6 +736,18 @@ export const HOW_IT_WORKS_STEPS = [
         title: "Report to the War Room",
         description: "Real-time command dashboards show your battle stats, recruitment network, proof history, and fundraising contributions.",
     },
+    {
+        key: "contribute",
+        step: "6",
+        title: "Make Your Contribution",
+        description: "Support missions financially by selecting a bank account, transferring your donation, and noting the reference number. Multiple currencies are supported across dedicated accounts.",
+    },
+    {
+        key: "submit-proof",
+        step: "7",
+        title: "Submit Your Proof",
+        description: "Upload a screenshot or receipt of your bank transfer as proof of payment. Your donation status moves to Received immediately and goes into the verification queue for Commanders to approve.",
+    },
 ] as const;
 
 /** Proof pipeline stages — rendered on How It Works page */
@@ -815,5 +830,30 @@ export const FAQ_ITEMS = [
         key: "proof-points",
         question: "What points do I earn from proofs?",
         answer: "Approved proofs earn Reliability Points — one of the four point categories that make up your military rank score. The more consistently you submit verified proofs, the faster you advance through the ranks.",
+    },
+    {
+        key: "donation-flow",
+        question: "How do I make a donation?",
+        answer: "Navigate to the Donations page, select a mission, choose a currency and bank account, transfer the specified amount, and then upload a screenshot of your transfer receipt as proof of payment. Your donation will be queued for commander verification.",
+    },
+    {
+        key: "proof-requirements",
+        question: "What are the proof requirements for donations?",
+        answer: "Upload a clear screenshot showing the bank transfer confirmation — including the amount, date, and reference number. Blurry or cropped images may be rejected. Commanders review proofs within 24–48 hours.",
+    },
+    {
+        key: "verification-timeline",
+        question: "How long does donation verification take?",
+        answer: "Most donations are verified within 24–48 hours. Once a Commander approves your proof, the donation status changes to Verified and you receive Leadership Points for your contribution.",
+    },
+    {
+        key: "supported-currencies",
+        question: "What currencies are supported?",
+        answer: "We currently support NGN (Nigerian Naira), USD (US Dollar), and GBP (British Pound). Each currency has dedicated bank accounts. Select your preferred currency when making a donation to see available accounts.",
+    },
+    {
+        key: "team-invite-links",
+        question: "How do team invite links work?",
+        answer: "Team Leads and Commanders can generate invite links with a set number of uses and an optional expiry date. Share the link with your recruits — when they click it, they join your team automatically. You can track usage from the Teams page.",
     },
 ] as const;

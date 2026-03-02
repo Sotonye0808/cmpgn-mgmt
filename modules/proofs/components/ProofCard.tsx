@@ -48,8 +48,8 @@ export default function ProofCard({
           )}
         </div>
         <span
-          className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${statusCfg.bgToken}`}
-          style={{ color: statusCfg.color }}>
+          className={`text-xs font-semibold px-2 py-0.5 rounded-full shrink-0 ${statusCfg.bgToken} text-dynamic`}
+          style={{ '--_dc': statusCfg.color } as React.CSSProperties}>
           {statusCfg.label}
         </span>
       </div>

@@ -103,8 +103,8 @@ export default function PublicActiveCampaigns({ campaigns }: PublicActiveCampaig
                     <div className="mb-3">
                       <div className="w-full bg-ds-surface-elevated rounded-full h-1.5">
                         <div
-                          className="bg-ds-brand-accent h-1.5 rounded-full transition-all"
-                          style={{ width: `${goalPercent}%` }}
+                          className="bg-ds-brand-accent h-1.5 rounded-full transition-all bar-dynamic"
+                          style={{ '--_bar-w': `${goalPercent}%` } as React.CSSProperties}
                         />
                       </div>
                       <p className="text-[11px] text-ds-text-subtle mt-1">

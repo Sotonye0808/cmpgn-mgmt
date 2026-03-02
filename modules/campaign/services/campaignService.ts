@@ -3,6 +3,34 @@ import { mockCache } from "@/lib/data/mockCache";
 import { CACHE_TTL_CAMPAIGN_LIST, DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { PaginatedResponse } from "@/types/api";
 
+// ─── Audit Helper ─────────────────────────────────────────────────────────────
+
+function recordAudit(
+    campaignId: string,
+    actorId: string,
+    actorRole: string,
+    eventType: string,
+    opts?: {
+        before?: Record<string, unknown>;
+        after?: Record<string, unknown>;
+        note?: string;
+    }
+) {
+    mockDb.campaignAuditEvents.create({
+        data: {
+            campaignId,
+            actorId,
+            actorRole,
+            eventType: eventType as unknown as CampaignAuditEventType,
+            before: opts?.before,
+            after: opts?.after,
+            note: opts?.note,
+            createdAt: new Date().toISOString(),
+        },
+    });
+    mockDb.emit("campaignAuditEvents:changed");
+}
+
 function applyCampaignFilters(campaign: Campaign, filters: CampaignFilters): boolean {
     if (filters.status && campaign.status !== filters.status) return false;
     if (filters.goalType && campaign.goalType !== filters.goalType) return false;
@@ -96,6 +124,12 @@ export async function createCampaign(
 
     mockCache.invalidatePattern("campaigns:list");
     mockDb.emit("campaigns:changed");
+
+    recordAudit(campaign.id, createdById, "UNKNOWN", "CREATED", {
+        after: { title: campaign.title, status: campaign.status as unknown as string },
+        note: `Campaign "${campaign.title}" created`,
+    });
+
     return campaign;
 }
 
@@ -110,6 +144,32 @@ export async function updateCampaign(
         where: { id },
         data: { ...input, updatedAt: new Date().toISOString() },
     });
+
+    // Detect status change vs field update
+    if (input.status && input.status !== existing.status) {
+        recordAudit(id, "system", "SYSTEM", "STATUS_CHANGED", {
+            before: { status: existing.status as unknown as string },
+            after: { status: input.status as unknown as string },
+            note: `Status changed from ${existing.status} to ${input.status}`,
+        });
+    } else {
+        const changedFields = Object.keys(input).filter(
+            (k) => (input as unknown as Record<string, unknown>)[k] !== (existing as unknown as Record<string, unknown>)[k]
+        );
+        if (changedFields.length > 0) {
+            const before: Record<string, unknown> = {};
+            const after: Record<string, unknown> = {};
+            for (const k of changedFields) {
+                before[k] = (existing as unknown as Record<string, unknown>)[k];
+                after[k] = (input as unknown as Record<string, unknown>)[k];
+            }
+            recordAudit(id, "system", "SYSTEM", "FIELDS_UPDATED", {
+                before,
+                after,
+                note: `Fields updated: ${changedFields.join(", ")}`,
+            });
+        }
+    }
 
     mockCache.del(`campaigns:detail:${id}`);
     mockCache.invalidatePattern("campaigns:list");
@@ -158,6 +218,10 @@ export async function joinCampaign(
     mockCache.invalidatePattern("campaigns:list");
     mockDb.emit("campaigns:changed");
     mockDb.emit("participations:changed");
+
+    recordAudit(campaignId, userId, "USER", "PARTICIPANT_JOINED", {
+        note: `User ${userId} joined campaign`,
+    });
 
     // Supress unused variable warning
     void existing;
@@ -238,3 +302,44 @@ export async function expireStale(): Promise<number> {
     }
     return count;
 }
+
+// ─── Audit Log ────────────────────────────────────────────────────────────────
+
+export async function getCampaignAuditLog(
+    campaignId: string,
+    page = 1,
+    pageSize = 20
+): Promise<PaginatedResponse<CampaignAuditEvent & { actorName?: string }>> {
+    const all = mockDb.campaignAuditEvents._data
+        .filter((e) => e.campaignId === campaignId)
+        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+
+    const total = all.length;
+    const skip = (page - 1) * pageSize;
+    const data = all.slice(skip, skip + pageSize).map((event) => {
+        const actor = mockDb.users.findUnique({ where: { id: event.actorId } });
+        return {
+            ...event,
+            actorName: actor
+                ? `${actor.firstName} ${actor.lastName}`
+                : event.actorId,
+        };
+    });
+    const totalPages = Math.ceil(total / pageSize);
+
+    return {
+        success: true,
+        data,
+        pagination: {
+            page,
+            pageSize,
+            total,
+            totalPages,
+            hasNext: page < totalPages,
+            hasPrev: page > 1,
+        },
+    };
+}
+
+/** Public recordAudit for use by other services (e.g., donationService) */
+export { recordAudit as recordCampaignAudit };

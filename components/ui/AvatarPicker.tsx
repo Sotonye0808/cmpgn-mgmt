@@ -6,7 +6,6 @@ import {
     CURATED_AVATARS,
     AVATAR_CATEGORIES,
     buildCustomAvatarUrl,
-    type AvatarOption,
 } from "@/config/avatars";
 import { cn } from "@/lib/utils/cn";
 

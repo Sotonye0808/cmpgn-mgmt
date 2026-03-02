@@ -210,6 +210,7 @@ export default function CampaignCard({
                     <button
                       type="button"
                       onClick={() => onShare(campaign)}
+                      aria-label="Share campaign"
                       className="flex items-center gap-1 text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
                       <ICONS.share className="text-xs" />
                     </button>

@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse(result.error.errors[0].message);
         }
 
-        const { email, password, firstName, lastName } = result.data;
+        const { email, password, firstName, lastName, whatsappNumber } = result.data;
 
         // Check if email already exists
         const existing = mockDb.users.findUnique({ where: { email } });
@@ -35,6 +35,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                     role: "USER" as unknown as UserRole,
                     trustScore: 100,
                     isActive: true,
+                    ...(whatsappNumber && { whatsappNumber }),
                     createdAt: new Date().toISOString(),
                     updatedAt: new Date().toISOString(),
                 },
@@ -61,6 +62,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             lastName: user.lastName,
             role: user.role,
             profilePicture: user.profilePicture,
+            whatsappNumber: user.whatsappNumber,
         };
 
         const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });

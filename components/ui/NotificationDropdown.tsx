@@ -107,11 +107,11 @@ export default function NotificationDropdown({
                 )}>
                 {/* Icon */}
                 <span
-                  className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm"
+                  className="mt-0.5 flex-shrink-0 w-7 h-7 rounded-full flex items-center justify-center text-sm bg-dynamic-muted text-dynamic"
                   style={{
-                    background: `${TYPE_COLOR[n.type]}22`,
-                    color: TYPE_COLOR[n.type],
-                  }}>
+                    '--_dc': TYPE_COLOR[n.type],
+                  } as React.CSSProperties}
+                >
                   <IconComponent />
                 </span>
 
@@ -129,8 +129,7 @@ export default function NotificationDropdown({
                     </span>
                     {!n.isRead && (
                       <span
-                        className="flex-shrink-0 w-2 h-2 rounded-full mt-1"
-                        style={{ background: "var(--ds-brand-accent)" }}
+                        className="flex-shrink-0 w-2 h-2 rounded-full mt-1 bg-ds-brand-accent"
                       />
                     )}
                   </div>

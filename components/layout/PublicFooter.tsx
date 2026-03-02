@@ -52,7 +52,7 @@ export default function PublicFooter() {
         {/* Divider */}
         <div className="border-t border-ds-border-glass pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-ds-text-disabled">
-            {PUBLIC_FOOTER_CONTENT.legal.copyright}
+            © {new Date().getFullYear()} {PUBLIC_FOOTER_CONTENT.legal.copyright.entity}
           </p>
           <div className="flex items-center gap-3 text-xs text-ds-text-disabled">
             <span>{PUBLIC_FOOTER_CONTENT.legal.rights}</span>

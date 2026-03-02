@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import { ROUTES } from "@/config/routes";
 import { LANDING_CONTENT, NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
@@ -101,10 +102,12 @@ export default function LandingPage() {
                   <div className="glass-surface rounded-ds-xl p-6 hover:glow-border transition-all">
                     <div className="flex flex-col gap-6">
                       {featuredCampaign.thumbnailUrl && (
-                        <img
+                        <Image
                           src={featuredCampaign.thumbnailUrl}
                           alt={featuredCampaign.title}
                           className="w-full h-40 object-cover rounded-ds-lg"
+                          width={500}
+                          height={160}
                         />
                       )}
                       <div>
@@ -161,9 +164,9 @@ export default function LandingPage() {
                             <div className="mt-4">
                               <div className="w-full bg-ds-surface-elevated rounded-full h-2">
                                 <div
-                                  className="bg-ds-brand-accent h-2 rounded-full transition-all"
+                                  className="bg-ds-brand-accent h-2 rounded-full transition-all bar-dynamic"
                                   style={{
-                                    width: `${Math.min(
+                                    '--_bar-w': `${Math.min(
                                       100,
                                       Math.round(
                                         (featuredCampaign.goalCurrent /
@@ -171,7 +174,7 @@ export default function LandingPage() {
                                           100,
                                       ),
                                     )}%`,
-                                  }}
+                                  } as React.CSSProperties}
                                 />
                               </div>
                               <p className="text-xs text-ds-text-subtle mt-1">
@@ -208,10 +211,12 @@ export default function LandingPage() {
                           #{soldier.position}
                         </div>
                         {soldier.profilePicture ? (
-                          <img
+                          <Image
                             src={soldier.profilePicture}
                             alt={soldier.firstName}
                             className="w-9 h-9 rounded-full object-cover shrink-0"
+                            width={36}
+                            height={36}
                           />
                         ) : (
                           <div className="w-9 h-9 rounded-full bg-ds-surface-elevated flex items-center justify-center shrink-0">

@@ -36,7 +36,7 @@ export default function TrustScoreIndicator({
   if (compact) {
     return (
       <Tooltip title={`Trust score: ${score} — ${label}`}>
-        <Tag color={color} icon={<ShieldIcon />} style={{ cursor: "default" }}>
+        <Tag color={color} icon={<ShieldIcon />} className="cursor-default">
           {score}
         </Tag>
       </Tooltip>

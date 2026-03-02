@@ -1,5 +1,6 @@
 import { mockDb } from "@/lib/data/mockDb";
 import { mockCache } from "@/lib/data/mockCache";
+import { RANK_LEVELS } from "@/config/ranks";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -167,6 +168,54 @@ export async function getTeamWithMembers(
         team.memberIds.includes(u.id)
     );
     return { team, members };
+}
+
+export interface TeamMemberStat {
+    id: string;
+    firstName: string;
+    lastName: string;
+    role: string;
+    profilePicture?: string;
+    totalPoints: number;
+    rankBadge: string;
+    rankName: string;
+    donationCount: number;
+}
+
+export async function getTeamMemberStats(
+    teamId: string
+): Promise<TeamMemberStat[] | null> {
+    const result = await getTeamWithMembers(teamId);
+    if (!result) return null;
+
+    const sortedRanks = [...RANK_LEVELS].sort((a, b) => b.minScore - a.minScore);
+
+    return result.members
+        .map((member) => {
+            const totalPoints = mockDb.pointsLedger._data
+                .filter((e) => e.userId === member.id)
+                .reduce((sum, e) => sum + Number(e.value), 0);
+
+            const rankLevel =
+                sortedRanks.find((r) => totalPoints >= r.minScore) ?? RANK_LEVELS[0];
+
+            const donationCount = mockDb.donations._data.filter(
+                (d) => d.userId === member.id && d.status === "VERIFIED"
+            ).length;
+
+            return {
+                id: member.id,
+                firstName: member.firstName,
+                lastName: member.lastName,
+                role: member.role as unknown as string,
+                profilePicture: member.profilePicture,
+                totalPoints,
+                rankBadge: rankLevel.badge,
+                rankName: rankLevel.name,
+                donationCount,
+            };
+        })
+        .sort((a, b) => b.totalPoints - a.totalPoints);
 }
 
 // ─── Team Membership ──────────────────────────────────────────────────────────

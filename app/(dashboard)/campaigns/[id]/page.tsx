@@ -12,6 +12,7 @@ import { ROUTES } from "@/config/routes";
 import { formatDate } from "@/lib/utils/format";
 import Card from "@/components/ui/Card";
 import SubmitProofModal from "@/modules/proofs/components/SubmitProofModal";
+import CampaignAuditLog from "@/modules/campaign/components/CampaignAuditLog";
 
 export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
@@ -113,7 +114,11 @@ export default function CampaignDetailPage() {
   };
 
   if (loading)
-    return <Spin size="large" className="flex justify-center p-12" />;
+    return (
+      <div className="flex justify-center p-12">
+        <Spin size="large" />
+      </div>
+    );
   if (error) return <div className="text-ds-status-error p-8">{error}</div>;
   if (!campaign)
     return <div className="text-ds-text-subtle p-8">Campaign not found.</div>;
@@ -144,7 +149,7 @@ export default function CampaignDetailPage() {
 
       {/* Admin Actions */}
       {isAdmin && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="secondary"
             icon={<ICONS.edit />}
@@ -156,7 +161,7 @@ export default function CampaignDetailPage() {
 
       {/* Submit Proof — available to all users on active campaigns */}
       {isActive && (
-        <div className="flex items-center gap-3">
+        <div className="flex flex-wrap items-center gap-2">
           <Button
             variant="primary"
             icon={<ICONS.camera />}
@@ -210,6 +215,9 @@ export default function CampaignDetailPage() {
         onClose={() => setSubmitProofOpen(false)}
         initialCampaignId={id}
       />
+
+      {/* Admin-only Audit Trail */}
+      {isAdmin && <CampaignAuditLog campaignId={id} />}
     </div>
   );
 }

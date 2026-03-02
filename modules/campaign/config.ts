@@ -56,9 +56,26 @@ export const CAMPAIGN_MEDIA_OPTIONS = [
     { label: "Link", value: "LINK" },
 ] as const;
 
+export const CAMPAIGN_STATUS_OPTIONS = [
+    { label: "Draft", value: "DRAFT" },
+    { label: "Active", value: "ACTIVE" },
+    { label: "Paused", value: "PAUSED" },
+    { label: "Completed", value: "COMPLETED" },
+    { label: "Archived", value: "ARCHIVED" },
+] as const;
+
 export const CAMPAIGN_AUDIENCE_TAGS = [
     { label: "General", value: "GENERAL" },
     { label: "Youth", value: "YOUTH" },
+    { label: "Students", value: "STUDENTS" },
+    { label: "Professionals", value: "PROFESSIONALS" },
+    { label: "Parents", value: "PARENTS" },
+    { label: "Seniors", value: "SENIORS" },
+    { label: "Entrepreneurs", value: "ENTREPRENEURS" },
     { label: "Tech Enthusiasts", value: "TECH_ENTHUSIASTS" },
+    { label: "Social Media Users", value: "SOCIAL_MEDIA_USERS" },
+    { label: "Church Members", value: "CHURCH_MEMBERS" },
+    { label: "Urban", value: "URBAN" },
+    { label: "Rural", value: "RURAL" },
     { label: "Gamers", value: "GAMERS" },
 ] as const;

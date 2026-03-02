@@ -7,7 +7,9 @@ import DataTable from "@/components/ui/DataTable";
 import { USERS_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/hooks/useAuth";
+import { ICONS } from "@/config/icons";
 import type { UserListItem } from "@/modules/users/services/userService";
+import Link from "next/link";
 
 const ROLE_COLORS: Record<string, string> = {
   USER: "default",
@@ -103,18 +105,24 @@ export default function UserManagementPanel() {
     {
       title: USERS_PAGE_CONTENT.actionsLabel,
       key: "actions",
-      render: (_, rec) =>
-        canEditRole(rec.role) ? (
-          <Select
-            size="small"
-            value={rec.role}
-            style={{ width: 130 }}
-            options={getAssignableRoles().map((r) => ({ value: r, label: r }))}
-            onChange={(val) => changeRole(rec.id, val)}
-          />
-        ) : (
-          <Tag color={ROLE_COLORS[rec.role] ?? "default"}>{rec.role}</Tag>
-        ),
+      render: (_, rec) => (
+        <div className="flex items-center gap-2">
+          <Link href={ROUTES.USER_DETAIL(rec.id)}>
+            <Button size="small" icon={<ICONS.view />} />
+          </Link>
+          {canEditRole(rec.role) ? (
+            <Select
+              size="small"
+              value={rec.role}
+              style={{ width: 130 }}
+              options={getAssignableRoles().map((r) => ({ value: r, label: r }))}
+              onChange={(val) => changeRole(rec.id, val)}
+            />
+          ) : (
+            <Tag color={ROLE_COLORS[rec.role] ?? "default"}>{rec.role}</Tag>
+          )}
+        </div>
+      ),
     },
   ];
 

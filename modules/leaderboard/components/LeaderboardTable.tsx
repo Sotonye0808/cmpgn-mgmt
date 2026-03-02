@@ -1,10 +1,13 @@
 "use client";
 
-import { Table, Avatar, Tooltip } from "antd";
+import { Avatar, Tooltip } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import Link from "next/link";
 import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import { RANK_LEVELS } from "@/config/ranks";
+import DataTable from "@/components/ui/DataTable";
+import { ROUTES } from "@/config/routes";
 
 interface LeaderboardTableProps {
   entries: LeaderboardEntry[];
@@ -49,29 +52,33 @@ export default function LeaderboardTable({
     {
       title: "Participant",
       key: "participant",
-      render: (_, entry) => (
-        <div className="flex items-center gap-3">
-          <Avatar
-            src={entry.profilePicture}
-            size={36}
-            className="flex-shrink-0">
-            {entry.firstName[0]}
-          </Avatar>
-          <div>
-            <p className="text-sm font-medium text-ds-text-primary leading-tight">
-              {entry.firstName} {entry.lastName}
-              {entry.userId === currentUserId && (
-                <span className="ml-1.5 text-xs text-ds-brand-accent">
-                  (You)
-                </span>
-              )}
-            </p>
-            <p className="text-xs text-ds-text-subtle">
-              {getRankLevel(entry.score).badge} {getRankLevel(entry.score).name}
-            </p>
-          </div>
-        </div>
-      ),
+      render: (_, entry) => {
+        const isSelf = entry.userId === currentUserId;
+        const href = isSelf ? ROUTES.SETTINGS : ROUTES.USER_DETAIL(entry.userId);
+        return (
+          <Link href={href} className="group flex items-center gap-3 hover:no-underline">
+            <Avatar
+              src={entry.profilePicture}
+              size={36}
+              className="flex-shrink-0">
+              {entry.firstName[0]}
+            </Avatar>
+            <div>
+              <p className="text-sm font-medium text-ds-text-primary group-hover:text-ds-brand-accent transition-colors leading-tight">
+                {entry.firstName} {entry.lastName}
+                {isSelf && (
+                  <span className="ml-1.5 text-xs text-ds-brand-accent">
+                    (You)
+                  </span>
+                )}
+              </p>
+              <p className="text-xs text-ds-text-subtle">
+                {getRankLevel(entry.score).badge} {getRankLevel(entry.score).name}
+              </p>
+            </div>
+          </Link>
+        );
+      },
     },
     {
       title: "Score",
@@ -151,7 +158,7 @@ export default function LeaderboardTable({
   ];
 
   return (
-    <Table<LeaderboardEntry>
+    <DataTable<LeaderboardEntry>
       rowKey="userId"
       dataSource={entries}
       columns={COLUMNS}
@@ -166,7 +173,6 @@ export default function LeaderboardTable({
       }}
       rowClassName={(entry) =>
         cn(
-          "transition-colors",
           entry.userId === currentUserId
             ? "bg-ds-brand-accent-subtle hover:bg-ds-brand-accent-subtle"
             : "",

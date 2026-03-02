@@ -14,11 +14,7 @@ export default function PublicLayout({
       {/* Ambient radial glows — give glass surfaces meaningful content to blur against */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 70% 45% at 50% -5%, rgba(124,58,237,0.12) 0%, transparent 65%), radial-gradient(ellipse 50% 35% at 85% 100%, rgba(124,58,237,0.08) 0%, transparent 55%), radial-gradient(ellipse 40% 30% at 10% 80%, rgba(16,185,129,0.05) 0%, transparent 50%)",
-        }}
+        className="pointer-events-none fixed inset-0 -z-10 ambient-glow-public"
       />
       <header className="glass-nav sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">

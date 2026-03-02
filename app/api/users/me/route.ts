@@ -12,6 +12,12 @@ const updateProfileSchema = z.object({
     firstName: z.string().min(1, "First name is required").max(50),
     lastName: z.string().min(1, "Last name is required").max(50),
     profilePicture: z.string().url("Must be a valid URL").optional(),
+    whatsappNumber: z
+        .string()
+        .regex(/^\+\d{1,4}\d{6,15}$/, "Invalid WhatsApp number format")
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export async function GET() {
@@ -45,6 +51,8 @@ export async function PATCH(request: NextRequest) {
                 ...(parsed.data.profilePicture !== undefined && {
                     profilePicture: parsed.data.profilePicture,
                 }),
+                // Allow explicit clear (undefined) or set new number
+                whatsappNumber: parsed.data.whatsappNumber,
                 updatedAt: new Date().toISOString(),
             },
         });

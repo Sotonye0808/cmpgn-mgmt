@@ -25,6 +25,7 @@ import { useFlaggedUsers } from "@/modules/trust/hooks/useTrust";
 import { GlobalLeaderboardAdminView } from "@/modules/leaderboard";
 import PageHeader from "@/components/ui/PageHeader";
 import AvatarPicker from "@/components/ui/AvatarPicker";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 const { Title, Text } = Typography;
 
@@ -52,6 +53,7 @@ function ProfileSection() {
           firstName: values.firstName,
           lastName: values.lastName,
           ...(avatarUrl && { profilePicture: avatarUrl }),
+          whatsappNumber: values.whatsappNumber ?? "",
         }),
       });
       const json = await res.json();
@@ -117,6 +119,7 @@ function ProfileSection() {
           firstName: user?.firstName,
           lastName: user?.lastName,
           email: user?.email,
+          whatsappNumber: user?.whatsappNumber,
         }}>
         <Row gutter={16}>
           <Col span={12}>
@@ -141,6 +144,18 @@ function ProfileSection() {
           name="email"
           rules={[{ required: true, type: "email" }]}>
           <Input prefix={<ICONS.mail />} disabled />
+        </Form.Item>
+        <Form.Item
+          label="WhatsApp Number"
+          name="whatsappNumber"
+          extra="Used for community updates and notifications"
+          rules={[
+            {
+              pattern: /^\+\d{7,19}$/,
+              message: "Enter a valid number, e.g. +2347012345678",
+            },
+          ]}>
+          <PhoneInput placeholder="7012345678" />
         </Form.Item>
         <Button
           type="primary"

@@ -310,6 +310,39 @@
     box-shadow: var(--ds-glow-accent-strong);
   }
 
+  /* Ambient glow backgrounds — extracted from inline styles in layouts */
+  .ambient-glow-dashboard {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  .ambient-glow-public {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  .ambient-glow-auth {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  /* Progress bar with dynamic width via --_bar-w custom property */
+  .bar-dynamic {
+    width: var(--_bar-w);
+  }
+
   .scrollbar-hide {
     /* scrollbar-width: not supported in Chrome < 121, Safari — ::-webkit-scrollbar fallback below covers those */
     scrollbar-width: none;
@@ -334,6 +367,8 @@
   }
 
   .bg-dynamic-muted {
+    /* Fallback for older browsers without color-mix() support */
+    background-color: rgba(124, 58, 237, 0.08);
     background-color: color-mix(in srgb, var(--_dc) 10%, transparent);
   }
 

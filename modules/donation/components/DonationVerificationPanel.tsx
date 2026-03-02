@@ -13,6 +13,7 @@ import {
   Space,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import Link from "next/link";
 import DataTable from "@/components/ui/DataTable";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
@@ -110,10 +111,13 @@ export default function DonationVerificationPanel() {
     },
     {
       title: "Donor",
-      dataIndex: "userName",
-      key: "userName",
-      render: (name: string) => (
-        <span className="text-ds-text-primary font-medium">{name}</span>
+      key: "donor",
+      render: (_: unknown, rec: EnrichedDonation) => (
+        <Link
+          href={ROUTES.USER_DETAIL(rec.userId)}
+          className="text-ds-text-primary font-medium hover:text-ds-brand-accent transition-colors">
+          {rec.userName}
+        </Link>
       ),
     },
     {

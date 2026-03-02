@@ -64,8 +64,8 @@ export default function TeamCard({
                 </div>
                 <div className="h-1.5 bg-ds-surface-elevated rounded-full overflow-hidden">
                     <div
-                        className="h-full bg-ds-brand-accent rounded-full transition-all duration-300"
-                        style={{ width: `${capacityPercent}%` }}
+                        className="h-full bg-ds-brand-accent rounded-full transition-all duration-300 bar-dynamic"
+                        style={{ '--_bar-w': `${capacityPercent}%` } as React.CSSProperties}
                     />
                 </div>
             </div>

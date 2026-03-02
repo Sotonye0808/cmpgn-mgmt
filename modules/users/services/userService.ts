@@ -1,5 +1,6 @@
 import { mockDb } from "@/lib/data/mockDb";
 import { mockCache } from "@/lib/data/mockCache";
+import { getUserAnalytics } from "@/modules/analytics/services/analyticsService";
 
 // ─── List All Users (Admin) ───────────────────────────────────────────────────
 
@@ -94,5 +95,66 @@ export async function changeUserRole(
         role: updated.role as unknown as string,
         createdAt: updated.createdAt,
         isActive: true,
+    };
+}
+
+// ─── User Profile (Admin View) ────────────────────────────────────────────────
+
+const PROTECTED_VIEW_ROLES: string[] = ["ADMIN", "SUPER_ADMIN"];
+
+export async function getUserProfile(
+    userId: string,
+    actorRole: string
+): Promise<UserProfileView> {
+    const user = mockDb.users.findUnique({ where: { id: userId } });
+    if (!user) throw new Error("User not found");
+
+    // Privilege boundary: ADMIN cannot view other ADMIN/SUPER_ADMIN profiles
+    if (actorRole !== "SUPER_ADMIN") {
+        const targetRole = user.role as unknown as string;
+        if (PROTECTED_VIEW_ROLES.includes(targetRole)) {
+            throw new Error("Insufficient permissions to view this profile");
+        }
+    }
+
+    // Aggregate all data
+    const analytics = await getUserAnalytics(userId);
+
+    const donations = mockDb.donations._data.filter(
+        (d) => d.userId === userId
+    );
+
+    const participations = mockDb.participations._data.filter(
+        (p) => p.userId === userId
+    );
+
+    const referralsGiven = mockDb.referrals._data.filter(
+        (r) => r.inviterId === userId
+    ).length;
+    const referralsReceived = mockDb.referrals._data.filter(
+        (r) => r.inviteeId === userId
+    ).length;
+
+    const team = user.teamId
+        ? mockDb.teams?._data?.find((t) => t.id === user.teamId)
+        : undefined;
+
+    const group = team
+        ? mockDb.groups?._data?.find((g) => g.id === team.groupId)
+        : undefined;
+
+    const trustScore = mockDb.trustScores._data.find(
+        (ts) => ts.userId === userId
+    );
+
+    return {
+        user,
+        analytics,
+        donations,
+        participations,
+        referrals: { given: referralsGiven, received: referralsReceived },
+        team,
+        group,
+        trustScore,
     };
 }
