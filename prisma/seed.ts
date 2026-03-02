@@ -1,10 +1,10 @@
 import "dotenv/config";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient } from "../prisma/generated/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
 import bcrypt from "bcryptjs";
 
 const prisma = new PrismaClient({
-    datasourceUrl: process.env.DATABASE_URL,
+    accelerateUrl: process.env.DATABASE_URL,
 }).$extends(withAccelerate());
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
@@ -23,25 +23,25 @@ function d(offsetDays: number): Date {
 async function main() {
     console.log("🌱 Seeding database…");
 
-    // Clear all tables in dependency order
-    await prisma.$transaction([
-        prisma.campaignAuditEvent.deleteMany(),
-        prisma.teamInviteLink.deleteMany(),
-        prisma.viewProof.deleteMany(),
-        prisma.appNotification.deleteMany(),
-        prisma.leaderboardSnapshot.deleteMany(),
-        prisma.pointsLedgerEntry.deleteMany(),
-        prisma.donation.deleteMany(),
-        prisma.referral.deleteMany(),
-        prisma.linkEvent.deleteMany(),
-        prisma.smartLink.deleteMany(),
-        prisma.campaignParticipation.deleteMany(),
-        prisma.trustScore.deleteMany(),
-        prisma.campaign.deleteMany(),
-        prisma.user.deleteMany(),
-        prisma.team.deleteMany(),
-        prisma.group.deleteMany(),
-    ]);
+    // Clear all tables in FK-safe dependency order.
+    // Sequential awaits instead of $transaction — Accelerate's interactive
+    // transaction timeout (5 s) is too short for 16 HTTP round trips.
+    await prisma.campaignAuditEvent.deleteMany();
+    await prisma.teamInviteLink.deleteMany();
+    await prisma.viewProof.deleteMany();
+    await prisma.appNotification.deleteMany();
+    await prisma.leaderboardSnapshot.deleteMany();
+    await prisma.pointsLedgerEntry.deleteMany();
+    await prisma.donation.deleteMany();
+    await prisma.referral.deleteMany();
+    await prisma.linkEvent.deleteMany();
+    await prisma.smartLink.deleteMany();
+    await prisma.campaignParticipation.deleteMany();
+    await prisma.trustScore.deleteMany();
+    await prisma.campaign.deleteMany();
+    await prisma.user.deleteMany();
+    await prisma.team.deleteMany();
+    await prisma.group.deleteMany();
 
     console.log("  ✓ Cleared existing data");
 

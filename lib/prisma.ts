@@ -22,7 +22,7 @@ const globalForPrisma = globalThis as unknown as {
 
 function buildPrismaClient(): PrismaClient {
     return new PrismaClient({
-        datasourceUrl: (process.env.DATABASE_URL || "fallback-url") as string,
+        accelerateUrl: process.env.DATABASE_URL,
         log:
             process.env.NODE_ENV === "development"
                 ? (["query", "error", "warn"] as const)

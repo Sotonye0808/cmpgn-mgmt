@@ -195,12 +195,19 @@ export async function getDonationById(id: string): Promise<Donation | null> {
 
 export async function listDonations(
     pagination: { page: number; pageSize: number } = { page: 1, pageSize: DEFAULT_PAGE_SIZE },
-    filters?: { campaignId?: string; status?: DonationStatus; userId?: string }
+    filters?: { campaignId?: string; status?: DonationStatus; userId?: string; search?: string }
 ): Promise<PaginatedResponse<Donation & { userName?: string; campaignTitle?: string }>> {
     const where: Record<string, unknown> = {};
     if (filters?.campaignId) where.campaignId = filters.campaignId;
     if (filters?.status) where.status = filters.status;
     if (filters?.userId) where.userId = filters.userId;
+    if (filters?.search) {
+        where.OR = [
+            { user: { firstName: { contains: filters.search, mode: "insensitive" } } },
+            { user: { lastName: { contains: filters.search, mode: "insensitive" } } },
+            { campaign: { title: { contains: filters.search, mode: "insensitive" } } },
+        ];
+    }
 
     const [raw, total] = await Promise.all([
         prisma.donation.findMany({

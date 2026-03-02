@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
 
         const result = await listDonations(
             { page, pageSize },
-            { status: status as DonationStatus | undefined, campaignId }
+            { status: status as DonationStatus | undefined, campaignId, search }
         );
 
         return paginatedResponse(result.data, result.pagination.total, page, pageSize);
