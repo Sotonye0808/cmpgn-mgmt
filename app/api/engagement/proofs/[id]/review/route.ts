@@ -6,7 +6,8 @@ import {
     notFoundResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 import { z } from "zod";
 
 const reviewSchema = z.object({
@@ -30,24 +31,22 @@ export async function PUT(
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const now = new Date().toISOString();
-        const updated = mockDb.viewProofs.update({
-            where: { id: proofId },
-            data: {
-                status: parsed.data.status as unknown as ViewProofStatus,
-                reviewedById: auth.user.id,
-                reviewedAt: now,
-                notes: parsed.data.notes,
-                updatedAt: now,
-            },
-        });
-
-        if (!updated) {
+        const existing = await prisma.viewProof.findUnique({ where: { id: proofId } });
+        if (!existing) {
             return notFoundResponse("View proof not found");
         }
 
-        mockDb.emit("viewProofs:changed");
-        return successResponse(updated);
+        const updated = await prisma.viewProof.update({
+            where: { id: proofId },
+            data: {
+                status: parsed.data.status as never,
+                reviewedById: auth.user.id,
+                reviewedAt: new Date(),
+                notes: parsed.data.notes,
+            },
+        });
+
+        return successResponse(serialize(updated));
     } catch (err) {
         return handleApiError(err);
     }

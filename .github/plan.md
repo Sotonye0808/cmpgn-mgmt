@@ -3,7 +3,7 @@
 > **Digital Mobilization & Harvest Impact Campaign Center**  
 > Status: **Active Development** · Last updated: February 2026
 >
-> **Progress:** Phases 1–13 ✅ complete · Phases 14–15 pending · `npx tsc --noEmit` passing clean (0 errors)
+> **Progress:** Phases 1–14 ✅ complete · Phase 15 pending · `npx tsc --noEmit` passing clean (0 errors)
 
 ---
 
@@ -27,7 +27,7 @@ Phase 10 ✅ Donation Module
 Phase 11 ✅ Trust & Fraud Detection
 Phase 12 ✅ Analytics Dashboard
 Phase 13 ✅ Admin Module + Landing Page
-Phase 14 → Prisma + Real Database Migration
+Phase 14 ✅ Prisma + Real Database Migration
 Phase 15 → Stabilization, QA, Deploy Readiness
 ```
 
@@ -589,25 +589,36 @@ Admin control panel for campaign/user management. Public landing page for DMHicc
 
 ---
 
-## Phase 14 — Prisma + Real Database
+## Phase 14 — Prisma + Real Database ✅
 
 ### Goals
 
-Swap the in-memory mock layer for real PostgreSQL via Prisma. Service layer only — no component changes.
+Swap the in-memory mock layer for real PostgreSQL via Prisma Accelerate, Upstash Redis for caching, and Cloudinary for media uploads. Service layer + API routes migrated — no component layout changes.
 
 ### Tasks
 
-- [ ] Full Prisma schema in `/prisma/schema.prisma`:
-  - Models: User, Campaign, CampaignParticipation, SmartLink, LinkEvent, Referral, Donation, PointsLedger, LeaderboardSnapshot, TrustScore
-  - Relations, indexes on high-query fields (`userId`, `campaignId`, `slug`)
-- [ ] Migration: `prisma migrate dev`
-- [ ] Seed script: `prisma/seed.ts` — deterministic seed data matching Phase 2 mock data structure
-- [ ] Replace `/lib/data/` in-memory stores with Prisma queries in service files
-- [ ] Add Redis integration:
-  - Click counter caching for SmartLink events
-  - Leaderboard snapshot caching
-  - Rate limiting middleware for link event endpoints
-- [ ] Validate all TypeScript types align with generated Prisma types
+- [x] Full Prisma schema in `/prisma/schema.prisma`:
+  - 16 models: User, Campaign, CampaignParticipation, SmartLink, LinkEvent, Referral, Donation (Decimal(12,2)), PointsLedgerEntry, LeaderboardSnapshot, TrustScore, AppNotification, ViewProof, Group, Team, TeamInviteLink, CampaignAuditEvent
+  - 15 enums matching global.d.ts
+  - All relations, @@unique constraints, @@index on high-query fields
+  - Team.memberIds → User.teamId FK relation; Group.teamIds → Team.groupId FK relation
+- [x] Prisma client singleton (`/lib/prisma.ts`) with `withAccelerate()` extension for Prisma Accelerate URLs
+- [x] Upstash Redis adapter (`/lib/redis.ts`) — REST-based, `dmhicc:v1:` key namespace, mirrors mockCache API
+- [x] Cloudinary server-side helper (`/lib/cloudinary.ts`) — `uploadAsset()` / `deleteAsset()`, folder mapping per AssetCategory, no avatars (DiceBear)
+- [x] Polling hook (`/hooks/useAutoRefresh.ts`) replacing `useMockDbSubscription` — tab-visibility-aware, configurable intervals
+- [x] Per-table refresh intervals config (`/config/realtime.ts`)
+- [x] Date/Decimal serialiser (`/lib/utils/serialize.ts`) for Prisma→JSON round-trips
+- [x] All 12 service files migrated from mockDb to Prisma queries with `$transaction` for multi-table writes:
+  - userService, campaignService, linkService, engagementService, referralService, pointsService, donationService, leaderboardService, analyticsService, teamService, trustService, publicStatsService
+- [x] All 13 API routes migrated from mockDb to Prisma:
+  - auth/login, auth/register, auth/refresh, users/me, users/weapons, smart-links/[id], campaigns/me, campaigns/joined, notifications, notifications/[id], notifications/read-all, engagement/proofs, engagement/proofs/[id]/review
+- [x] Public landing page converted to async server component with Prisma queries
+- [x] Upload API route migrated to Cloudinary (`uploadAsset()` integration)
+- [x] All hooks/components swapped from `useMockDbSubscription` to `useAutoRefresh` (14 files)
+- [x] Seed script: `prisma/seed.ts` — deterministic seed data matching original mockDb fixtures, Prisma-native `createMany`
+- [x] `package.json` updated with `db:generate`, `db:push`, `db:seed`, `db:migrate`, `db:studio` scripts + `prisma.seed` config
+- [x] Redis caching: campaigns list, leaderboard, user trust scores, public stats, points summaries
+- [x] Validate all TypeScript types align with generated Prisma types
 
 ---
 
@@ -663,13 +674,20 @@ Analytics ← (all modules)
 | `config/routes.ts`               | All route strings as typed constants                      |
 | `config/icons.ts`                | All Ant Design icon imports                               |
 | `lib/constants.ts`               | POINTS_CONFIG, RANK_LEVELS, limits, durations             |
-| `lib/data/mockDb.ts`             | Global mock DB singleton — all tables, CRUD, EventEmitter |
-| `lib/data/mockCache.ts`          | Mock Redis TTL cache — get/set/del/invalidatePattern      |
-| `lib/data/seed.ts`               | Deterministic seed data matching Prisma schema shape      |
+| `lib/data/mockDb.ts`             | Global mock DB singleton (legacy — replaced by Prisma in Phase 14) |
+| `lib/data/mockCache.ts`          | Mock Redis TTL cache (legacy — replaced by Upstash in Phase 14) |
+| `lib/data/seed.ts`               | Legacy mock seed data (replaced by prisma/seed.ts)        |
+| `lib/prisma.ts`                  | PrismaClient singleton with Accelerate extension          |
+| `lib/redis.ts`                   | Upstash Redis adapter with dmhicc:v1: namespace           |
+| `lib/cloudinary.ts`              | Cloudinary upload/delete helpers per asset category        |
+| `lib/utils/serialize.ts`         | Date/Decimal→primitive serialiser for API responses        |
+| `prisma/schema.prisma`           | 16 models, 15 enums, all relations + indexes              |
+| `prisma/seed.ts`                 | Prisma-native deterministic seed script                   |
+| `config/realtime.ts`             | Per-table polling intervals for useAutoRefresh             |
+| `hooks/useAutoRefresh.ts`        | Tab-visibility-aware polling hook (replaced useMockDbSubscription) |
 | `providers/AntdProvider.tsx`     | Ant Design token bridge (CSS vars → antd)                 |
 | `lib/middleware/auth.ts`         | getAuthenticatedUser, requireRole                         |
 | `types/global.d.ts`              | ALL core types declared globally — no imports needed      |
 | `lib/utils/api.ts`               | Typed API response helpers                                |
 | `lib/utils/roleGuard.ts`         | filterByRole utility for allowedRoles config filtering    |
-| `hooks/useMockDbSubscription.ts` | Subscribe to mockDb events for live re-renders            |
 | `hooks/useRole.ts`               | hasRole, canAccess helpers from AuthContext               |

@@ -1,5 +1,6 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+import { serialize } from "@/lib/utils/serialize";
 import { generateSlug } from "@/lib/utils/slug";
 import { CACHE_TTL_CAMPAIGN_LIST as CACHE_TTL_SHORT } from "@/lib/constants";
 
@@ -23,11 +24,8 @@ interface GetLinksOptions {
 interface IncrementClickInput {
     slug: string;
     referrerId?: string;
-    /** IP address for fingerprint dedup */
     ipAddress?: string;
-    /** User-agent string for fingerprint dedup */
     userAgent?: string;
-    /** True when the dedup cookie for this slug was already set on the visitor */
     cookieSeen?: boolean;
 }
 
@@ -54,99 +52,106 @@ interface LogEventInput {
 export async function generateLink(input: GenerateLinkInput): Promise<SmartLink> {
     const { userId, campaignId, customAlias } = input;
 
-    // Check if user already has a link for this campaign
-    const existing = mockDb.smartLinks.findMany({ where: { userId, campaignId } })[0] ?? null;
-    if (existing) return existing;
+    // Check if user already has a link for this campaign (compound unique)
+    const existing = await prisma.smartLink.findUnique({
+        where: { userId_campaignId: { userId, campaignId } },
+    });
+    if (existing) return serialize<SmartLink>(existing);
 
     // Ensure campaign exists and is active
-    const campaign = await mockDb.campaigns.findUnique({ where: { id: campaignId } });
+    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
     if (!campaign) throw new Error("Campaign not found");
     if (campaign.status !== "ACTIVE") throw new Error("Campaign is not active");
 
     // Generate unique slug
     let slug = customAlias ?? generateSlug();
-    let slugTaken = !!(await mockDb.smartLinks.findUnique({ where: { slug } }));
+    let slugTaken = !!(await prisma.smartLink.findUnique({ where: { slug } }));
     let retries = 0;
     while (slugTaken && retries < 5) {
         slug = generateSlug();
-        slugTaken = !!(await mockDb.smartLinks.findUnique({ where: { slug } }));
+        slugTaken = !!(await prisma.smartLink.findUnique({ where: { slug } }));
         retries++;
     }
     if (slugTaken) throw new Error("Could not generate unique slug. Try again.");
 
-    const now = new Date().toISOString();
-    const newLink: SmartLink = {
-        id: crypto.randomUUID(),
-        slug,
-        userId,
-        campaignId,
-        originalUrl: campaign.ctaUrl ?? `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/campaigns/${campaignId}`,
-        clickCount: 0,
-        uniqueClickCount: 0,
-        conversionCount: 0,
-        isActive: true,
-        isExpired: false,
-        expiresAt: campaign.endDate ?? undefined,
-        createdAt: now,
-        updatedAt: now,
-    };
+    const newLink = await prisma.smartLink.create({
+        data: {
+            slug,
+            userId,
+            campaignId,
+            originalUrl: campaign.ctaUrl ?? `${process.env.NEXT_PUBLIC_BASE_URL ?? "http://localhost:3000"}/campaigns/${campaignId}`,
+            clickCount: 0,
+            uniqueClickCount: 0,
+            conversionCount: 0,
+            isActive: true,
+            isExpired: false,
+            expiresAt: campaign.endDate ?? undefined,
+        },
+    });
 
-    await mockDb.smartLinks.create({ data: newLink });
-    mockCache.invalidatePattern(`smartlinks:user:${userId}`);
-    mockDb.emit("smartLinks:changed");
-
-    return newLink;
+    await redis.invalidatePattern(`smartlinks:user:${userId}`);
+    return serialize<SmartLink>(newLink);
 }
 
 // ─── Get link by slug ──────────────────────────────────────────────────────────
 export async function getLinkBySlug(slug: string): Promise<SmartLink | null> {
     const cacheKey = `smartlink:slug:${slug}`;
-    const cached = mockCache.get<SmartLink>(cacheKey);
+    const cached = await redis.get<SmartLink>(cacheKey);
     if (cached) return cached;
 
-    const link = await mockDb.smartLinks.findUnique({ where: { slug } });
-    if (link) mockCache.set(cacheKey, link, CACHE_TTL_SHORT);
-    return link ?? null;
+    const link = await prisma.smartLink.findUnique({ where: { slug } });
+    if (!link) return null;
+
+    const serialized = serialize<SmartLink>(link);
+    await redis.set(cacheKey, serialized, CACHE_TTL_SHORT);
+    return serialized;
 }
 
 // ─── Get links (by user or campaign) ────────────────────────────────────────
 export async function getLinksByUser(userId: string): Promise<SmartLinkView[]> {
     const cacheKey = `smartlinks:user:${userId}`;
-    const cached = mockCache.get<SmartLinkView[]>(cacheKey);
+    const cached = await redis.get<SmartLinkView[]>(cacheKey);
     if (cached) return cached;
 
-    const links = await mockDb.smartLinks.findMany({ where: { userId } });
+    const links = await prisma.smartLink.findMany({
+        where: { userId },
+        include: { campaign: { select: { title: true } } },
+    });
 
-    // Enrich with campaign titles via a single batched lookup
-    const campaignIds = [...new Set(links.map((l) => l.campaignId))];
-    const allCampaigns = await mockDb.campaigns.findMany();
-    const campaigns = allCampaigns.filter((c) => campaignIds.includes(c.id));
-    const titleMap = new Map(campaigns.map((c) => [c.id, c.title]));
-    const views: SmartLinkView[] = links.map((l) => ({
-        ...l,
-        campaignTitle: titleMap.get(l.campaignId),
-    }));
+    const views: SmartLinkView[] = links.map((l) => {
+        const { campaign: campaignRel, ...rest } = l;
+        return serialize<SmartLinkView>({
+            ...rest,
+            campaignTitle: campaignRel?.title,
+        });
+    });
 
-    mockCache.set(cacheKey, views, CACHE_TTL_SHORT);
+    await redis.set(cacheKey, views, CACHE_TTL_SHORT);
     return views;
 }
 
 export async function getLinksByCampaign(options: GetLinksOptions) {
     const { campaignId, page = 1, pageSize = 10 } = options;
-    const all = await mockDb.smartLinks.findMany(campaignId ? { where: { campaignId } } : {});
 
-    // Enrich with campaign title
-    const campaign = campaignId
-        ? await mockDb.campaigns.findUnique({ where: { id: campaignId } })
-        : null;
-    const views: SmartLinkView[] = all.map((l) => ({
-        ...l,
-        campaignTitle: campaign?.title,
-    }));
+    const where = campaignId ? { campaignId } : {};
+    const [all, total] = await Promise.all([
+        prisma.smartLink.findMany({
+            where,
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            include: { campaign: { select: { title: true } } },
+        }),
+        prisma.smartLink.count({ where }),
+    ]);
 
-    const total = views.length;
-    const start = (page - 1) * pageSize;
-    const data = views.slice(start, start + pageSize);
+    const data: SmartLinkView[] = all.map((l) => {
+        const { campaign: campaignRel, ...rest } = l;
+        return serialize<SmartLinkView>({
+            ...rest,
+            campaignTitle: campaignRel?.title,
+        });
+    });
+
     return {
         data,
         meta: { page, pageSize, total, totalPages: Math.ceil(total / pageSize) },
@@ -157,7 +162,7 @@ export async function getLinksByCampaign(options: GetLinksOptions) {
 export async function incrementClick(input: IncrementClickInput): Promise<SmartLink> {
     const { slug, ipAddress, userAgent, cookieSeen } = input;
 
-    const link = await mockDb.smartLinks.findUnique({ where: { slug } });
+    const link = await prisma.smartLink.findUnique({ where: { slug } });
     if (!link) throw new Error("Link not found");
     if (!link.isActive) throw new Error("Link is no longer active");
     if (link.expiresAt && new Date(link.expiresAt) < new Date()) {
@@ -167,71 +172,60 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
     // Fingerprint-based unique click deduplication (24h TTL)
     const fingerprint = simpleHash((ipAddress ?? "") + (userAgent ?? ""));
     const seenKey = `seen:${link.id}:${fingerprint}`;
-    const alreadySeen = !!mockCache.get<boolean>(seenKey) || !!cookieSeen;
+    const alreadySeen = !!(await redis.get<boolean>(seenKey)) || !!cookieSeen;
     if (!alreadySeen) {
-        mockCache.set(seenKey, true, 86_400); // 24 h
+        await redis.set(seenKey, true, 86_400_000); // 24h in ms
     }
 
-    const updatedLink = await mockDb.smartLinks.update({
+    const updatedLink = await prisma.smartLink.update({
         where: { id: link.id },
         data: {
-            clickCount: link.clickCount + 1,
-            uniqueClickCount: alreadySeen
-                ? link.uniqueClickCount
-                : link.uniqueClickCount + 1,
-            updatedAt: new Date().toISOString(),
+            clickCount: { increment: 1 },
+            uniqueClickCount: alreadySeen ? undefined : { increment: 1 },
         },
     });
-    if (!updatedLink) throw new Error("Failed to update link");
 
-    mockCache.del(`smartlink:slug:${slug}`);
-    mockDb.emit("smartLinks:changed");
+    await redis.del(`smartlink:slug:${slug}`);
 
     // Distribute click points via transaction
-    await mockDb.transaction(async (tx) => {
-        const pointEntry = {
-            id: crypto.randomUUID(),
-            userId: link.userId,
-            campaignId: link.campaignId,
-            type: "IMPACT" as PointsLedgerEntry["type"],
-            value: 1,
-            description: "Smart link click received",
-            createdAt: new Date().toISOString(),
-        };
-        await tx.pointsLedger.create({ data: pointEntry });
-        mockCache.del(`points:summary:${link.userId}`);
-        mockDb.emit("pointsLedger:changed");
+    await prisma.$transaction(async (tx) => {
+        await tx.pointsLedgerEntry.create({
+            data: {
+                userId: link.userId,
+                campaignId: link.campaignId,
+                type: "IMPACT" as never,
+                value: 1,
+                description: "Smart link click received",
+            },
+        });
+        await redis.del(`points:summary:${link.userId}`);
     });
 
-    return updatedLink;
+    return serialize<SmartLink>(updatedLink);
 }
 
 // ─── Log link event ────────────────────────────────────────────────────────────
 export async function logLinkEvent(input: LogEventInput): Promise<LinkEvent> {
-    const event: LinkEvent = {
-        id: crypto.randomUUID(),
-        linkId: input.linkId,
-        eventType: input.type as unknown as LinkEventType,
-        userId: input.userId,
-        ipAddress: input.ipAddress,
-        userAgent: input.userAgent,
-        referrer: input.referrer,
-        country: input.country,
-        createdAt: new Date().toISOString(),
-    };
-    await mockDb.linkEvents.create({ data: event });
-    mockDb.emit("linkEvents:changed");
-    return event;
+    const event = await prisma.linkEvent.create({
+        data: {
+            linkId: input.linkId,
+            eventType: input.type as never,
+            userId: input.userId,
+            ipAddress: input.ipAddress,
+            userAgent: input.userAgent,
+            referrer: input.referrer,
+            country: input.country,
+        },
+    });
+    return serialize<LinkEvent>(event);
 }
 
 // ─── Expire / deactivate link ──────────────────────────────────────────────────
 export async function deactivateLink(id: string): Promise<SmartLink> {
-    const link = await mockDb.smartLinks.update({
+    const link = await prisma.smartLink.update({
         where: { id },
-        data: { isActive: false, updatedAt: new Date().toISOString() },
+        data: { isActive: false },
     });
-    if (!link) throw new Error("Link not found");
-    mockCache.invalidatePattern(`smartlink:`);
-    mockDb.emit("smartLinks:changed");
-    return link;
+    await redis.invalidatePattern("smartlink:");
+    return serialize<SmartLink>(link);
 }

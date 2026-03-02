@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 import { fetchProofs, submitProof, reviewProof, type ReviewProofInput } from "../services/proofService";
 
 // ─── useProofs ────────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ export function useProofs(campaignId?: string): UseProofsReturn {
     }, [campaignId]);
 
     useEffect(() => { fetch(); }, [fetch]);
-    useMockDbSubscription("viewProofs", fetch);
+    useAutoRefresh("viewProofs", fetch);
 
     return { proofs, loading, error, refresh: fetch };
 }

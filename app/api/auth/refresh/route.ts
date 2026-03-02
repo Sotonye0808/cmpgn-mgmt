@@ -6,7 +6,7 @@ import {
     signRefreshToken,
     setAuthCookies,
 } from "@/lib/utils/jwt";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
 import { JWT_REFRESH_COOKIE } from "@/lib/constants";
 import { successResponse, unauthorizedResponse, handleApiError } from "@/lib/utils/api";
 import type { ApiResponse } from "@/types/api";
@@ -31,7 +31,7 @@ export async function POST(_req: NextRequest): Promise<NextResponse<ApiResponse<
         const payload = verifyRefreshToken(refreshToken);
         if (!payload) return unauthorizedResponse("Refresh token invalid or expired");
 
-        const user = mockDb.users.findUnique({ where: { id: payload.sub } });
+        const user = await prisma.user.findUnique({ where: { id: payload.sub } });
         if (!user || !user.isActive) return unauthorizedResponse("User not found or inactive");
 
         const authUser: AuthUser = {
@@ -39,8 +39,8 @@ export async function POST(_req: NextRequest): Promise<NextResponse<ApiResponse<
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role,
-            profilePicture: user.profilePicture,
+            role: user.role as UserRole,
+            profilePicture: user.profilePicture ?? undefined,
         };
 
         const rememberMe = payload.rem ?? false;

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { BCRYPT_SALT_ROUNDS } from "@/lib/constants";
 import { registerSchema } from "@/lib/schemas/authSchemas";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
 import { signAccessToken, signRefreshToken, setAuthCookies } from "@/lib/utils/jwt";
 import { successResponse, badRequestResponse, handleApiError } from "@/lib/utils/api";
 import type { ApiResponse } from "@/types/api";
@@ -18,51 +18,46 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         const { email, password, firstName, lastName, whatsappNumber } = result.data;
 
         // Check if email already exists
-        const existing = mockDb.users.findUnique({ where: { email } });
+        const existing = await prisma.user.findUnique({ where: { email } });
         if (existing) {
             return badRequestResponse("An account with this email already exists");
         }
 
         const passwordHash = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
 
-        const user = await mockDb.transaction(async (tx) => {
-            const newUser = tx.users.create({
+        const user = await prisma.$transaction(async (tx) => {
+            const newUser = await tx.user.create({
                 data: {
                     email,
                     passwordHash,
                     firstName,
                     lastName,
-                    role: "USER" as unknown as UserRole,
+                    role: "USER" as never,
                     trustScore: 100,
                     isActive: true,
                     ...(whatsappNumber && { whatsappNumber }),
-                    createdAt: new Date().toISOString(),
-                    updatedAt: new Date().toISOString(),
                 },
             });
 
-            tx.trustScores.create({
+            await tx.trustScore.create({
                 data: {
                     userId: newUser.id,
                     score: 100,
                     flags: [],
-                    updatedAt: new Date().toISOString(),
                 },
             });
 
             return newUser;
         });
 
-        mockDb.emit("users:changed");
-
         const authUser: AuthUser = {
             id: user.id,
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role,
-            profilePicture: user.profilePicture,
-            whatsappNumber: user.whatsappNumber,
+            role: user.role as UserRole,
+            profilePicture: user.profilePicture ?? undefined,
+            whatsappNumber: user.whatsappNumber ?? undefined,
         };
 
         const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });

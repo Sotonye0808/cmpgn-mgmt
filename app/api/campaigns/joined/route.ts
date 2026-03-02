@@ -1,6 +1,6 @@
 import { successResponse, handleApiError } from "@/lib/utils/api";
 import { requireAuth } from "@/lib/middleware/auth";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
 
 /**
  * GET /api/campaigns/joined
@@ -11,7 +11,7 @@ export async function GET() {
         const auth = await requireAuth();
         if (auth.error) return auth.error;
 
-        const participations = mockDb.participations.findMany({
+        const participations = await prisma.campaignParticipation.findMany({
             where: { userId: auth.user.id },
         });
 

@@ -17,7 +17,7 @@ export {
     deactivateInviteLink,
     getTeamMemberStats,
 } from "./services/teamService";
-export type { CreateGroupInput, CreateTeamInput, TeamMemberStat } from "./services/teamService";
+export type { TeamMemberStat } from "./services/teamService";
 export { useTeams } from "./hooks/useTeams";
 export { default as TeamCard } from "./components/TeamCard";
 export { default as MyTeamCard } from "./components/MyTeamCard";

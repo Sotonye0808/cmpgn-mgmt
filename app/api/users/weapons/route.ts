@@ -5,7 +5,8 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 import { z } from "zod";
 
 const weaponsSchema = z.object({
@@ -34,16 +35,14 @@ export async function PUT(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const updated = mockDb.users.update({
+        const updated = await prisma.user.update({
             where: { id: user.id },
             data: {
                 weaponsOfChoice: parsed.data.weaponsOfChoice as unknown as SocialPlatform[],
-                updatedAt: new Date().toISOString(),
             },
         });
 
-        mockDb.emit("users:changed");
-        return successResponse(updated);
+        return successResponse(serialize(updated));
     } catch (err) {
         return handleApiError(err);
     }
@@ -55,7 +54,7 @@ export async function GET() {
         const { user, error } = await requireAuth();
         if (error) return error;
 
-        const found = mockDb.users.findUnique({ where: { id: user.id } });
+        const found = await prisma.user.findUnique({ where: { id: user.id } });
         return successResponse({ weaponsOfChoice: found?.weaponsOfChoice ?? [] });
     } catch (err) {
         return handleApiError(err);

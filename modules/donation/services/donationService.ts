@@ -1,12 +1,10 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
-import {
-    CACHE_TTL_DONATIONS,
-    DEFAULT_PAGE_SIZE,
-    POINTS_CONFIG,
-} from "@/lib/constants";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+import { serialize, serializeArray } from "@/lib/utils/serialize";
+import { CACHE_TTL_DONATIONS, DEFAULT_PAGE_SIZE } from "@/lib/constants";
+import { recordCampaignAudit } from "@/modules/campaign/services/campaignService";
 import { nanoid } from "nanoid";
-import { getBankAccountById } from "@/config/bankAccounts";
+import type { PaginatedResponse } from "@/types/api";
 
 // ─── Record Donation ──────────────────────────────────────────────────────────
 
@@ -14,355 +12,323 @@ export async function recordDonation(
     userId: string,
     input: CreateDonationInputExtended
 ): Promise<Donation> {
-    const campaign = mockDb.campaigns.findUnique({ where: { id: input.campaignId } });
-    if (!campaign) throw new Error("Campaign not found");
-    if (campaign.status !== ("ACTIVE" as unknown as CampaignStatus))
-        throw new Error("Campaign is not active");
-    if (input.amount <= 0) throw new Error("Donation amount must be positive");
+    const reference = `DON-${nanoid(8).toUpperCase()}`;
 
-    // Validate bank account if provided
-    if (input.bankAccountId) {
-        const bank = getBankAccountById(input.bankAccountId);
-        if (!bank) throw new Error("Invalid bank account");
-        if (bank.currency !== (input.currency ?? "NGN"))
-            throw new Error("Bank account currency does not match donation currency");
-    }
-
-    // Determine initial status based on whether proof is provided
-    const hasProof = !!input.proofScreenshotUrl;
-    const initialStatus = hasProof
-        ? ("RECEIVED" as unknown as DonationStatus) // proof uploaded → awaiting verification
-        : ("PENDING" as unknown as DonationStatus); // no proof yet
-
-    let donation!: Donation;
-
-    await mockDb.transaction(async (tx) => {
-        donation = tx.donations.create({
+    const donation = await prisma.$transaction(async (tx) => {
+        const d = await tx.donation.create({
             data: {
-                id: nanoid(),
                 userId,
                 campaignId: input.campaignId,
                 amount: input.amount,
                 currency: input.currency ?? "NGN",
-                status: initialStatus,
-                reference: `DON-${nanoid(8).toUpperCase()}`,
+                status: "PENDING" as never,
+                reference,
                 bankAccountId: input.bankAccountId,
                 proofScreenshotUrl: input.proofScreenshotUrl,
-                notes: input.notes,
-                createdAt: new Date().toISOString(),
-                updatedAt: new Date().toISOString(),
+                notes: input.notes ?? input.message,
             },
         });
 
-        // Award Leadership Points for donating
-        const pcfg = POINTS_CONFIG.TEAM_MILESTONE;
-        tx.pointsLedger.create({
+        // Award points for donating
+        await tx.pointsLedgerEntry.create({
             data: {
-                id: nanoid(),
                 userId,
                 campaignId: input.campaignId,
-                type: pcfg.type as unknown as PointType,
-                value: pcfg.value,
-                description: `Donated to campaign`,
-                referenceId: donation.id,
-                createdAt: new Date().toISOString(),
+                type: "RELIABILITY" as never,
+                value: 10,
+                description: `Donation ${reference} submitted`,
+                referenceId: d.id,
             },
         });
+
+        return d;
     });
 
-    mockCache.del(`donations:stats:${input.campaignId}`);
-    mockCache.invalidatePattern(`donations:user:${userId}`);
-    mockCache.invalidatePattern(`points:summary:${userId}`);
-    mockDb.emit("donations:changed");
-    mockDb.emit("pointsLedger:changed");
+    await redis.invalidatePattern(`donations:`);
+    await redis.del(`points:summary:${userId}`);
 
-    return donation;
+    await recordCampaignAudit(input.campaignId, userId, "USER", "DONATION_RECEIVED", {
+        after: { amount: input.amount, currency: input.currency, reference },
+        note: `Donation ${reference} of ${input.amount} ${input.currency}`,
+    });
+
+    return serialize<Donation>(donation);
 }
 
-// ─── Upload Proof of Payment ─────────────────────────────────────────────────
+// ─── Upload Proof ─────────────────────────────────────────────────────────────
 
 export async function uploadDonationProof(
     donationId: string,
-    userId: string,
-    proofScreenshotUrl: string
+    screenshotUrl: string
 ): Promise<Donation> {
-    const donation = mockDb.donations.findUnique({ where: { id: donationId } });
-    if (!donation) throw new Error("Donation not found");
-    if (donation.userId !== userId)
-        throw new Error("You can only upload proof for your own donations");
-    if (donation.status !== ("PENDING" as unknown as DonationStatus))
-        throw new Error("Proof can only be uploaded for PENDING donations");
-
-    const updated = mockDb.donations.update({
+    const donation = await prisma.donation.update({
         where: { id: donationId },
-        data: {
-            proofScreenshotUrl,
-            status: "RECEIVED" as unknown as DonationStatus,
-            updatedAt: new Date().toISOString(),
-        },
+        data: { proofScreenshotUrl: screenshotUrl },
     });
-    if (!updated) throw new Error("Failed to update donation");
-    mockCache.invalidatePattern(`donations:user:${userId}`);
-    mockDb.emit("donations:changed");
-    return updated;
+    await redis.invalidatePattern("donations:");
+    return serialize<Donation>(donation);
 }
 
-// ─── Verify / Reject Donation (Admin) ────────────────────────────────────────
+// ─── Verify Donation (Admin) ──────────────────────────────────────────────────
 
 export async function verifyDonation(
     donationId: string,
-    adminId: string,
-    action: "VERIFIED" | "REJECTED",
+    status: DonationStatus,
+    verifiedById: string,
     notes?: string
 ): Promise<Donation> {
-    const donation = mockDb.donations.findUnique({ where: { id: donationId } });
-    if (!donation) throw new Error("Donation not found");
-    if (
-        donation.status !== ("RECEIVED" as unknown as DonationStatus) &&
-        donation.status !== ("PENDING" as unknown as DonationStatus)
-    )
-        throw new Error(
-            `Cannot ${action.toLowerCase()} a donation with status ${donation.status}`
-        );
+    const donation = await prisma.$transaction(async (tx) => {
+        const d = await tx.donation.update({
+            where: { id: donationId },
+            data: {
+                status: status as never,
+                verifiedById,
+                verifiedAt: new Date(),
+                notes,
+            },
+        });
 
-    const updated = mockDb.donations.update({
-        where: { id: donationId },
-        data: {
-            status: action as unknown as DonationStatus,
-            verifiedById: adminId,
-            verifiedAt: new Date().toISOString(),
-            notes: notes ?? donation.notes,
-            updatedAt: new Date().toISOString(),
-        },
+        // If verified/received, update campaign goal
+        if (status === "VERIFIED" || status === "RECEIVED") {
+            const amountNum = typeof d.amount === "object"
+                ? (d.amount as unknown as { toNumber(): number }).toNumber()
+                : Number(d.amount);
+
+            await tx.campaign.update({
+                where: { id: d.campaignId },
+                data: { goalCurrent: { increment: amountNum } },
+            });
+        }
+
+        return d;
     });
-    if (!updated) throw new Error("Failed to update donation");
 
-    mockCache.del(`donations:stats:${donation.campaignId}`);
-    mockCache.invalidatePattern(`donations:user:${donation.userId}`);
-    mockDb.emit("donations:changed");
-
-    return updated;
+    await redis.invalidatePattern("donations:");
+    return serialize<Donation>(donation);
 }
 
-// ─── Get Campaign Fundraising Stats ──────────────────────────────────────────
+// ─── Campaign Fundraising Stats ───────────────────────────────────────────────
 
 export async function getCampaignFundraisingStats(
     campaignId: string
 ): Promise<DonationStats> {
     const cacheKey = `donations:stats:${campaignId}`;
-    const cached = mockCache.get<DonationStats>(cacheKey);
+    const cached = await redis.get<DonationStats>(cacheKey);
     if (cached) return cached;
 
-    const allDonations = mockDb.donations._data.filter(
-        (d) =>
-            d.campaignId === campaignId &&
-            (d.status === "COMPLETED" || d.status === "VERIFIED")
+    const donations = await prisma.donation.findMany({
+        where: { campaignId },
+        include: { user: { select: { id: true, firstName: true, lastName: true } } },
+    });
+
+    const verified = donations.filter(
+        (d) => d.status === "VERIFIED" || d.status === "RECEIVED"
     );
 
-    const totalRaised = allDonations.reduce((sum, d) => sum + d.amount, 0);
-    const donorCount = new Set(allDonations.map((d) => d.userId)).size;
+    const totalRaised = verified.reduce((s, d) => {
+        const amount = typeof d.amount === "object"
+            ? (d.amount as unknown as { toNumber(): number }).toNumber()
+            : Number(d.amount);
+        return s + amount;
+    }, 0);
 
-    // Participation count for conversion rate
-    const participantCount = mockDb.participations._data.filter(
-        (p) => p.campaignId === campaignId
-    ).length;
-    const conversionRate =
-        participantCount > 0 ? donorCount / participantCount : 0;
+    const donorIds = new Set(verified.map((d) => d.userId));
 
-    // Top donors per user
-    const donorTotals = new Map<string, number>();
-    for (const d of allDonations) {
-        donorTotals.set(d.userId, (donorTotals.get(d.userId) ?? 0) + d.amount);
+    // Top donors
+    const donorTotals = new Map<string, { userId: string; firstName: string; lastName: string; total: number }>();
+    for (const d of verified) {
+        const amount = typeof d.amount === "object"
+            ? (d.amount as unknown as { toNumber(): number }).toNumber()
+            : Number(d.amount);
+        const existing = donorTotals.get(d.userId);
+        if (existing) {
+            existing.total += amount;
+        } else {
+            donorTotals.set(d.userId, {
+                userId: d.userId,
+                firstName: d.user.firstName,
+                lastName: d.user.lastName,
+                total: amount,
+            });
+        }
     }
 
-    const topDonorsRaw = [...donorTotals.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 5);
+    const topDonors = Array.from(donorTotals.values())
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10);
 
-    const topDonors = topDonorsRaw.map(([uid, total]) => {
-        const user = mockDb.users._data.find((u) => u.id === uid);
-        return {
-            userId: uid,
-            firstName: user?.firstName ?? "Unknown",
-            lastName: user?.lastName ?? "",
-            total,
-        };
-    });
+    const participantCount = await prisma.campaignParticipation.count({ where: { campaignId } });
+    const conversionRate = participantCount > 0
+        ? Number(((donorIds.size / participantCount) * 100).toFixed(1))
+        : 0;
 
     const stats: DonationStats = {
         campaignId,
         totalRaised,
-        donorCount,
+        donorCount: donorIds.size,
         conversionRate,
         topDonors,
     };
 
-    mockCache.set(cacheKey, stats, CACHE_TTL_DONATIONS);
+    await redis.set(cacheKey, stats, CACHE_TTL_DONATIONS);
     return stats;
 }
 
 // ─── Get User Donations ───────────────────────────────────────────────────────
 
-export async function getUserDonations(
-    userId: string,
-    page = 1,
-    pageSize = DEFAULT_PAGE_SIZE
-): Promise<{ data: Donation[]; total: number }> {
-    const cacheKey = `donations:user:${userId}:${page}:${pageSize}`;
-    const cached = mockCache.get<{ data: Donation[]; total: number }>(cacheKey);
-    if (cached) return cached;
-
-    const all = mockDb.donations._data
-        .filter((d) => d.userId === userId)
-        .sort(
-            (a, b) =>
-                new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-        );
-
-    const total = all.length;
-    const data = all.slice((page - 1) * pageSize, page * pageSize);
-
-    const result = { data, total };
-    mockCache.set(cacheKey, result, CACHE_TTL_DONATIONS);
-    return result;
+export async function getUserDonations(userId: string): Promise<Donation[]> {
+    const donations = await prisma.donation.findMany({
+        where: { userId },
+        orderBy: { createdAt: "desc" },
+    });
+    return serializeArray<Donation>(donations);
 }
 
 // ─── Get Donation By ID ───────────────────────────────────────────────────────
 
 export async function getDonationById(id: string): Promise<Donation | null> {
-    return mockDb.donations.findUnique({ where: { id } }) ?? null;
+    const donation = await prisma.donation.findUnique({ where: { id } });
+    return donation ? serialize<Donation>(donation) : null;
 }
 
-// ─── List All Donations (Admin) ──────────────────────────────────────────────
+// ─── List Donations (Admin, enriched) ─────────────────────────────────────────
 
 export async function listDonations(
-    page = 1,
-    pageSize = DEFAULT_PAGE_SIZE,
-    filters?: {
-        status?: string;
-        campaignId?: string;
-        search?: string;
-    }
-): Promise<{ data: (Donation & { userName?: string; campaignTitle?: string })[]; total: number }> {
-    let all = [...mockDb.donations._data];
+    pagination: { page: number; pageSize: number } = { page: 1, pageSize: DEFAULT_PAGE_SIZE },
+    filters?: { campaignId?: string; status?: DonationStatus; userId?: string }
+): Promise<PaginatedResponse<Donation & { userName?: string; campaignTitle?: string }>> {
+    const where: Record<string, unknown> = {};
+    if (filters?.campaignId) where.campaignId = filters.campaignId;
+    if (filters?.status) where.status = filters.status;
+    if (filters?.userId) where.userId = filters.userId;
 
-    if (filters?.status) {
-        all = all.filter((d) => d.status === filters.status);
-    }
-    if (filters?.campaignId) {
-        all = all.filter((d) => d.campaignId === filters.campaignId);
-    }
-    if (filters?.search) {
-        const term = filters.search.toLowerCase();
-        all = all.filter((d) => {
-            const user = mockDb.users._data.find((u) => u.id === d.userId);
-            return (
-                d.reference.toLowerCase().includes(term) ||
-                (user &&
-                    `${user.firstName} ${user.lastName}`
-                        .toLowerCase()
-                        .includes(term))
-            );
-        });
-    }
+    const [raw, total] = await Promise.all([
+        prisma.donation.findMany({
+            where: where as never,
+            orderBy: { createdAt: "desc" },
+            skip: (pagination.page - 1) * pagination.pageSize,
+            take: pagination.pageSize,
+            include: {
+                user: { select: { firstName: true, lastName: true } },
+                campaign: { select: { title: true } },
+            },
+        }),
+        prisma.donation.count({ where: where as never }),
+    ]);
 
-    all.sort(
-        (a, b) =>
-            new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-    );
-
-    const total = all.length;
-    const page_data = all.slice((page - 1) * pageSize, page * pageSize);
-
-    // Enrich with user and campaign names
-    const enriched = page_data.map((d) => {
-        const user = mockDb.users._data.find((u) => u.id === d.userId);
-        const campaign = mockDb.campaigns._data.find(
-            (c) => c.id === d.campaignId
-        );
+    const data = raw.map((d) => {
+        const { user, campaign, ...rest } = d;
         return {
-            ...d,
-            userName: user
-                ? `${user.firstName} ${user.lastName}`
-                : "Unknown User",
-            campaignTitle: campaign?.title ?? "Unknown Campaign",
+            ...serialize<Donation>(rest),
+            userName: user ? `${user.firstName} ${user.lastName}` : undefined,
+            campaignTitle: campaign?.title,
         };
     });
 
-    return { data: enriched, total };
+    const totalPages = Math.ceil(total / pagination.pageSize);
+
+    return {
+        success: true,
+        data,
+        pagination: {
+            page: pagination.page,
+            pageSize: pagination.pageSize,
+            total,
+            totalPages,
+            hasNext: pagination.page < totalPages,
+            hasPrev: pagination.page > 1,
+        },
+    };
 }
 
-// ─── Donation Analytics ──────────────────────────────────────────────────────
+// ─── Donation Analytics ───────────────────────────────────────────────────────
 
-export async function getDonationAnalytics(): Promise<DonationAnalytics> {
-    const cacheKey = "donations:analytics";
-    const cached = mockCache.get<DonationAnalytics>(cacheKey);
-    if (cached) return cached;
+export async function getDonationAnalytics(
+    filters?: { campaignId?: string }
+): Promise<DonationAnalytics> {
+    const where: Record<string, unknown> = {};
+    if (filters?.campaignId) where.campaignId = filters.campaignId;
 
-    const all = mockDb.donations._data;
+    const donations = await prisma.donation.findMany({
+        where: where as never,
+        include: { user: { select: { firstName: true, lastName: true } } },
+        orderBy: { createdAt: "asc" },
+    });
 
-    const totalRaised = all
-        .filter((d) => d.status === "COMPLETED" || d.status === "VERIFIED")
-        .reduce((sum, d) => sum + d.amount, 0);
+    const toNum = (val: unknown): number => {
+        if (val !== null && typeof val === "object" && typeof (val as { toNumber(): number }).toNumber === "function") {
+            return (val as { toNumber(): number }).toNumber();
+        }
+        return Number(val);
+    };
 
+    // Total raised (all statuses except FAILED/REFUNDED/REJECTED)
+    const countable = donations.filter(
+        (d) => !["FAILED", "REFUNDED", "REJECTED"].includes(d.status as string)
+    );
+    const totalRaised = countable.reduce((s, d) => s + toNum(d.amount), 0);
+    const totalCount = countable.length;
+
+    // By status
     const byStatus: Record<string, { count: number; amount: number }> = {};
-    for (const d of all) {
-        const s = String(d.status);
-        if (!byStatus[s]) byStatus[s] = { count: 0, amount: 0 };
-        byStatus[s].count++;
-        byStatus[s].amount += d.amount;
+    for (const d of donations) {
+        const st = d.status as string;
+        if (!byStatus[st]) byStatus[st] = { count: 0, amount: 0 };
+        byStatus[st].count++;
+        byStatus[st].amount += toNum(d.amount);
     }
 
-    const byCurrency: Record<string, { count: number; amount: number }> = {};
-    for (const d of all) {
-        if (!byCurrency[d.currency]) byCurrency[d.currency] = { count: 0, amount: 0 };
-        byCurrency[d.currency].count++;
-        byCurrency[d.currency].amount += d.amount;
+    // Timeline (day-by-day)
+    const timelineMap = new Map<string, { amount: number; count: number }>();
+    for (const d of countable) {
+        const date = new Date(d.createdAt).toISOString().slice(0, 10);
+        const entry = timelineMap.get(date) ?? { amount: 0, count: 0 };
+        entry.amount += toNum(d.amount);
+        entry.count++;
+        timelineMap.set(date, entry);
     }
-
-    // Timeline — group by date
-    const dateMap = new Map<string, { amount: number; count: number }>();
-    for (const d of all) {
-        const date = d.createdAt.split("T")[0];
-        const existing = dateMap.get(date) ?? { amount: 0, count: 0 };
-        existing.amount += d.amount;
-        existing.count++;
-        dateMap.set(date, existing);
-    }
-    const timeline = [...dateMap.entries()]
+    const timeline = Array.from(timelineMap.entries())
         .map(([date, v]) => ({ date, ...v }))
         .sort((a, b) => a.date.localeCompare(b.date));
 
     // Top donors
-    const donorTotals = new Map<string, number>();
-    for (const d of all.filter(
-        (d) => d.status === "COMPLETED" || d.status === "VERIFIED"
-    )) {
-        donorTotals.set(d.userId, (donorTotals.get(d.userId) ?? 0) + d.amount);
+    const donorMap = new Map<string, { userId: string; firstName: string; lastName: string; total: number }>();
+    for (const d of countable) {
+        const key = d.userId;
+        const existing = donorMap.get(key);
+        if (existing) {
+            existing.total += toNum(d.amount);
+        } else {
+            donorMap.set(key, {
+                userId: d.userId,
+                firstName: d.user.firstName,
+                lastName: d.user.lastName,
+                total: toNum(d.amount),
+            });
+        }
     }
-    const topDonors = [...donorTotals.entries()]
-        .sort(([, a], [, b]) => b - a)
-        .slice(0, 10)
-        .map(([uid, total]) => {
-            const user = mockDb.users._data.find((u) => u.id === uid);
-            return {
-                userId: uid,
-                firstName: user?.firstName ?? "Unknown",
-                lastName: user?.lastName ?? "",
-                total,
-            };
-        });
+    const topDonors = Array.from(donorMap.values())
+        .sort((a, b) => b.total - a.total)
+        .slice(0, 10);
 
-    const analytics: DonationAnalytics = {
+    const averageAmount = totalCount > 0 ? totalRaised / totalCount : 0;
+
+    // By currency
+    const byCurrency: Record<string, { count: number; amount: number }> = {};
+    for (const d of countable) {
+        const c = d.currency;
+        if (!byCurrency[c]) byCurrency[c] = { count: 0, amount: 0 };
+        byCurrency[c].count++;
+        byCurrency[c].amount += toNum(d.amount);
+    }
+
+    return {
         totalRaised,
-        totalCount: all.length,
+        totalCount,
         byStatus,
         timeline,
         topDonors,
-        averageAmount: all.length > 0 ? totalRaised / all.length : 0,
+        averageAmount,
         byCurrency,
     };
-
-    mockCache.set(cacheKey, analytics, CACHE_TTL_DONATIONS);
-    return analytics;
 }

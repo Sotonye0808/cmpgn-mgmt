@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseTeamsReturn {
     teams: Team[];
@@ -30,17 +30,16 @@ export function useTeams(userId?: string): UseTeamsReturn {
                 window.fetch("/api/groups"),
             ]);
 
+            let foundMyTeam: Team | null = null;
+
             if (teamsRes.ok) {
                 const json = await teamsRes.json();
                 const allTeams: Team[] = json.data ?? [];
                 setTeams(allTeams);
 
-                // Find user's team
                 if (userId) {
-                    const userTeam = allTeams.find((t) =>
-                        t.memberIds.includes(userId)
-                    );
-                    setMyTeam(userTeam ?? null);
+                    foundMyTeam = allTeams.find((t) => t.memberIds.includes(userId)) ?? null;
+                    setMyTeam(foundMyTeam);
                 }
             }
 
@@ -49,12 +48,14 @@ export function useTeams(userId?: string): UseTeamsReturn {
                 const allGroups: Group[] = json.data ?? [];
                 setGroups(allGroups);
 
-                // Find user's group (via team)
-                if (userId && myTeam) {
+                // Use the locally resolved team — not the stale state value
+                if (foundMyTeam) {
                     const userGroup = allGroups.find((g) =>
-                        g.teamIds.includes(myTeam.id)
+                        g.teamIds.includes(foundMyTeam!.id)
                     );
                     setMyGroup(userGroup ?? null);
+                } else {
+                    setMyGroup(null);
                 }
             }
         } catch (e) {
@@ -62,14 +63,15 @@ export function useTeams(userId?: string): UseTeamsReturn {
         } finally {
             setLoading(false);
         }
-    }, [userId, myTeam]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [userId]); // intentionally excludes myTeam — derived inside fetchData to avoid loop
 
     useEffect(() => {
         fetchData();
     }, [fetchData]);
 
-    useMockDbSubscription("teams", fetchData);
-    useMockDbSubscription("groups", fetchData);
+    useAutoRefresh("teams", fetchData);
+    useAutoRefresh("groups", fetchData);
 
     return { teams, groups, myTeam, myGroup, loading, error, refetch: fetchData };
 }

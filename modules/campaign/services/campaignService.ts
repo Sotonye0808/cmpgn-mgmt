@@ -1,11 +1,13 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { Prisma } from "@prisma/client";
+import { redis } from "@/lib/redis";
+import { serialize, serializeArray } from "@/lib/utils/serialize";
 import { CACHE_TTL_CAMPAIGN_LIST, DEFAULT_PAGE_SIZE } from "@/lib/constants";
 import type { PaginatedResponse } from "@/types/api";
 
 // ─── Audit Helper ─────────────────────────────────────────────────────────────
 
-function recordAudit(
+async function recordAudit(
     campaignId: string,
     actorId: string,
     actorRole: string,
@@ -16,19 +18,17 @@ function recordAudit(
         note?: string;
     }
 ) {
-    mockDb.campaignAuditEvents.create({
+    await prisma.campaignAuditEvent.create({
         data: {
             campaignId,
             actorId,
             actorRole,
-            eventType: eventType as unknown as CampaignAuditEventType,
-            before: opts?.before,
-            after: opts?.after,
+            eventType: eventType as never,
+            before: (opts?.before ?? undefined) as Prisma.InputJsonValue | undefined,
+            after: (opts?.after ?? undefined) as Prisma.InputJsonValue | undefined,
             note: opts?.note,
-            createdAt: new Date().toISOString(),
         },
     });
-    mockDb.emit("campaignAuditEvents:changed");
 }
 
 function applyCampaignFilters(campaign: Campaign, filters: CampaignFilters): boolean {
@@ -51,12 +51,14 @@ export async function listCampaigns(
     user?: AuthUser
 ): Promise<PaginatedResponse<Campaign>> {
     const cacheKey = `campaigns:list:${JSON.stringify(filters)}:p${pagination.page}:ps${pagination.pageSize}`;
-    const cached = mockCache.get<PaginatedResponse<Campaign>>(cacheKey);
+    const cached = await redis.get<PaginatedResponse<Campaign>>(cacheKey);
     if (cached) return cached;
 
-    let all = mockDb.campaigns.findMany({
+    const rawAll = await prisma.campaign.findMany({
         orderBy: { createdAt: "desc" },
     });
+
+    let all = serializeArray<Campaign>(rawAll);
 
     // Non-admins only see non-DRAFT campaigns
     if (!user || !["ADMIN", "SUPER_ADMIN"].includes(user.role as string)) {
@@ -83,73 +85,95 @@ export async function listCampaigns(
         },
     };
 
-    mockCache.set(cacheKey, result, CACHE_TTL_CAMPAIGN_LIST);
+    await redis.set(cacheKey, result, CACHE_TTL_CAMPAIGN_LIST);
     return result;
 }
 
 export async function getCampaignById(id: string): Promise<Campaign | null> {
     const cacheKey = `campaigns:detail:${id}`;
-    const cached = mockCache.get<Campaign>(cacheKey);
+    const cached = await redis.get<Campaign>(cacheKey);
     if (cached) return cached;
 
-    const campaign = mockDb.campaigns.findUnique({ where: { id } });
-    if (campaign) mockCache.set(cacheKey, campaign, CACHE_TTL_CAMPAIGN_LIST);
-    return campaign;
+    const campaign = await prisma.campaign.findUnique({ where: { id } });
+    if (!campaign) return null;
+
+    const serialized = serialize<Campaign>(campaign);
+    await redis.set(cacheKey, serialized, CACHE_TTL_CAMPAIGN_LIST);
+    return serialized;
 }
 
 export async function createCampaign(
     input: CreateCampaignInput,
     createdById: string
 ): Promise<Campaign> {
-    const now = new Date().toISOString();
-    const campaign = mockDb.campaigns.create({
+    const now = new Date();
+    const campaign = await prisma.campaign.create({
         data: {
-            ...input,
+            title: input.title,
+            description: input.description,
+            content: input.content,
+            media: (input.media ?? []) as never,
+            mediaType: input.mediaType as never,
+            mediaUrl: input.mediaUrl,
+            thumbnailUrl: input.thumbnailUrl,
+            ctaText: input.ctaText,
+            ctaUrl: input.ctaUrl,
             createdById,
-            status: input.publishImmediately
-                ? ("ACTIVE" as unknown as CampaignStatus)
-                : ("DRAFT" as unknown as CampaignStatus),
+            status: input.publishImmediately ? "ACTIVE" as never : "DRAFT" as never,
+            goalType: input.goalType as never,
+            goalTarget: input.goalTarget,
+            startDate: input.startDate ? new Date(input.startDate) : undefined,
+            endDate: input.endDate ? new Date(input.endDate) : undefined,
+            targetAudience: input.targetAudience ?? [],
+            publishedAt: input.publishImmediately ? now : undefined,
+            metaTitle: input.metaTitle,
+            metaDescription: input.metaDescription,
+            metaImage: input.metaImage,
+            isMegaCampaign: input.isMegaCampaign,
+            parentCampaignId: input.parentCampaignId,
             viewCount: 0,
             clickCount: 0,
             shareCount: 0,
             likeCount: 0,
             participantCount: 0,
             goalCurrent: 0,
-            publishedAt: input.publishImmediately ? now : undefined,
-            media: input.media ?? [],
-            createdAt: now,
-            updatedAt: now,
         },
     });
 
-    mockCache.invalidatePattern("campaigns:list");
-    mockDb.emit("campaigns:changed");
+    await redis.invalidatePattern("campaigns:list");
 
-    recordAudit(campaign.id, createdById, "UNKNOWN", "CREATED", {
-        after: { title: campaign.title, status: campaign.status as unknown as string },
+    await recordAudit(campaign.id, createdById, "UNKNOWN", "CREATED", {
+        after: { title: campaign.title, status: campaign.status as string },
         note: `Campaign "${campaign.title}" created`,
     });
 
-    return campaign;
+    return serialize<Campaign>(campaign);
 }
 
 export async function updateCampaign(
     id: string,
     input: UpdateCampaignInput
 ): Promise<Campaign | null> {
-    const existing = mockDb.campaigns.findUnique({ where: { id } });
+    const existing = await prisma.campaign.findUnique({ where: { id } });
     if (!existing) return null;
 
-    const updated = mockDb.campaigns.update({
+    // Build data object, converting date strings to Date objects
+    const data: Record<string, unknown> = { ...input };
+    if (input.startDate) data.startDate = new Date(input.startDate);
+    if (input.endDate) data.endDate = new Date(input.endDate);
+    if (input.media) data.media = input.media as never;
+    delete data.publishImmediately;
+
+    const updated = await prisma.campaign.update({
         where: { id },
-        data: { ...input, updatedAt: new Date().toISOString() },
+        data: data as never,
     });
 
     // Detect status change vs field update
-    if (input.status && input.status !== existing.status) {
-        recordAudit(id, "system", "SYSTEM", "STATUS_CHANGED", {
-            before: { status: existing.status as unknown as string },
-            after: { status: input.status as unknown as string },
+    if (input.status && input.status !== (existing.status as unknown as CampaignStatus)) {
+        await recordAudit(id, "system", "SYSTEM", "STATUS_CHANGED", {
+            before: { status: existing.status as string },
+            after: { status: input.status as string },
             note: `Status changed from ${existing.status} to ${input.status}`,
         });
     } else {
@@ -163,7 +187,7 @@ export async function updateCampaign(
                 before[k] = (existing as unknown as Record<string, unknown>)[k];
                 after[k] = (input as unknown as Record<string, unknown>)[k];
             }
-            recordAudit(id, "system", "SYSTEM", "FIELDS_UPDATED", {
+            await recordAudit(id, "system", "SYSTEM", "FIELDS_UPDATED", {
                 before,
                 after,
                 note: `Fields updated: ${changedFields.join(", ")}`,
@@ -171,76 +195,63 @@ export async function updateCampaign(
         }
     }
 
-    mockCache.del(`campaigns:detail:${id}`);
-    mockCache.invalidatePattern("campaigns:list");
-    mockDb.emit("campaigns:changed");
-    return updated;
+    await redis.del(`campaigns:detail:${id}`);
+    await redis.invalidatePattern("campaigns:list");
+    return serialize<Campaign>(updated);
 }
 
 export async function joinCampaign(
     userId: string,
     campaignId: string
 ): Promise<CampaignParticipation> {
-    const existing = mockDb.participations.findUnique({
-        where: { id: `${userId}-${campaignId}` },
+    // Check if already joined (compound unique)
+    const alreadyJoined = await prisma.campaignParticipation.findUnique({
+        where: { userId_campaignId: { userId, campaignId } },
     });
-    // Check by userId + campaignId combination
-    const alreadyJoined = mockDb.participations.findMany({}).find(
-        (p) => p.userId === userId && p.campaignId === campaignId
-    );
-    if (alreadyJoined) return alreadyJoined;
+    if (alreadyJoined) return serialize<CampaignParticipation>(alreadyJoined);
 
-    const participation = await mockDb.transaction(async (tx) => {
-        const part = tx.participations.create({
-            data: {
-                userId,
-                campaignId,
-                joinedAt: new Date().toISOString(),
-            },
+    const participation = await prisma.$transaction(async (tx) => {
+        const part = await tx.campaignParticipation.create({
+            data: { userId, campaignId },
         });
 
         // Increment participant count
-        const campaign = tx.campaigns.findUnique({ where: { id: campaignId } });
-        if (campaign) {
-            tx.campaigns.update({
-                where: { id: campaignId },
-                data: {
-                    participantCount: (campaign.participantCount ?? 0) + 1,
-                    updatedAt: new Date().toISOString(),
-                },
-            });
-        }
+        await tx.campaign.update({
+            where: { id: campaignId },
+            data: { participantCount: { increment: 1 } },
+        });
 
         return part;
     });
 
-    mockCache.del(`campaigns:detail:${campaignId}`);
-    mockCache.invalidatePattern("campaigns:list");
-    mockDb.emit("campaigns:changed");
-    mockDb.emit("participations:changed");
+    await redis.del(`campaigns:detail:${campaignId}`);
+    await redis.invalidatePattern("campaigns:list");
 
-    recordAudit(campaignId, userId, "USER", "PARTICIPANT_JOINED", {
+    await recordAudit(campaignId, userId, "USER", "PARTICIPANT_JOINED", {
         note: `User ${userId} joined campaign`,
     });
 
-    // Supress unused variable warning
-    void existing;
-    return participation;
+    return serialize<CampaignParticipation>(participation);
 }
 
 export async function getCampaignParticipants(
     campaignId: string,
     pagination: { page: number; pageSize: number }
 ): Promise<PaginatedResponse<CampaignParticipation>> {
-    const all = mockDb.participations.findMany({ where: { campaignId } });
-    const total = all.length;
-    const skip = (pagination.page - 1) * pagination.pageSize;
-    const data = all.slice(skip, skip + pagination.pageSize);
+    const [data, total] = await Promise.all([
+        prisma.campaignParticipation.findMany({
+            where: { campaignId },
+            skip: (pagination.page - 1) * pagination.pageSize,
+            take: pagination.pageSize,
+        }),
+        prisma.campaignParticipation.count({ where: { campaignId } }),
+    ]);
+
     const totalPages = Math.ceil(total / pagination.pageSize);
 
     return {
         success: true,
-        data,
+        data: serializeArray<CampaignParticipation>(data),
         pagination: {
             page: pagination.page,
             pageSize: pagination.pageSize,
@@ -253,11 +264,13 @@ export async function getCampaignParticipants(
 }
 
 export async function getCampaignStats(campaignId: string) {
-    const campaign = mockDb.campaigns.findUnique({ where: { id: campaignId } });
+    const campaign = await prisma.campaign.findUnique({ where: { id: campaignId } });
     if (!campaign) return null;
 
-    const participantCount = mockDb.participations.count({ where: { campaignId } });
-    const smartLinkCount = mockDb.smartLinks.count({ where: { campaignId } });
+    const [participantCount, smartLinkCount] = await Promise.all([
+        prisma.campaignParticipation.count({ where: { campaignId } }),
+        prisma.smartLink.count({ where: { campaignId } }),
+    ]);
 
     return {
         campaignId,
@@ -276,31 +289,20 @@ export async function getCampaignStats(campaignId: string) {
 }
 
 export async function expireStale(): Promise<number> {
-    const now = new Date().toISOString();
-    let count = 0;
+    const now = new Date();
 
-    const activeCampaigns = mockDb.campaigns.findMany({
-        where: { status: "ACTIVE" as unknown as CampaignStatus },
+    const result = await prisma.campaign.updateMany({
+        where: {
+            status: "ACTIVE" as never,
+            endDate: { lt: now },
+        },
+        data: { status: "COMPLETED" as never },
     });
 
-    for (const campaign of activeCampaigns) {
-        if (campaign.endDate && campaign.endDate < now) {
-            mockDb.campaigns.update({
-                where: { id: campaign.id },
-                data: {
-                    status: "COMPLETED" as unknown as CampaignStatus,
-                    updatedAt: now,
-                },
-            });
-            count++;
-        }
+    if (result.count > 0) {
+        await redis.invalidatePattern("campaigns:");
     }
-
-    if (count > 0) {
-        mockCache.invalidatePattern("campaigns:");
-        mockDb.emit("campaigns:changed");
-    }
-    return count;
+    return result.count;
 }
 
 // ─── Audit Log ────────────────────────────────────────────────────────────────
@@ -310,21 +312,32 @@ export async function getCampaignAuditLog(
     page = 1,
     pageSize = 20
 ): Promise<PaginatedResponse<CampaignAuditEvent & { actorName?: string }>> {
-    const all = mockDb.campaignAuditEvents._data
-        .filter((e) => e.campaignId === campaignId)
-        .sort((a, b) => b.createdAt.localeCompare(a.createdAt));
+    const [rawData, total] = await Promise.all([
+        prisma.campaignAuditEvent.findMany({
+            where: { campaignId },
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+            include: { actor: { select: { firstName: true, lastName: true } } },
+        }),
+        prisma.campaignAuditEvent.count({ where: { campaignId } }),
+    ]);
 
-    const total = all.length;
-    const skip = (page - 1) * pageSize;
-    const data = all.slice(skip, skip + pageSize).map((event) => {
-        const actor = mockDb.users.findUnique({ where: { id: event.actorId } });
-        return {
-            ...event,
-            actorName: actor
-                ? `${actor.firstName} ${actor.lastName}`
-                : event.actorId,
-        };
-    });
+    const data = rawData.map((event) => ({
+        id: event.id,
+        campaignId: event.campaignId,
+        actorId: event.actorId,
+        actorRole: event.actorRole,
+        eventType: event.eventType as unknown as CampaignAuditEventType,
+        before: event.before as Record<string, unknown> | undefined,
+        after: event.after as Record<string, unknown> | undefined,
+        note: event.note ?? undefined,
+        createdAt: event.createdAt.toISOString(),
+        actorName: event.actor
+            ? `${event.actor.firstName} ${event.actor.lastName}`
+            : event.actorId,
+    }));
+
     const totalPages = Math.ceil(total / pageSize);
 
     return {

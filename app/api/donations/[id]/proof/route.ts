@@ -25,7 +25,6 @@ export async function PATCH(
 
         const donation = await uploadDonationProof(
             id,
-            auth.user.id,
             parsed.data.proofScreenshotUrl
         );
         return successResponse(donation);

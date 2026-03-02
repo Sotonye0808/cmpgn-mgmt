@@ -1,12 +1,29 @@
+import type { Metadata } from "next";
 import { ABOUT_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import Link from "next/link";
 import PublicPageHero from "@/components/ui/PublicPageHero";
 import PublicStatsBar from "@/components/ui/PublicStatsBar";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: ABOUT_PAGE_CONTENT.meta.title,
   description: ABOUT_PAGE_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/about") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/about"),
+    title: `${ABOUT_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: ABOUT_PAGE_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${ABOUT_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: ABOUT_PAGE_CONTENT.meta.description,
+    images: [SITE_CONFIG.ogImage],
+  },
 };
 
 export default function AboutPage() {

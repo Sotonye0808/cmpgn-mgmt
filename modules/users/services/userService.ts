@@ -1,5 +1,6 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+import { serialize, serializeArray } from "@/lib/utils/serialize";
 import { getUserAnalytics } from "@/modules/analytics/services/analyticsService";
 
 // ─── List All Users (Admin) ───────────────────────────────────────────────────
@@ -18,30 +19,30 @@ export async function listUsers(
     search = "",
     role?: string
 ): Promise<UserListItem[]> {
-    let users = mockDb.users._data;
+    const where: Record<string, unknown> = {};
 
     if (role) {
-        users = users.filter((u) => (u.role as unknown as string) === role);
+        where.role = role;
     }
 
     if (search) {
-        const lower = search.toLowerCase();
-        users = users.filter(
-            (u) =>
-                u.firstName.toLowerCase().includes(lower) ||
-                u.lastName.toLowerCase().includes(lower) ||
-                u.email.toLowerCase().includes(lower)
-        );
+        where.OR = [
+            { firstName: { contains: search, mode: "insensitive" } },
+            { lastName: { contains: search, mode: "insensitive" } },
+            { email: { contains: search, mode: "insensitive" } },
+        ];
     }
+
+    const users = await prisma.user.findMany({ where });
 
     return users.map((u) => ({
         id: u.id,
         email: u.email,
         firstName: u.firstName,
         lastName: u.lastName,
-        role: u.role as unknown as string,
-        createdAt: u.createdAt,
-        isActive: true, // mock: all users are active
+        role: u.role as string,
+        createdAt: u.createdAt.toISOString(),
+        isActive: u.isActive,
     }));
 }
 
@@ -58,13 +59,11 @@ export async function changeUserRole(
     actorId?: string,
     actorRole?: string
 ): Promise<UserListItem> {
-    const user = mockDb.users.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
 
-    // Privilege ceiling: only SUPER_ADMIN can modify ADMIN/SUPER_ADMIN users
-    // or assign ADMIN/SUPER_ADMIN roles
     if (actorRole && actorRole !== "SUPER_ADMIN") {
-        const targetCurrentRole = user.role as unknown as string;
+        const targetCurrentRole = user.role as string;
         if (PROTECTED_ROLES.includes(targetCurrentRole)) {
             throw new Error("Insufficient permissions to modify this user's role");
         }
@@ -73,28 +72,25 @@ export async function changeUserRole(
         }
     }
 
-    // Prevent self-demotion for SUPER_ADMIN
     if (actorId === userId && actorRole === "SUPER_ADMIN" && newRole !== "SUPER_ADMIN") {
         throw new Error("Cannot demote your own SUPER_ADMIN role");
     }
 
-    const updated = mockDb.users.update({
+    const updated = await prisma.user.update({
         where: { id: userId },
-        data: { role: newRole as unknown as UserRole },
+        data: { role: newRole as never },
     });
-    if (!updated) throw new Error("Failed to update user");
 
-    mockCache.del(`user:${userId}`);
-    mockDb.emit("users:changed");
+    await redis.del(`user:${userId}`);
 
     return {
         id: updated.id,
         email: updated.email,
         firstName: updated.firstName,
         lastName: updated.lastName,
-        role: updated.role as unknown as string,
-        createdAt: updated.createdAt,
-        isActive: true,
+        role: updated.role as string,
+        createdAt: updated.createdAt.toISOString(),
+        isActive: updated.isActive,
     };
 }
 
@@ -106,55 +102,62 @@ export async function getUserProfile(
     userId: string,
     actorRole: string
 ): Promise<UserProfileView> {
-    const user = mockDb.users.findUnique({ where: { id: userId } });
+    const user = await prisma.user.findUnique({ where: { id: userId } });
     if (!user) throw new Error("User not found");
 
-    // Privilege boundary: ADMIN cannot view other ADMIN/SUPER_ADMIN profiles
     if (actorRole !== "SUPER_ADMIN") {
-        const targetRole = user.role as unknown as string;
+        const targetRole = user.role as string;
         if (PROTECTED_VIEW_ROLES.includes(targetRole)) {
             throw new Error("Insufficient permissions to view this profile");
         }
     }
 
-    // Aggregate all data
     const analytics = await getUserAnalytics(userId);
 
-    const donations = mockDb.donations._data.filter(
-        (d) => d.userId === userId
-    );
+    const [donations, participations, referralsGiven, referralsReceived, trustScore] =
+        await Promise.all([
+            prisma.donation.findMany({ where: { userId } }),
+            prisma.campaignParticipation.findMany({ where: { userId } }),
+            prisma.referral.count({ where: { inviterId: userId } }),
+            prisma.referral.count({ where: { inviteeId: userId } }),
+            prisma.trustScore.findUnique({ where: { userId } }),
+        ]);
 
-    const participations = mockDb.participations._data.filter(
-        (p) => p.userId === userId
-    );
+    // Resolve team + group
+    let team: Team | undefined;
+    let group: Group | undefined;
 
-    const referralsGiven = mockDb.referrals._data.filter(
-        (r) => r.inviterId === userId
-    ).length;
-    const referralsReceived = mockDb.referrals._data.filter(
-        (r) => r.inviteeId === userId
-    ).length;
-
-    const team = user.teamId
-        ? mockDb.teams?._data?.find((t) => t.id === user.teamId)
-        : undefined;
-
-    const group = team
-        ? mockDb.groups?._data?.find((g) => g.id === team.groupId)
-        : undefined;
-
-    const trustScore = mockDb.trustScores._data.find(
-        (ts) => ts.userId === userId
-    );
+    if (user.teamId) {
+        const rawTeam = await prisma.team.findUnique({
+            where: { id: user.teamId },
+            include: { members: { select: { id: true } } },
+        });
+        if (rawTeam) {
+            team = serialize<Team>({
+                ...rawTeam,
+                memberIds: rawTeam.members.map((m) => m.id),
+            });
+            const rawGroup = await prisma.group.findUnique({
+                where: { id: rawTeam.groupId },
+                include: { teams: { select: { id: true } } },
+            });
+            if (rawGroup) {
+                group = serialize<Group>({
+                    ...rawGroup,
+                    teamIds: rawGroup.teams.map((t) => t.id),
+                });
+            }
+        }
+    }
 
     return {
-        user,
+        user: serialize<User>(user),
         analytics,
-        donations,
-        participations,
+        donations: serializeArray<Donation>(donations),
+        participations: serializeArray<CampaignParticipation>(participations),
         referrals: { given: referralsGiven, received: referralsReceived },
         team,
         group,
-        trustScore,
+        trustScore: trustScore ? serialize<TrustScore>(trustScore) : undefined,
     };
 }

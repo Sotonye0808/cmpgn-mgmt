@@ -1,220 +1,279 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 import { CACHE_TTL_LEADERBOARD } from "@/lib/constants";
-import { getPointsSummary } from "@/modules/points/services/pointsService";
+import { RANK_LEVELS } from "@/config/ranks";
 
-// ─── Compute ranked entries for a campaign or global ─────────────────────────
-export async function computeRankings(campaignId?: string): Promise<LeaderboardEntry[]> {
-    // Fetch all users who participated in the campaign (or all users for global)
-    let userIds: string[];
-    if (campaignId) {
-        const participants = await mockDb.participations.findMany({ where: { campaignId } });
-        userIds = [...new Set(participants.map((p) => p.userId))];
-    } else {
-        const users = await mockDb.users.findMany({ where: { isActive: true } });
-        userIds = users.map((u) => u.id);
+// ─── Compute Rankings ─────────────────────────────────────────────────────────
+
+async function computeRankings(
+    campaignId?: string
+): Promise<LeaderboardEntry[]> {
+    const where: Record<string, unknown> = {};
+    if (campaignId) where.campaignId = campaignId;
+
+    const entries = await prisma.pointsLedgerEntry.findMany({
+        where: where as never,
+    });
+
+    // Aggregate by userId + type
+    const userScores = new Map<
+        string,
+        { impact: number; consistency: number; leadership: number; reliability: number }
+    >();
+
+    for (const e of entries) {
+        const uid = e.userId;
+        const current = userScores.get(uid) ?? {
+            impact: 0,
+            consistency: 0,
+            leadership: 0,
+            reliability: 0,
+        };
+        const type = (e.type as string).toLowerCase() as
+            | "impact"
+            | "consistency"
+            | "leadership"
+            | "reliability";
+        current[type] += e.value;
+        userScores.set(uid, current);
     }
 
-    const entries: LeaderboardEntry[] = [];
+    // Fetch user details for all userIds
+    const userIds = Array.from(userScores.keys());
+    const users = await prisma.user.findMany({
+        where: { id: { in: userIds } },
+        select: { id: true, firstName: true, lastName: true, profilePicture: true },
+    });
+    const userMap = new Map(users.map((u) => [u.id, u]));
 
-    for (const userId of userIds) {
-        const user = await mockDb.users.findUnique({ where: { id: userId } });
-        if (!user) continue;
+    // Build entries sorted by total score desc
+    const rankings: LeaderboardEntry[] = userIds
+        .map((uid) => {
+            const scores = userScores.get(uid)!;
+            const total =
+                scores.impact +
+                scores.consistency +
+                scores.leadership +
+                scores.reliability;
+            const user = userMap.get(uid);
+            return {
+                userId: uid,
+                firstName: user?.firstName ?? "Unknown",
+                lastName: user?.lastName ?? "",
+                profilePicture: user?.profilePicture ?? undefined,
+                rank: 0,
+                score: total,
+                impact: scores.impact,
+                consistency: scores.consistency,
+                leadership: scores.leadership,
+                reliability: scores.reliability,
+                campaignId,
+            };
+        })
+        .sort((a, b) => b.score - a.score);
 
-        const summary = await getPointsSummary(userId, campaignId);
+    // Assign ranks
+    rankings.forEach((entry, idx) => {
+        entry.rank = idx + 1;
+    });
 
-        entries.push({
-            userId,
-            firstName: user.firstName,
-            lastName: user.lastName,
-            profilePicture: user.profilePicture,
-            rank: 0, // assigned after sort
-            score: summary.total,
-            impact: summary.impact,
-            consistency: summary.consistency,
-            leadership: summary.leadership,
-            reliability: summary.reliability,
-            campaignId,
-        });
-    }
+    return rankings;
+}
 
-    // Sort descending by score, assign ranks
-    entries.sort((a, b) => b.score - a.score);
+// ─── Team Leaderboard ─────────────────────────────────────────────────────────
+
+export async function getTeamLeaderboard(
+    campaignId?: string
+): Promise<TeamLeaderboardEntry[]> {
+    const cacheKey = `leaderboard:team:${campaignId ?? "global"}`;
+    const cached = await redis.get<TeamLeaderboardEntry[]>(cacheKey);
+    if (cached) return cached;
+
+    const rankings = await computeRankings(campaignId);
+    const rankMap = new Map(rankings.map((r) => [r.userId, r.score]));
+
+    // Get all teams with their members and groups
+    const teams = await prisma.team.findMany({
+        include: {
+            group: { select: { name: true } },
+            members: { select: { id: true } },
+        },
+    });
+
+    const entries: TeamLeaderboardEntry[] = teams
+        .map((team) => {
+            const memberIds = team.members.map((m) => m.id);
+            const score = memberIds.reduce(
+                (sum, mid) => sum + (rankMap.get(mid) ?? 0),
+                0
+            );
+            return {
+                teamId: team.id,
+                teamName: team.name,
+                groupName: team.group?.name ?? "Unassigned",
+                memberCount: memberIds.length,
+                score,
+                rank: 0,
+            };
+        })
+        .sort((a, b) => b.score - a.score);
+
     entries.forEach((e, i) => {
         e.rank = i + 1;
     });
 
+    await redis.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
     return entries;
 }
 
-// ─── Team Leaderboard ─────────────────────────────────────────────────────────
-export async function getTeamLeaderboard(
-    campaignId?: string,
-    page = 1,
-    pageSize = 20,
-): Promise<{ data: TeamLeaderboardEntry[]; total: number }> {
-    const cacheKey = campaignId
-        ? `leaderboard:team:${campaignId}`
-        : "leaderboard:team:global";
-
-    const cached = mockCache.get<TeamLeaderboardEntry[]>(cacheKey);
-    if (cached) {
-        const start = (page - 1) * pageSize;
-        return { data: cached.slice(start, start + pageSize), total: cached.length };
-    }
-
-    const teams = mockDb.teams.findMany();
-    const entries: TeamLeaderboardEntry[] = [];
-
-    for (const team of teams) {
-        let totalScore = 0;
-        for (const memberId of team.memberIds) {
-            const summary = await getPointsSummary(memberId, campaignId);
-            totalScore += summary.total;
-        }
-
-        const group = mockDb.groups.findUnique({ where: { id: team.groupId } });
-        entries.push({
-            teamId: team.id,
-            teamName: team.name,
-            groupName: group?.name ?? "Unknown",
-            memberCount: team.memberIds.length,
-            score: totalScore,
-            rank: 0,
-        });
-    }
-
-    entries.sort((a, b) => b.score - a.score);
-    entries.forEach((e, i) => { e.rank = i + 1; });
-
-    mockCache.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
-
-    const total = entries.length;
-    const start = (page - 1) * pageSize;
-    return { data: entries.slice(start, start + pageSize), total };
-}
-
 // ─── Group Leaderboard ────────────────────────────────────────────────────────
+
 export async function getGroupLeaderboard(
-    campaignId?: string,
-    page = 1,
-    pageSize = 20,
-): Promise<{ data: GroupLeaderboardEntry[]; total: number }> {
-    const cacheKey = campaignId
-        ? `leaderboard:group:${campaignId}`
-        : "leaderboard:group:global";
+    campaignId?: string
+): Promise<GroupLeaderboardEntry[]> {
+    const cacheKey = `leaderboard:group:${campaignId ?? "global"}`;
+    const cached = await redis.get<GroupLeaderboardEntry[]>(cacheKey);
+    if (cached) return cached;
 
-    const cached = mockCache.get<GroupLeaderboardEntry[]>(cacheKey);
-    if (cached) {
-        const start = (page - 1) * pageSize;
-        return { data: cached.slice(start, start + pageSize), total: cached.length };
-    }
+    const rankings = await computeRankings(campaignId);
+    const rankMap = new Map(rankings.map((r) => [r.userId, r.score]));
 
-    const groups = mockDb.groups.findMany();
-    const entries: GroupLeaderboardEntry[] = [];
+    // Get all groups with their teams and team members
+    const groups = await prisma.group.findMany({
+        include: {
+            teams: {
+                include: { members: { select: { id: true } } },
+            },
+        },
+    });
 
-    for (const group of groups) {
-        const groupTeams = mockDb.teams.findMany().filter(
-            (t) => group.teamIds.includes(t.id)
-        );
-        let totalScore = 0;
-        let totalMembers = 0;
+    const entries: GroupLeaderboardEntry[] = groups
+        .map((group) => {
+            const memberIds = group.teams.flatMap((t) =>
+                t.members.map((m) => m.id)
+            );
+            const score = memberIds.reduce(
+                (sum, mid) => sum + (rankMap.get(mid) ?? 0),
+                0
+            );
+            return {
+                groupId: group.id,
+                groupName: group.name,
+                teamCount: group.teams.length,
+                memberCount: memberIds.length,
+                score,
+                rank: 0,
+            };
+        })
+        .sort((a, b) => b.score - a.score);
 
-        for (const team of groupTeams) {
-            totalMembers += team.memberIds.length;
-            for (const memberId of team.memberIds) {
-                const summary = await getPointsSummary(memberId, campaignId);
-                totalScore += summary.total;
-            }
-        }
+    entries.forEach((e, i) => {
+        e.rank = i + 1;
+    });
 
-        entries.push({
-            groupId: group.id,
-            groupName: group.name,
-            teamCount: groupTeams.length,
-            memberCount: totalMembers,
-            score: totalScore,
-            rank: 0,
-        });
-    }
-
-    entries.sort((a, b) => b.score - a.score);
-    entries.forEach((e, i) => { e.rank = i + 1; });
-
-    mockCache.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
-
-    const total = entries.length;
-    const start = (page - 1) * pageSize;
-    return { data: entries.slice(start, start + pageSize), total };
+    await redis.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
+    return entries;
 }
 
-// ─── Get leaderboard (cached snapshot fallback to computed) ───────────────────
+// ─── Get Leaderboard (unified) ────────────────────────────────────────────────
+
 export async function getLeaderboard(
-    filter: LeaderboardFilter,
-    campaignId?: string,
-    page = 1,
-    pageSize = 20,
-): Promise<{ data: LeaderboardEntry[]; total: number }> {
-    const cacheKey = campaignId
-        ? `leaderboard:${filter}:${campaignId}`
-        : `leaderboard:${filter}:global`;
+    filter: LeaderboardFilter = "individual",
+    campaignId?: string
+): Promise<LeaderboardEntry[] | TeamLeaderboardEntry[] | GroupLeaderboardEntry[]> {
+    if (filter === "team") return getTeamLeaderboard(campaignId);
+    if (filter === "group") return getGroupLeaderboard(campaignId);
 
-    const cached = mockCache.get<LeaderboardEntry[]>(cacheKey);
-    let entries = cached;
+    const cacheKey = `leaderboard:${filter}:${campaignId ?? "global"}`;
+    const cached = await redis.get<LeaderboardEntry[]>(cacheKey);
+    if (cached) return cached;
 
-    if (!entries) {
-        entries = await computeRankings(filter === "global" ? undefined : campaignId);
-        mockCache.set(cacheKey, entries, CACHE_TTL_LEADERBOARD);
-    }
-
-    const total = entries.length;
-    const start = (page - 1) * pageSize;
-    return { data: entries.slice(start, start + pageSize), total };
+    const rankings = await computeRankings(campaignId);
+    await redis.set(cacheKey, rankings, CACHE_TTL_LEADERBOARD);
+    return rankings;
 }
 
-// ─── Get a single user's rank across a campaign ────────────────────────────────
-export async function getUserRank(userId: string, campaignId?: string): Promise<UserRankInfo> {
-    const entries = await computeRankings(campaignId);
-    const entry = entries.find((e) => e.userId === userId);
+// ─── Get User Rank ────────────────────────────────────────────────────────────
 
-    if (!entry) {
-        return { position: entries.length + 1, score: 0, percentile: 0, campaignId };
+export async function getUserRank(
+    userId: string,
+    campaignId?: string
+): Promise<UserRankInfo> {
+    const rankings = await computeRankings(campaignId);
+    const entry = rankings.find((r) => r.userId === userId);
+
+    const position = entry?.rank ?? rankings.length + 1;
+    const score = entry?.score ?? 0;
+    const percentile =
+        rankings.length > 0
+            ? Math.round(((rankings.length - position + 1) / rankings.length) * 100)
+            : 0;
+
+    return { position, score, percentile, campaignId };
+}
+
+// ─── Rank Progress ────────────────────────────────────────────────────────────
+
+export function getRankProgress(totalScore: number): RankProgress {
+    let currentRank = RANK_LEVELS[0];
+    let nextRank: RankLevel | null = RANK_LEVELS[1] ?? null;
+
+    for (let i = RANK_LEVELS.length - 1; i >= 0; i--) {
+        if (totalScore >= RANK_LEVELS[i].minScore) {
+            currentRank = RANK_LEVELS[i];
+            nextRank = RANK_LEVELS[i + 1] ?? null;
+            break;
+        }
     }
 
-    const percentile = entries.length > 1
-        ? Math.round(((entries.length - entry.rank) / (entries.length - 1)) * 100)
+    const pointsToNext = nextRank
+        ? nextRank.minScore - totalScore
+        : null;
+
+    const progressPercent = nextRank
+        ? Math.min(
+            100,
+            Math.round(
+                ((totalScore - currentRank.minScore) /
+                    (nextRank.minScore - currentRank.minScore)) *
+                100
+            )
+        )
         : 100;
 
-    return {
-        position: entry.rank,
-        score: entry.score,
-        percentile,
-        campaignId,
-    };
+    return { currentRank, nextRank, totalScore, pointsToNext, progressPercent };
 }
 
-// ─── Refresh and store a snapshot ────────────────────────────────────────────
-export async function refreshSnapshot(campaignId?: string): Promise<void> {
-    const entries = await computeRankings(campaignId);
-    const now = new Date().toISOString();
-    const period = now.slice(0, 10); // YYYY-MM-DD
+// ─── Refresh Snapshot (cron) ──────────────────────────────────────────────────
 
-    await mockDb.transaction(async (tx) => {
-        for (const e of entries) {
-            const snapshot: LeaderboardSnapshot = {
-                id: crypto.randomUUID(),
-                userId: e.userId,
-                campaignId,
+export async function refreshSnapshot(
+    campaignId?: string,
+    period = "weekly"
+): Promise<void> {
+    const rankings = await computeRankings(campaignId);
+
+    await prisma.$transaction(async (tx) => {
+        // Delete old snapshots for this period+campaign
+        await tx.leaderboardSnapshot.deleteMany({
+            where: {
                 period,
-                rank: e.rank,
-                score: e.score,
-                createdAt: now,
-            };
-            await tx.leaderboardSnapshots.create({ data: snapshot });
+                campaignId: campaignId ?? undefined,
+            },
+        });
+
+        // Insert new snapshots
+        for (const entry of rankings) {
+            await tx.leaderboardSnapshot.create({
+                data: {
+                    userId: entry.userId,
+                    campaignId: entry.campaignId,
+                    period,
+                    rank: entry.rank,
+                    score: entry.score,
+                },
+            });
         }
     });
 
-    // Invalidate cache so next read re-queries
-    mockCache.invalidatePattern(`leaderboard:`);
-    mockDb.emit("leaderboardSnapshots:changed");
+    await redis.invalidatePattern("leaderboard:");
 }

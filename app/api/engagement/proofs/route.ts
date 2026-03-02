@@ -5,7 +5,8 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize, serializeArray } from "@/lib/utils/serialize";
 import { z } from "zod";
 
 const createProofSchema = z.object({
@@ -35,22 +36,18 @@ export async function POST(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const now = new Date().toISOString();
-        const proof = mockDb.viewProofs.create({
+        const proof = await prisma.viewProof.create({
             data: {
                 userId: user.id,
                 campaignId: parsed.data.campaignId,
                 smartLinkId: parsed.data.smartLinkId,
-                platform: parsed.data.platform as unknown as SocialPlatform,
+                platform: parsed.data.platform as never,
                 screenshotUrl: parsed.data.screenshotUrl,
-                status: "PENDING" as unknown as ViewProofStatus,
-                createdAt: now,
-                updatedAt: now,
+                status: "PENDING" as never,
             },
         });
 
-        mockDb.emit("viewProofs:changed");
-        return successResponse(proof, 201);
+        return successResponse(serialize(proof), 201);
     } catch (err) {
         return handleApiError(err);
     }
@@ -65,18 +62,13 @@ export async function GET(request: NextRequest) {
         const campaignId = request.nextUrl.searchParams.get("campaignId") ?? undefined;
         const isAdmin = user.role === "ADMIN" || user.role === "SUPER_ADMIN";
 
-        let proofs: ViewProof[];
-        if (isAdmin) {
-            proofs = campaignId
-                ? mockDb.viewProofs.findMany({ where: { campaignId } as Partial<ViewProof> })
-                : mockDb.viewProofs.findMany();
-        } else {
-            const where: Partial<ViewProof> = { userId: user.id };
-            if (campaignId) (where as Record<string, unknown>).campaignId = campaignId;
-            proofs = mockDb.viewProofs.findMany({ where });
-        }
+        const where: Record<string, unknown> = {};
+        if (!isAdmin) where.userId = user.id;
+        if (campaignId) where.campaignId = campaignId;
 
-        return successResponse(proofs);
+        const proofs = await prisma.viewProof.findMany({ where: where as never });
+
+        return successResponse(serializeArray(proofs));
     } catch (err) {
         return handleApiError(err);
     }

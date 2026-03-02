@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { ICONS } from "@/config/icons";
 import type { UserListItem } from "@/modules/users/services/userService";
 import Link from "next/link";
+import { formatDate } from "@/lib/utils/format";
 
 const ROLE_COLORS: Record<string, string> = {
   USER: "default",
@@ -100,7 +101,7 @@ export default function UserManagementPanel() {
       title: "Joined",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (d: string) => new Date(d).toLocaleDateString(),
+      render: (d: string) => formatDate(d),
     },
     {
       title: USERS_PAGE_CONTENT.actionsLabel,

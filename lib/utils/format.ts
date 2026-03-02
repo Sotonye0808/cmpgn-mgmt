@@ -2,12 +2,12 @@ import { format, formatDistanceToNow, parseISO } from "date-fns";
 
 export function formatDate(date: string | Date): string {
     const d = typeof date === "string" ? parseISO(date) : date;
-    return format(d, "d MMM yyyy");
+    return format(d, "dd MMM yyyy");
 }
 
 export function formatDateTime(date: string | Date): string {
     const d = typeof date === "string" ? parseISO(date) : date;
-    return format(d, "d MMM yyyy, HH:mm");
+    return format(d, "dd MMM yyyy, HH:mm");
 }
 
 export function formatRelative(date: string | Date): string {
@@ -24,6 +24,7 @@ export function formatCurrency(amount: number, currency = "NGN"): string {
 }
 
 export function formatNumber(n: number): string {
+    if (n == null || !isFinite(n)) return "0";
     if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
     if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
     return n.toString();

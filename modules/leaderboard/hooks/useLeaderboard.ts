@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseLeaderboardOptions {
     campaignId?: string;
@@ -78,8 +78,8 @@ export function useLeaderboard({
     }, [campaignId, filter, page, pageSize, days]);
 
     useEffect(() => { fetch(); }, [fetch]);
-    useMockDbSubscription("leaderboardSnapshots", fetch);
-    useMockDbSubscription("pointsLedger", fetch);
+    useAutoRefresh("leaderboardSnapshots", fetch);
+    useAutoRefresh("pointsLedger", fetch);
 
     return { entries, myRank, total, loading, error, refetch: fetch };
 }

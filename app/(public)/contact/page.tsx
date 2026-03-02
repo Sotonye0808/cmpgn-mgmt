@@ -1,10 +1,27 @@
+import type { Metadata } from "next";
 import { CONTACT_PAGE_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
 import PublicPageHero from "@/components/ui/PublicPageHero";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: CONTACT_PAGE_CONTENT.meta.title,
   description: CONTACT_PAGE_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/contact") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/contact"),
+    title: `${CONTACT_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: CONTACT_PAGE_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: `${CONTACT_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: CONTACT_PAGE_CONTENT.meta.description,
+    images: [SITE_CONFIG.ogImage],
+  },
 };
 
 export default function ContactPage() {

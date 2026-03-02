@@ -20,6 +20,7 @@ import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/hooks/useAuth";
 import { DONATION_STATUS_CONFIG } from "@/config/bankAccounts";
+import { formatDate } from "@/lib/utils/format";
 
 const ROLE_COLORS: Record<string, string> = {
   USER: "default",
@@ -176,7 +177,7 @@ export default function UserProfilePage() {
       title: "Date",
       dataIndex: "createdAt",
       key: "date",
-      render: (d: string) => new Date(d).toLocaleDateString(),
+      render: (d: string) => formatDate(d),
     },
     {
       title: "Proof",
@@ -211,7 +212,7 @@ export default function UserProfilePage() {
       title: "Joined",
       dataIndex: "joinedAt",
       key: "joinedAt",
-      render: (d: string) => new Date(d).toLocaleDateString(),
+      render: (d: string) => formatDate(d),
     },
   ];
 
@@ -250,7 +251,7 @@ export default function UserProfilePage() {
                 </Tag>
               </Descriptions.Item>
               <Descriptions.Item label="Joined">
-                {new Date(user.createdAt).toLocaleDateString()}
+                {formatDate(user.createdAt)}
               </Descriptions.Item>
               {user.whatsappNumber && (
                 <Descriptions.Item label="WhatsApp">

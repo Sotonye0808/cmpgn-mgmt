@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAuth } from "@/lib/middleware/auth";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serializeArray } from "@/lib/utils/serialize";
 import { successResponse, handleApiError } from "@/lib/utils/api";
 
 export interface MyCampaignsResult {
@@ -18,18 +19,21 @@ export async function GET(): Promise<NextResponse> {
         if (auth.error) return auth.error;
 
         const userId = auth.user.id;
-        const allCampaigns = mockDb.campaigns.findMany();
 
         // Campaigns the user has participated in
-        const participationCampaignIds = new Set(
-            mockDb.participations._data
-                .filter((p) => p.userId === userId)
-                .map((p) => p.campaignId)
-        );
-        const joined = allCampaigns.filter((c) => participationCampaignIds.has(c.id));
+        const participations = await prisma.campaignParticipation.findMany({
+            where: { userId },
+            select: { campaignId: true },
+        });
+        const participationCampaignIds = participations.map((p) => p.campaignId);
+        const joinedRaw = participationCampaignIds.length > 0
+            ? await prisma.campaign.findMany({ where: { id: { in: participationCampaignIds } } })
+            : [];
+        const joined = serializeArray<Campaign>(joinedRaw);
 
         // Campaigns the user created (applies to ADMIN/SUPER_ADMIN)
-        const created = allCampaigns.filter((c) => c.createdById === userId);
+        const createdRaw = await prisma.campaign.findMany({ where: { createdById: userId } });
+        const created = serializeArray<Campaign>(createdRaw);
 
         return successResponse<MyCampaignsResult>({ joined, created });
     } catch (error) {

@@ -25,8 +25,8 @@ export async function PATCH(
 
         const donation = await verifyDonation(
             id,
+            parsed.data.action as DonationStatus,
             auth.user.id,
-            parsed.data.action,
             parsed.data.notes
         );
         return successResponse(donation);

@@ -19,6 +19,9 @@ const eslintConfig = [
         "error",
         { argsIgnorePattern: "^_" },
       ],
+      // --_dc / --_bar-w / --_dc-ring are the design-system CSS custom property
+      // injection pattern. Per-element CSS vars cannot be moved to a stylesheet.
+      "no-inline-styles": "off",
     },
   },
 ];

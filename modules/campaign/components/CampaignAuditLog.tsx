@@ -5,7 +5,8 @@ import { Timeline, Tag, Skeleton, Empty, Avatar, Tooltip } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { formatDate } from "@/lib/utils/format";
 
 const EVENT_TYPE_CONFIG: Record<
   string,
@@ -59,7 +60,7 @@ export default function CampaignAuditLog({
     fetchAudit();
   }, [fetchAudit]);
 
-  useMockDbSubscription("campaignAuditEvents", fetchAudit);
+  useAutoRefresh("campaignAuditEvents", fetchAudit);
 
   if (loading) return <Skeleton active paragraph={{ rows: 4 }} />;
   if (events.length === 0)
@@ -87,12 +88,7 @@ export default function CampaignAuditLog({
         {Object.entries(grouped).map(([date, dayEvents]) => (
           <div key={date}>
             <div className="text-xs font-semibold text-ds-text-subtle uppercase tracking-wide mb-3">
-              {new Date(date).toLocaleDateString("en-US", {
-                weekday: "long",
-                year: "numeric",
-                month: "long",
-                day: "numeric",
-              })}
+              {formatDate(date)}
             </div>
             <Timeline
               items={dayEvents.map((event) => {

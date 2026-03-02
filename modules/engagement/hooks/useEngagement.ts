@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseEngagementOptions {
     campaignId?: string;
@@ -52,7 +52,7 @@ export function useEngagement({ campaignId, days = 14 }: UseEngagementOptions = 
     }, [campaignId, days]);
 
     useEffect(() => { fetch(); }, [fetch]);
-    useMockDbSubscription("linkEvents", fetch);
+    useAutoRefresh("linkEvents", fetch);
 
     return { stats, timeline, loading, error, refetch: fetch };
 }

@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { PRIVACY_PAGE_CONTENT } from "@/config/content";
 import PublicPageHero from "@/components/ui/PublicPageHero";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: PRIVACY_PAGE_CONTENT.meta.title,
   description: PRIVACY_PAGE_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/privacy") },
+  robots: { index: true, follow: false },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/privacy"),
+    title: `${PRIVACY_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: PRIVACY_PAGE_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary",
+    title: `${PRIVACY_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: PRIVACY_PAGE_CONTENT.meta.description,
+  },
 };
 
 type CookieRow = {

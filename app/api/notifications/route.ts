@@ -1,6 +1,7 @@
 import { requireAuth } from "@/lib/middleware/auth";
 import { handleApiError, successResponse } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serializeArray } from "@/lib/utils/serialize";
 
 export async function GET() {
     try {
@@ -8,14 +9,12 @@ export async function GET() {
         if (auth.error) return auth.error;
         const user = auth.user;
 
-        const notifications = mockDb.notifications
-            .findMany({ where: { userId: user.id } })
-            .sort(
-                (a, b) =>
-                    new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
-            );
+        const notifications = await prisma.appNotification.findMany({
+            where: { userId: user.id },
+            orderBy: { createdAt: "desc" },
+        });
 
-        return successResponse(notifications);
+        return successResponse(serializeArray(notifications));
     } catch (err) {
         return handleApiError(err);
     }

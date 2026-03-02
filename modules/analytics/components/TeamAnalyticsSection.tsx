@@ -5,7 +5,7 @@ import { Skeleton, Progress, Avatar } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface TeamAnalyticsData {
   teamId: string;
@@ -51,7 +51,7 @@ export default function TeamAnalyticsSection() {
     fetchTeams();
   }, [fetchTeams]);
 
-  useMockDbSubscription("teams", fetchTeams);
+  useAutoRefresh("teams", fetchTeams);
 
   if (loading) return <Skeleton active paragraph={{ rows: 6 }} />;
   if (!teams.length)

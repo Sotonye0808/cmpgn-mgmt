@@ -19,7 +19,8 @@ import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
 import { DONATION_STATUS_CONFIG } from "@/config/bankAccounts";
 import { getBankAccountById } from "@/config/bankAccounts";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
+import { formatDate } from "@/lib/utils/format";
 
 interface EnrichedDonation extends Donation {
   userName?: string;
@@ -70,7 +71,7 @@ export default function DonationVerificationPanel() {
     fetchDonations();
   }, [fetchDonations]);
 
-  useMockDbSubscription("donations", fetchDonations);
+  useAutoRefresh("donations", fetchDonations);
 
   const handleVerify = async (action: "VERIFIED" | "REJECTED") => {
     if (!selectedDonation) return;
@@ -167,12 +168,7 @@ export default function DonationVerificationPanel() {
       title: "Date",
       dataIndex: "createdAt",
       key: "createdAt",
-      render: (d: string) =>
-        new Date(d).toLocaleDateString("en-NG", {
-          day: "numeric",
-          month: "short",
-          year: "numeric",
-        }),
+      render: (d: string) => formatDate(d),
       sorter: (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
     },
@@ -286,10 +282,7 @@ export default function DonationVerificationPanel() {
                 }).format(selectedDonation.amount)}
               </Descriptions.Item>
               <Descriptions.Item label="Date">
-                {new Date(selectedDonation.createdAt).toLocaleDateString(
-                  "en-NG",
-                  { day: "numeric", month: "long", year: "numeric" },
-                )}
+                {formatDate(selectedDonation.createdAt)}
               </Descriptions.Item>
               {bankInfo && (
                 <>

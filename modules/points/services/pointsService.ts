@@ -1,5 +1,5 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 import { POINTS_CONFIG, CACHE_TTL_POINTS_SUMMARY } from "@/lib/constants";
 import { RANK_LEVELS } from "@/config/ranks";
 
@@ -12,25 +12,27 @@ export async function award(
 ): Promise<PointsLedgerEntry> {
     const config = POINTS_CONFIG[action];
 
-    const entry = await mockDb.transaction(async (tx) => {
-        const newEntry: PointsLedgerEntry = {
-            id: crypto.randomUUID(),
-            userId,
-            campaignId,
-            type: config.type as PointType,
-            value: config.value,
-            description: action.replace(/_/g, " ").toLowerCase(),
-            referenceId,
-            createdAt: new Date().toISOString(),
-        };
-        await tx.pointsLedger.create({ data: newEntry });
-        mockCache.del(`points:summary:${userId}`);
-        if (campaignId) mockCache.del(`points:summary:${userId}:${campaignId}`);
-        mockDb.emit("pointsLedger:changed");
+    const entry = await prisma.$transaction(async (tx) => {
+        const newEntry = await tx.pointsLedgerEntry.create({
+            data: {
+                userId,
+                campaignId,
+                type: config.type as never,
+                value: config.value,
+                description: action.replace(/_/g, " ").toLowerCase(),
+                referenceId,
+            },
+        });
+        await redis.del(`points:summary:${userId}`);
+        if (campaignId) await redis.del(`points:summary:${userId}:${campaignId}`);
         return newEntry;
     });
 
-    return entry;
+    return {
+        ...entry,
+        type: entry.type as unknown as PointType,
+        createdAt: entry.createdAt.toISOString(),
+    } as unknown as PointsLedgerEntry;
 }
 
 // ─── Get points summary ───────────────────────────────────────────────────────
@@ -41,10 +43,10 @@ export async function getPointsSummary(
     const cacheKey = campaignId
         ? `points:summary:${userId}:${campaignId}`
         : `points:summary:${userId}`;
-    const cached = mockCache.get<PointsSummary>(cacheKey);
+    const cached = await redis.get<PointsSummary>(cacheKey);
     if (cached) return cached;
 
-    const entries = await mockDb.pointsLedger.findMany({
+    const entries = await prisma.pointsLedgerEntry.findMany({
         where: campaignId ? { userId, campaignId } : { userId },
     });
 
@@ -66,7 +68,7 @@ export async function getPointsSummary(
         summary.total += entry.value;
     }
 
-    mockCache.set(cacheKey, summary, CACHE_TTL_POINTS_SUMMARY);
+    await redis.set(cacheKey, summary, CACHE_TTL_POINTS_SUMMARY);
     return summary;
 }
 
@@ -75,7 +77,6 @@ export async function getRank(userId: string): Promise<RankLevel> {
     const summary = await getPointsSummary(userId);
     const total = summary.total;
 
-    // Find highest rank level the user has reached
     const sorted = [...RANK_LEVELS].sort((a, b) => b.minScore - a.minScore);
     return sorted.find((r) => total >= r.minScore) ?? RANK_LEVELS[0];
 }
@@ -109,10 +110,21 @@ export async function getLedger(
     page = 1,
     pageSize = 20,
 ): Promise<{ data: PointsLedgerEntry[]; total: number }> {
-    const all = await mockDb.pointsLedger.findMany({ where: { userId } });
-    const sorted = all.sort(
-        (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime(),
-    );
-    const start = (page - 1) * pageSize;
-    return { data: sorted.slice(start, start + pageSize), total: sorted.length };
+    const [entries, total] = await Promise.all([
+        prisma.pointsLedgerEntry.findMany({
+            where: { userId },
+            orderBy: { createdAt: "desc" },
+            skip: (page - 1) * pageSize,
+            take: pageSize,
+        }),
+        prisma.pointsLedgerEntry.count({ where: { userId } }),
+    ]);
+
+    const data = entries.map((e) => ({
+        ...e,
+        type: e.type as unknown as PointType,
+        createdAt: e.createdAt.toISOString(),
+    })) as unknown as PointsLedgerEntry[];
+
+    return { data, total };
 }

@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ROUTES } from "@/config/routes";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseAnalyticsReturn {
     analytics: UserAnalytics | null;
@@ -35,9 +35,9 @@ export function useUserAnalytics(): UseAnalyticsReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("pointsLedger", fetch);
-    useMockDbSubscription("linkEvents", fetch);
-    useMockDbSubscription("referrals", fetch);
+    useAutoRefresh("pointsLedger", fetch);
+    useAutoRefresh("linkEvents", fetch);
+    useAutoRefresh("referrals", fetch);
 
     return { analytics, loading, error, refresh: fetch };
 }
@@ -80,8 +80,8 @@ export function useCampaignAnalytics(
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("linkEvents", fetch);
-    useMockDbSubscription("donations", fetch);
+    useAutoRefresh("linkEvents", fetch);
+    useAutoRefresh("donations", fetch);
 
     return { analytics, loading, error, refresh: fetch };
 }
@@ -119,8 +119,8 @@ export function useOverviewAnalytics(): UseOverviewAnalyticsReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("users", fetch);
-    useMockDbSubscription("campaigns", fetch);
+    useAutoRefresh("users", fetch);
+    useAutoRefresh("campaigns", fetch);
 
     return { overview, loading, error, refresh: fetch };
 }

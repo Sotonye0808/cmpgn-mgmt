@@ -11,8 +11,10 @@ export async function GET(request: NextRequest) {
         const user = auth.user;
 
         const { page, pageSize } = parsePagination(request.nextUrl.searchParams);
-        const { data, total } = await getUserDonations(user.id, page, pageSize);
-        return paginatedResponse(data, total, page, pageSize);
+        const donations = await getUserDonations(user.id);
+        const total = donations.length;
+        const paged = donations.slice((page - 1) * pageSize, page * pageSize);
+        return paginatedResponse(paged, total, page, pageSize);
     } catch (err) {
         return handleApiError(err);
     }

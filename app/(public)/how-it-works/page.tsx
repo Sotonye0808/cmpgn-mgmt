@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import {
   LANDING_CONTENT,
   HOW_IT_WORKS_STEPS,
@@ -10,9 +11,33 @@ import PublicPageHero from "@/components/ui/PublicPageHero";
 import PublicStatsBar from "@/components/ui/PublicStatsBar";
 import PublicFaqAccordion from "@/components/ui/PublicFaqAccordion";
 import PublicCtaSection from "@/components/ui/PublicCtaSection";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export default function HowItWorksPage() {
-  const publicStats = getPublicStats();
+export const metadata: Metadata = {
+  title: "How It Works",
+  description:
+    "Learn how DMHicc works — from enlistment to deployment, proof submission, rank progression, and real-time analytics.",
+  alternates: { canonical: absoluteUrl("/how-it-works") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/how-it-works"),
+    title: "How It Works | DMHicc",
+    description:
+      "Learn how DMHicc works — from enlistment to deployment, proof submission, rank progression, and real-time analytics.",
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "How It Works | DMHicc",
+    description:
+      "Learn how DMHicc works — from enlistment to deployment, proof submission, rank progression, and real-time analytics.",
+    images: [SITE_CONFIG.ogImage],
+  },
+};
+
+export default async function HowItWorksPage() {
+  const publicStats = await getPublicStats();
   return (
     <div className="min-h-screen">
       <PublicPageHero
@@ -79,13 +104,8 @@ export default function HowItWorksPage() {
                 </div>
                 {/* Status badge */}
                 <span
-                  className="text-xs font-semibold px-2 py-0.5 rounded-full mb-2 text-dynamic"
-                  style={
-                    {
-                      "--_dc": stage.color,
-                      backgroundColor: `${stage.color}1A`,
-                    } as React.CSSProperties
-                  }>
+                  className="text-xs font-semibold px-2 py-0.5 rounded-full mb-2 text-dynamic bg-dynamic-muted"
+                  style={{ "--_dc": stage.color } as React.CSSProperties}>
                   {stage.statusLabel}
                 </span>
                 <h3 className="font-semibold text-ds-text-primary mb-1">

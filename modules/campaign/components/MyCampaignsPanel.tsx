@@ -146,13 +146,7 @@ export default function MyCampaignsPanel() {
       }
       size="small"
       className="bg-ds-surface-elevated border-ds-border-subtle rounded-ds-xl"
-      extra={
-        <Link
-          href={ROUTES.CAMPAIGNS}
-          className="text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors">
-          View all
-        </Link>
-      }>
+      >
       <Tabs
         items={tabItems}
         size="small"

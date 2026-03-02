@@ -1,7 +1,8 @@
 import { NextRequest } from "next/server";
 import { successResponse, notFoundResponse, handleApiError } from "@/lib/utils/api";
 import { requireAuth } from "@/lib/middleware/auth";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 import { deactivateLink } from "@/modules/links/services/linkService";
 
 interface RouteParams {
@@ -14,9 +15,9 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
         if (auth.error) return auth.error;
 
         const { id } = await params;
-        const link = await mockDb.smartLinks.findUnique({ where: { id } });
+        const link = await prisma.smartLink.findUnique({ where: { id } });
         if (!link) return notFoundResponse("Smart link not found");
-        return successResponse(link);
+        return successResponse(serialize(link));
     } catch (err) {
         return handleApiError(err);
     }
@@ -29,7 +30,7 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         const user = auth.user;
 
         const { id } = await params;
-        const link = await mockDb.smartLinks.findUnique({ where: { id } });
+        const link = await prisma.smartLink.findUnique({ where: { id } });
         if (!link) return notFoundResponse("Smart link not found");
 
         // Owner or admin can deactivate

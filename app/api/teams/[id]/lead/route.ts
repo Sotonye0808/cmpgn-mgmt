@@ -9,7 +9,7 @@ import { setTeamLead } from "@/modules/teams";
 import { z } from "zod";
 
 const setLeadSchema = z.object({
-    userId: z.string().optional(),
+    userId: z.string().min(1),
 });
 
 export async function POST(

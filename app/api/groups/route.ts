@@ -36,10 +36,7 @@ export async function POST(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const group = await createGroup(
-            parsed.data,
-            auth.user.role as unknown as string
-        );
+        const group = await createGroup(parsed.data);
         return successResponse(group, 201);
     } catch (err) {
         return handleApiError(err);

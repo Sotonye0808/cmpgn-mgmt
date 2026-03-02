@@ -1,9 +1,26 @@
+import type { Metadata } from "next";
 import { TERMS_PAGE_CONTENT } from "@/config/content";
 import PublicPageHero from "@/components/ui/PublicPageHero";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export const metadata = {
+export const metadata: Metadata = {
   title: TERMS_PAGE_CONTENT.meta.title,
   description: TERMS_PAGE_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/terms") },
+  robots: { index: true, follow: false },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/terms"),
+    title: `${TERMS_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: TERMS_PAGE_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary",
+    title: `${TERMS_PAGE_CONTENT.meta.title} | ${SITE_CONFIG.name}`,
+    description: TERMS_PAGE_CONTENT.meta.description,
+  },
 };
 
 export default function TermsPage() {

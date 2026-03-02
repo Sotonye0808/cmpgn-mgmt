@@ -6,6 +6,7 @@ import {
     handleApiError,
 } from "@/lib/utils/api";
 import { generateInviteLink } from "@/modules/teams";
+import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 
 const inviteSchema = z.object({
@@ -29,12 +30,13 @@ export async function POST(
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const actorRole = auth.user.role as unknown as string;
+        const actorRole = auth.user.role as string;
 
         // Regular users can only create MEMBER invites for their own team
         if (actorRole === "USER") {
-            const user = (await import("@/lib/data/mockDb")).mockDb.users.findUnique({
+            const user = await prisma.user.findUnique({
                 where: { id: auth.user.id },
+                select: { teamId: true },
             });
             if (!user?.teamId || user.teamId !== teamId) {
                 return badRequestResponse("You can only create invites for your own team");
@@ -46,8 +48,9 @@ export async function POST(
 
         // Team leads can create MEMBER invites for their own team
         if (actorRole === "TEAM_LEAD") {
-            const user = (await import("@/lib/data/mockDb")).mockDb.users.findUnique({
+            const user = await prisma.user.findUnique({
                 where: { id: auth.user.id },
+                select: { teamId: true },
             });
             if (!user?.teamId || user.teamId !== teamId) {
                 return badRequestResponse("You can only create invites for your own team");
@@ -56,12 +59,12 @@ export async function POST(
 
         // Admins can invite to any team with any role — no additional checks
 
-        const invite = await generateInviteLink(
+        const invite = await generateInviteLink({
             teamId,
-            parsed.data.targetRole,
-            auth.user.id,
-            parsed.data.maxUses
-        );
+            createdById: auth.user.id,
+            targetRole: parsed.data.targetRole,
+            maxUses: parsed.data.maxUses,
+        });
         return successResponse(invite, 201);
     } catch (err) {
         return handleApiError(err);

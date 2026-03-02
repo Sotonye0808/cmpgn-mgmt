@@ -1,515 +1,428 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
-import { RANK_LEVELS } from "@/config/ranks";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
+import { serialize } from "@/lib/utils/serialize";
+import { nanoid } from "nanoid";
 
-// ─── Constants ────────────────────────────────────────────────────────────────
+// ─── Exported Types ───────────────────────────────────────────────────────────
 
-const MAX_TEAM_MEMBERS = 10;
-const MAX_GROUP_TEAMS = 4;
-const CACHE_TTL = 60_000; // 1 minute
+export interface TeamMemberStat {
+    id: string;
+    userId: string;
+    firstName: string;
+    lastName: string;
+    profilePicture: string | null;
+    role: string;
+    points: number;
+    clicks: number;
+    donationCount: number;
+    rankBadge: string;
+    rankName: string;
+}
 
 // ─── Groups ───────────────────────────────────────────────────────────────────
 
-export interface CreateGroupInput {
+export async function createGroup(input: {
     name: string;
     description?: string;
-}
-
-export async function createGroup(
-    input: CreateGroupInput,
-    actorRole: string
-): Promise<Group> {
-    if (actorRole !== "ADMIN" && actorRole !== "SUPER_ADMIN") {
-        throw new Error("Only admins can create groups");
-    }
-
-    const now = new Date().toISOString();
-    const group = mockDb.groups.create({
+    maxTeams?: number;
+}): Promise<Group> {
+    const group = await prisma.group.create({
         data: {
             name: input.name,
             description: input.description,
-            teamIds: [],
-            maxTeams: MAX_GROUP_TEAMS,
-            createdAt: now,
-            updatedAt: now,
+            maxTeams: input.maxTeams ?? 10,
         },
     });
 
-    mockCache.invalidatePattern("groups:");
-    mockDb.emit("groups:changed");
-    return group;
+    await redis.invalidatePattern("groups:");
+    return toGroupView(group);
 }
 
 export async function listGroups(): Promise<Group[]> {
-    const cached = mockCache.get<Group[]>("groups:list");
+    const cacheKey = "groups:list";
+    const cached = await redis.get<Group[]>(cacheKey);
     if (cached) return cached;
 
-    const groups = mockDb.groups.findMany({
+    const groups = await prisma.group.findMany({
+        include: { teams: { select: { id: true } } },
         orderBy: { createdAt: "desc" },
     });
-    mockCache.set("groups:list", groups, CACHE_TTL);
-    return groups;
+
+    const result = groups.map((g) => ({
+        ...serialize<Group>(g),
+        teamIds: g.teams.map((t) => t.id),
+    }));
+
+    await redis.set(cacheKey, result, 60_000);
+    return result;
 }
 
-export async function getGroup(groupId: string): Promise<Group | null> {
-    return mockDb.groups.findUnique({ where: { id: groupId } });
+export async function getGroup(id: string): Promise<Group | null> {
+    const group = await prisma.group.findUnique({
+        where: { id },
+        include: { teams: { select: { id: true } } },
+    });
+    if (!group) return null;
+    return {
+        ...serialize<Group>(group),
+        teamIds: group.teams.map((t) => t.id),
+    };
 }
 
-export async function getGroupWithTeams(
-    groupId: string
-): Promise<{ group: Group; teams: Team[] } | null> {
-    const group = mockDb.groups.findUnique({ where: { id: groupId } });
+export async function getGroupWithTeams(id: string) {
+    const group = await prisma.group.findUnique({
+        where: { id },
+        include: {
+            teams: {
+                include: { members: { select: { id: true, firstName: true, lastName: true } } },
+            },
+        },
+    });
     if (!group) return null;
 
-    const teams = mockDb.teams.findMany().filter((t) => group.teamIds.includes(t.id));
-    return { group, teams };
+    return {
+        ...serialize<Group>(group),
+        teamIds: group.teams.map((t) => t.id),
+        teams: group.teams.map((t) => ({
+            ...serialize<Team>(t),
+            memberIds: t.members.map((m) => m.id),
+            members: t.members,
+        })),
+    };
 }
 
 // ─── Teams ────────────────────────────────────────────────────────────────────
 
-export interface CreateTeamInput {
+export async function createTeam(input: {
     name: string;
     groupId: string;
     teamLeadId?: string;
-}
-
-export async function createTeam(
-    input: CreateTeamInput,
-    actorRole: string
-): Promise<Team> {
-    if (actorRole !== "ADMIN" && actorRole !== "SUPER_ADMIN") {
-        throw new Error("Only admins can create teams");
-    }
-
-    const group = mockDb.groups.findUnique({ where: { id: input.groupId } });
-    if (!group) throw new Error("Group not found");
-
-    if (group.teamIds.length >= group.maxTeams) {
-        throw new Error(
-            `Group "${group.name}" already has ${group.maxTeams} teams (max)`
-        );
-    }
-
-    const now = new Date().toISOString();
-    const initialMembers: string[] = [];
-
-    // If a team lead is assigned, validate and add as first member
-    if (input.teamLeadId) {
-        const leadUser = mockDb.users.findUnique({ where: { id: input.teamLeadId } });
-        if (!leadUser) throw new Error("Team lead user not found");
-        initialMembers.push(input.teamLeadId);
-    }
-
-    return mockDb.transaction(async (tx) => {
-        const team = tx.teams.create({
+    maxMembers?: number;
+}): Promise<Team> {
+    const team = await prisma.$transaction(async (tx) => {
+        const created = await tx.team.create({
             data: {
                 name: input.name,
                 groupId: input.groupId,
                 teamLeadId: input.teamLeadId,
-                memberIds: initialMembers,
-                maxMembers: MAX_TEAM_MEMBERS,
-                createdAt: now,
-                updatedAt: now,
+                maxMembers: input.maxMembers ?? 20,
             },
         });
 
-        // Add team to group
-        tx.groups.update({
-            where: { id: input.groupId },
-            data: {
-                teamIds: [...group.teamIds, team.id],
-                updatedAt: now,
-            },
-        });
-
-        // Assign team lead's teamId on their user record
+        // If team lead specified, assign them to this team
         if (input.teamLeadId) {
-            tx.users.update({
+            await tx.user.update({
                 where: { id: input.teamLeadId },
-                data: { teamId: team.id, updatedAt: now },
+                data: { teamId: created.id },
             });
         }
 
-        mockCache.invalidatePattern("groups:");
-        mockCache.invalidatePattern("teams:");
-        mockDb.emit("teams:changed");
-        mockDb.emit("groups:changed");
-
-        return team;
+        return created;
     });
+
+    await redis.invalidatePattern("teams:");
+    await redis.invalidatePattern("groups:");
+    return toTeamView(team);
 }
 
 export async function listTeams(groupId?: string): Promise<Team[]> {
-    const cacheKey = groupId ? `teams:list:${groupId}` : "teams:list:all";
-    const cached = mockCache.get<Team[]>(cacheKey);
+    const cacheKey = `teams:list:${groupId ?? "all"}`;
+    const cached = await redis.get<Team[]>(cacheKey);
     if (cached) return cached;
 
-    let teams: Team[];
-    if (groupId) {
-        teams = mockDb.teams.findMany().filter((t) => t.groupId === groupId);
-    } else {
-        teams = mockDb.teams.findMany({ orderBy: { createdAt: "desc" } });
-    }
-    mockCache.set(cacheKey, teams, CACHE_TTL);
-    return teams;
+    const where = groupId ? { groupId } : {};
+    const teams = await prisma.team.findMany({
+        where,
+        include: { members: { select: { id: true } } },
+        orderBy: { createdAt: "desc" },
+    });
+
+    const result = teams.map((t) => ({
+        ...serialize<Team>(t),
+        memberIds: t.members.map((m) => m.id),
+    }));
+
+    await redis.set(cacheKey, result, 60_000);
+    return result;
 }
 
-export async function getTeam(teamId: string): Promise<Team | null> {
-    return mockDb.teams.findUnique({ where: { id: teamId } });
+export async function getTeam(id: string): Promise<Team | null> {
+    const team = await prisma.team.findUnique({
+        where: { id },
+        include: { members: { select: { id: true } } },
+    });
+    if (!team) return null;
+    return { ...serialize<Team>(team), memberIds: team.members.map((m) => m.id) };
 }
 
-export async function getTeamWithMembers(
-    teamId: string
-): Promise<{ team: Team; members: User[] } | null> {
-    const team = mockDb.teams.findUnique({ where: { id: teamId } });
+export async function getTeamWithMembers(id: string) {
+    const team = await prisma.team.findUnique({
+        where: { id },
+        include: {
+            members: {
+                select: {
+                    id: true,
+                    firstName: true,
+                    lastName: true,
+                    email: true,
+                    profilePicture: true,
+                    role: true,
+                    isActive: true,
+                    createdAt: true,
+                },
+            },
+            group: { select: { id: true, name: true } },
+        },
+    });
     if (!team) return null;
 
-    const members = mockDb.users.findMany().filter((u) =>
-        team.memberIds.includes(u.id)
-    );
-    return { team, members };
+    return {
+        ...serialize<Team>(team),
+        memberIds: team.members.map((m) => m.id),
+        members: team.members.map((m) => serialize(m)),
+        group: team.group ? serialize(team.group) : null,
+    };
 }
 
-export interface TeamMemberStat {
-    id: string;
-    firstName: string;
-    lastName: string;
-    role: string;
-    profilePicture?: string;
-    totalPoints: number;
-    rankBadge: string;
-    rankName: string;
-    donationCount: number;
+export async function getTeamMemberStats(teamId: string): Promise<TeamMemberStat[] | null> {
+    const team = await prisma.team.findUnique({
+        where: { id: teamId },
+        include: {
+            members: {
+                select: { id: true, firstName: true, lastName: true, profilePicture: true, role: true },
+            },
+        },
+    });
+    if (!team) return null;
+
+    const memberIds = team.members.map((m) => m.id);
+
+    const [pointEntries, events, donations] = await Promise.all([
+        prisma.pointsLedgerEntry.findMany({
+            where: { userId: { in: memberIds } },
+        }),
+        prisma.linkEvent.findMany({
+            where: { smartLink: { userId: { in: memberIds } } },
+        }),
+        prisma.donation.findMany({
+            where: { userId: { in: memberIds } },
+        }),
+    ]);
+
+    // Simple rank assignment based on points
+    const rankTiers = [
+        { min: 1000, badge: "🎖️", name: "General" },
+        { min: 500, badge: "⭐", name: "Colonel" },
+        { min: 200, badge: "🏅", name: "Major" },
+        { min: 50, badge: "🔰", name: "Corporal" },
+        { min: 0, badge: "🪖", name: "Private" },
+    ];
+
+    return team.members.map((m) => {
+        const memberPoints = pointEntries
+            .filter((p) => p.userId === m.id)
+            .reduce((s: number, p) => s + p.value, 0);
+        const memberClicks = events.filter(
+            (e) => e.eventType === "CLICK" && e.userId === m.id
+        ).length;
+        const donationCount = donations.filter((d) => d.userId === m.id).length;
+        const tier = rankTiers.find((r) => memberPoints >= r.min) ?? rankTiers[rankTiers.length - 1];
+
+        return {
+            id: m.id,
+            userId: m.id,
+            firstName: m.firstName,
+            lastName: m.lastName,
+            profilePicture: m.profilePicture,
+            role: m.role,
+            points: memberPoints,
+            clicks: memberClicks,
+            donationCount,
+            rankBadge: tier.badge,
+            rankName: tier.name,
+        };
+    });
 }
 
-export async function getTeamMemberStats(
-    teamId: string
-): Promise<TeamMemberStat[] | null> {
-    const result = await getTeamWithMembers(teamId);
-    if (!result) return null;
-
-    const sortedRanks = [...RANK_LEVELS].sort((a, b) => b.minScore - a.minScore);
-
-    return result.members
-        .map((member) => {
-            const totalPoints = mockDb.pointsLedger._data
-                .filter((e) => e.userId === member.id)
-                .reduce((sum, e) => sum + Number(e.value), 0);
-
-            const rankLevel =
-                sortedRanks.find((r) => totalPoints >= r.minScore) ?? RANK_LEVELS[0];
-
-            const donationCount = mockDb.donations._data.filter(
-                (d) => d.userId === member.id && d.status === "VERIFIED"
-            ).length;
-
-            return {
-                id: member.id,
-                firstName: member.firstName,
-                lastName: member.lastName,
-                role: member.role as unknown as string,
-                profilePicture: member.profilePicture,
-                totalPoints,
-                rankBadge: rankLevel.badge,
-                rankName: rankLevel.name,
-                donationCount,
-            };
-        })
-        .sort((a, b) => b.totalPoints - a.totalPoints);
-}
-
-// ─── Team Membership ──────────────────────────────────────────────────────────
+// ─── Membership ───────────────────────────────────────────────────────────────
 
 export async function addMemberToTeam(
     teamId: string,
     userId: string
 ): Promise<Team> {
-    const team = mockDb.teams.findUnique({ where: { id: teamId } });
-    if (!team) throw new Error("Team not found");
-
-    if (team.memberIds.includes(userId)) {
-        throw new Error("User is already a member of this team");
-    }
-
-    if (team.memberIds.length >= team.maxMembers) {
-        throw new Error(
-            `Team "${team.name}" is full (${team.maxMembers} members max)`
-        );
-    }
-
-    const user = mockDb.users.findUnique({ where: { id: userId } });
-    if (!user) throw new Error("User not found");
-
-    if (user.teamId && user.teamId !== teamId) {
-        throw new Error("User is already a member of another team");
-    }
-
-    const now = new Date().toISOString();
-
-    return mockDb.transaction(async (tx) => {
-        const updated = tx.teams.update({
+    const team = await prisma.$transaction(async (tx) => {
+        const t = await tx.team.findUnique({
             where: { id: teamId },
-            data: {
-                memberIds: [...team.memberIds, userId],
-                updatedAt: now,
-            },
+            include: { members: { select: { id: true } } },
         });
-        if (!updated) throw new Error("Failed to update team");
+        if (!t) throw new Error("Team not found");
+        if (t.members.length >= t.maxMembers) throw new Error("Team is full");
 
-        tx.users.update({
+        await tx.user.update({
             where: { id: userId },
-            data: { teamId, updatedAt: now },
+            data: { teamId },
         });
 
-        mockCache.invalidatePattern("teams:");
-        mockCache.del(`user:${userId}`);
-        mockDb.emit("teams:changed");
-        mockDb.emit("users:changed");
-
-        return updated;
+        return tx.team.findUnique({
+            where: { id: teamId },
+            include: { members: { select: { id: true } } },
+        });
     });
+
+    await redis.invalidatePattern("teams:");
+    return { ...serialize<Team>(team!), memberIds: team!.members.map((m: { id: string }) => m.id) };
 }
 
 export async function removeMemberFromTeam(
     teamId: string,
     userId: string
 ): Promise<Team> {
-    const team = mockDb.teams.findUnique({ where: { id: teamId } });
-    if (!team) throw new Error("Team not found");
+    await prisma.$transaction(async (tx) => {
+        const user = await tx.user.findUnique({ where: { id: userId } });
+        if (!user || user.teamId !== teamId) throw new Error("User not in team");
 
-    if (!team.memberIds.includes(userId)) {
-        throw new Error("User is not a member of this team");
-    }
-
-    const now = new Date().toISOString();
-
-    return mockDb.transaction(async (tx) => {
-        const updatedData: Partial<Team> = {
-            memberIds: team.memberIds.filter((id) => id !== userId),
-            updatedAt: now,
-        };
-
-        // If this user was the team lead, clear the lead
-        if (team.teamLeadId === userId) {
-            updatedData.teamLeadId = undefined;
-        }
-
-        const updated = tx.teams.update({
-            where: { id: teamId },
-            data: updatedData,
-        });
-        if (!updated) throw new Error("Failed to update team");
-
-        tx.users.update({
+        await tx.user.update({
             where: { id: userId },
-            data: { teamId: undefined, updatedAt: now },
+            data: { teamId: null },
         });
-
-        mockCache.invalidatePattern("teams:");
-        mockCache.del(`user:${userId}`);
-        mockDb.emit("teams:changed");
-        mockDb.emit("users:changed");
-
-        return updated;
     });
-}
 
-// ─── Team Lead ────────────────────────────────────────────────────────────────
+    const team = await prisma.team.findUnique({
+        where: { id: teamId },
+        include: { members: { select: { id: true } } },
+    });
+
+    await redis.invalidatePattern("teams:");
+    return { ...serialize<Team>(team!), memberIds: team!.members.map((m) => m.id) };
+}
 
 export async function setTeamLead(
     teamId: string,
-    userId?: string
+    userId: string
 ): Promise<Team> {
-    const team = mockDb.teams.findUnique({ where: { id: teamId } });
-    if (!team) throw new Error("Team not found");
-
-    if (userId) {
-        if (!team.memberIds.includes(userId)) {
-            throw new Error("User must be a team member to become team lead");
-        }
-    }
-
-    const now = new Date().toISOString();
-    const updated = mockDb.teams.update({
+    const team = await prisma.team.update({
         where: { id: teamId },
-        data: { teamLeadId: userId, updatedAt: now },
+        data: { teamLeadId: userId },
+        include: { members: { select: { id: true } } },
     });
-    if (!updated) throw new Error("Failed to update team");
 
-    // Update user roles — promote new lead, demote old lead
-    if (userId) {
-        mockDb.users.update({
-            where: { id: userId },
-            data: { role: "TEAM_LEAD" as unknown as UserRole, updatedAt: now },
-        });
-    }
-    if (team.teamLeadId && team.teamLeadId !== userId) {
-        mockDb.users.update({
-            where: { id: team.teamLeadId },
-            data: { role: "USER" as unknown as UserRole, updatedAt: now },
-        });
-    }
+    // Also update user role to TEAM_LEAD
+    await prisma.user.update({
+        where: { id: userId },
+        data: { role: "TEAM_LEAD" as never },
+    });
 
-    mockCache.invalidatePattern("teams:");
-    mockDb.emit("teams:changed");
-    mockDb.emit("users:changed");
-    return updated;
+    await redis.invalidatePattern("teams:");
+    return { ...serialize<Team>(team), memberIds: team.members.map((m) => m.id) };
 }
 
 // ─── Invite Links ─────────────────────────────────────────────────────────────
 
-export async function generateInviteLink(
-    teamId: string,
-    targetRole: "MEMBER" | "TEAM_LEAD",
-    createdById: string,
-    maxUses = 50
-): Promise<TeamInviteLink> {
-    const team = mockDb.teams.findUnique({ where: { id: teamId } });
-    if (!team) throw new Error("Team not found");
+export async function generateInviteLink(input: {
+    teamId: string;
+    createdById: string;
+    targetRole?: "MEMBER" | "TEAM_LEAD";
+    maxUses?: number;
+    expiresInDays?: number;
+}): Promise<TeamInviteLink> {
+    const token = nanoid(16);
+    const expiresAt = input.expiresInDays
+        ? new Date(Date.now() + input.expiresInDays * 86_400_000)
+        : undefined;
 
-    const token = `${teamId}-${crypto.randomUUID().slice(0, 8)}`;
-    const now = new Date().toISOString();
-    // Default expiry: 7 days
-    const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString();
-
-    const invite = mockDb.teamInviteLinks.create({
+    const link = await prisma.teamInviteLink.create({
         data: {
             token,
-            teamId,
-            targetRole,
-            createdById,
+            teamId: input.teamId,
+            targetRole: input.targetRole ?? "MEMBER",
+            createdById: input.createdById,
+            maxUses: input.maxUses ?? 10,
             usedCount: 0,
-            maxUses,
-            expiresAt,
             isActive: true,
-            createdAt: now,
+            expiresAt,
         },
     });
 
-    mockDb.emit("teamInviteLinks:changed");
-    return invite;
+    return serialize<TeamInviteLink>(link);
 }
 
-export async function getInviteLink(
-    token: string
-): Promise<{
-    invite: TeamInviteLink;
-    team: Team;
-    group: Group | null;
-} | null> {
-    const invite = mockDb.teamInviteLinks
-        .findMany()
-        .find((i) => i.token === token);
-    if (!invite) return null;
-
-    const team = mockDb.teams.findUnique({ where: { id: invite.teamId } });
-    if (!team) return null;
-
-    const group = mockDb.groups.findUnique({ where: { id: team.groupId } });
-
-    return { invite, team, group };
+export async function getInviteLink(token: string): Promise<TeamInviteLink | null> {
+    const link = await prisma.teamInviteLink.findUnique({ where: { token } });
+    return link ? serialize<TeamInviteLink>(link) : null;
 }
 
 export async function consumeInviteLink(
     token: string,
     userId: string
-): Promise<{ team: Team; role: "MEMBER" | "TEAM_LEAD" }> {
-    const data = await getInviteLink(token);
-    if (!data) throw new Error("Invalid invite link");
+): Promise<{ team: Team; invite: TeamInviteLink }> {
+    return prisma.$transaction(async (tx) => {
+        const link = await tx.teamInviteLink.findUnique({ where: { token } });
+        if (!link) throw new Error("Invite link not found");
+        if (!link.isActive) throw new Error("Invite link is inactive");
+        if (link.usedCount >= link.maxUses) throw new Error("Invite link fully used");
+        if (link.expiresAt && new Date(link.expiresAt) < new Date())
+            throw new Error("Invite link has expired");
 
-    const { invite, team } = data;
-
-    // Validate invite is usable
-    if (!invite.isActive) {
-        throw new Error("This invite link has been deactivated");
-    }
-    if (invite.expiresAt && new Date(invite.expiresAt) < new Date()) {
-        throw new Error("This invite link has expired");
-    }
-    if (invite.usedCount >= invite.maxUses) {
-        throw new Error("This invite link has reached its usage limit");
-    }
-
-    // Validate user
-    const user = mockDb.users.findUnique({ where: { id: userId } });
-    if (!user) throw new Error("User not found");
-
-    if (team.memberIds.includes(userId)) {
-        throw new Error("You are already a member of this team");
-    }
-
-    if (user.teamId && user.teamId !== team.id) {
-        throw new Error("You are already a member of another team");
-    }
-
-    if (team.memberIds.length >= team.maxMembers) {
-        throw new Error(`Team "${team.name}" is full`);
-    }
-
-    const now = new Date().toISOString();
-
-    return mockDb.transaction(async (tx) => {
         // Add user to team
-        tx.teams.update({
-            where: { id: team.id },
-            data: {
-                memberIds: [...team.memberIds, userId],
-                teamLeadId:
-                    invite.targetRole === "TEAM_LEAD" ? userId : team.teamLeadId,
-                updatedAt: now,
-            },
-        });
-
-        // Update user record
-        const newRole: string =
-            invite.targetRole === "TEAM_LEAD" ? "TEAM_LEAD" : user.role as unknown as string;
-        tx.users.update({
+        await tx.user.update({
             where: { id: userId },
-            data: {
-                teamId: team.id,
-                role: newRole as unknown as UserRole,
-                updatedAt: now,
-            },
+            data: { teamId: link.teamId },
         });
 
-        // Increment usage
-        tx.teamInviteLinks.update({
-            where: { id: invite.id },
-            data: { usedCount: invite.usedCount + 1 },
+        // If target role is TEAM_LEAD, update user role
+        if (link.targetRole === "TEAM_LEAD") {
+            await tx.user.update({
+                where: { id: userId },
+                data: { role: "TEAM_LEAD" as never },
+            });
+        }
+
+        // Increment used count
+        const updatedLink = await tx.teamInviteLink.update({
+            where: { id: link.id },
+            data: { usedCount: { increment: 1 } },
         });
 
-        mockCache.invalidatePattern("teams:");
-        mockCache.del(`user:${userId}`);
-        mockDb.emit("teams:changed");
-        mockDb.emit("users:changed");
-        mockDb.emit("teamInviteLinks:changed");
+        const team = await tx.team.findUnique({
+            where: { id: link.teamId },
+            include: { members: { select: { id: true } } },
+        });
 
-        const updatedTeam = tx.teams.findUnique({ where: { id: team.id } })!;
-        return { team: updatedTeam, role: invite.targetRole };
+        await redis.invalidatePattern("teams:");
+
+        return {
+            team: { ...serialize<Team>(team!), memberIds: team!.members.map((m: { id: string }) => m.id) },
+            invite: serialize<TeamInviteLink>(updatedLink),
+        };
     });
 }
 
-// ─── Deactivate Invite ────────────────────────────────────────────────────────
-
-export async function deactivateInviteLink(
-    token: string,
-    actorRole: string
-): Promise<TeamInviteLink> {
-    if (actorRole !== "ADMIN" && actorRole !== "SUPER_ADMIN" && actorRole !== "TEAM_LEAD") {
-        throw new Error("Insufficient permissions");
-    }
-
-    const invite = mockDb.teamInviteLinks
-        .findMany()
-        .find((i) => i.token === token);
-    if (!invite) throw new Error("Invite link not found");
-
-    const updated = mockDb.teamInviteLinks.update({
-        where: { id: invite.id },
+export async function deactivateInviteLink(id: string): Promise<TeamInviteLink> {
+    const link = await prisma.teamInviteLink.update({
+        where: { id },
         data: { isActive: false },
     });
-    if (!updated) throw new Error("Failed to deactivate invite");
+    return serialize<TeamInviteLink>(link);
+}
 
-    mockDb.emit("teamInviteLinks:changed");
-    return updated;
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Convert Prisma Team to global Team with computed memberIds */
+async function toTeamView(team: unknown): Promise<Team> {
+    const t = serialize<Team>(team);
+    const members = await prisma.user.findMany({
+        where: { teamId: t.id },
+        select: { id: true },
+    });
+    return { ...t, memberIds: members.map((m) => m.id) };
+}
+
+/** Convert Prisma Group to global Group with computed teamIds */
+async function toGroupView(group: unknown): Promise<Group> {
+    const g = serialize<Group>(group);
+    const teams = await prisma.team.findMany({
+        where: { groupId: g.id },
+        select: { id: true },
+    });
+    return { ...g, teamIds: teams.map((t) => t.id) };
 }

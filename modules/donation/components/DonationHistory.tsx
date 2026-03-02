@@ -4,6 +4,7 @@ import { Tag, Skeleton, Empty } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import DataTable from "@/components/ui/DataTable";
 import { DONATION_PAGE_CONTENT } from "@/config/content";
+import { formatDate } from "@/lib/utils/format";
 
 interface Props {
   donations: Donation[];
@@ -63,12 +64,7 @@ const COLUMNS: ColumnsType<Donation> = [
     title: "Date",
     dataIndex: "createdAt",
     key: "createdAt",
-    render: (d: string) =>
-      new Date(d).toLocaleDateString("en-NG", {
-        day: "numeric",
-        month: "short",
-        year: "numeric",
-      }),
+    render: (d: string) => formatDate(d),
   },
 ];
 

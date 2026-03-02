@@ -7,7 +7,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 import { ROUTES } from "@/config/routes";
 import { DONATION_STATUS_CONFIG } from "@/config/bankAccounts";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-NG", {
@@ -36,7 +36,7 @@ export default function DonationAnalyticsSection() {
     fetchAnalytics();
   }, [fetchAnalytics]);
 
-  useMockDbSubscription("donations", fetchAnalytics);
+  useAutoRefresh("donations", fetchAnalytics);
 
   if (loading) return <Skeleton active paragraph={{ rows: 6 }} />;
   if (!analytics)

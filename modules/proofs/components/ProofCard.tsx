@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Image, Popconfirm, Input, Tooltip } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
+import { formatDate } from "@/lib/utils/format";
 import { PROOF_STATUS_CONFIG, PROOFS_PAGE_CONTENT } from "../config";
 import { useReviewProof } from "../hooks/useProofs";
 
@@ -57,15 +58,15 @@ export default function ProofCard({
       {/* Platform + date */}
       <div className="flex items-center justify-between text-xs text-ds-text-subtle">
         <span className="font-medium">{platformLabel.replace("_", " ")}</span>
-        <span>{new Date(proof.createdAt).toLocaleDateString()}</span>
+        <span>{formatDate(proof.createdAt)}</span>
       </div>
 
       {/* Screenshot */}
-      <div className="rounded-ds-md overflow-hidden border border-ds-border bg-ds-surface">
+      <div className="rounded-ds-md overflow-hidden w-fit mx-auto border border-ds-border bg-ds-surface">
         <Image
           src={proof.screenshotUrl}
           alt={`Proof on ${platformLabel}`}
-          className="w-full object-cover max-h-48"
+          className="w-full object-contain"
           fallback="https://placehold.co/400x300?text=Screenshot"
           preview={{ mask: "View Screenshot" }}
         />

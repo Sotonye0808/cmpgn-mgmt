@@ -1,15 +1,38 @@
 import Link from "next/link";
+import type { Metadata } from "next";
 import Image from "next/image";
 import { ROUTES } from "@/config/routes";
 import { LANDING_CONTENT, NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
 import { RANK_LEVELS } from "@/config/ranks";
 import { getPublicStats } from "@/lib/services/publicStatsService";
+import { serializeArray } from "@/lib/utils/serialize";
 import PublicCtaSection from "@/components/ui/PublicCtaSection";
 import PublicActiveCampaigns from "@/components/ui/PublicActiveCampaigns";
 import PublicStatsBar from "@/components/ui/PublicStatsBar";
 import FeaturedCampaignJoinButton from "@/components/ui/FeaturedCampaignJoinButton";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
+
+export const metadata: Metadata = {
+  title: LANDING_CONTENT.meta.title,
+  description: LANDING_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/"),
+    title: LANDING_CONTENT.meta.title,
+    description: LANDING_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: LANDING_CONTENT.meta.title,
+    description: LANDING_CONTENT.meta.description,
+    images: [SITE_CONFIG.ogImage],
+  },
+};
 
 function getRankForScore(score: number): (typeof RANK_LEVELS)[number] {
   let current = RANK_LEVELS[0];
@@ -19,22 +42,20 @@ function getRankForScore(score: number): (typeof RANK_LEVELS)[number] {
   return current;
 }
 
-export default function LandingPage() {
-  const publicStats = getPublicStats();
+export default async function LandingPage() {
+  const publicStats = await getPublicStats();
 
   // Featured mega campaign (or highest-participant active campaign)
-  const allCampaigns = mockDb.campaigns.findMany({
-    where: { status: "ACTIVE" as unknown as CampaignStatus },
+  const rawCampaigns = await prisma.campaign.findMany({
+    where: { status: "ACTIVE" as never },
+    orderBy: { participantCount: "desc" },
   });
+  const allCampaigns = serializeArray<Campaign>(rawCampaigns);
   const megaCampaign = allCampaigns.find((c) => c.isMegaCampaign);
-  const featuredCampaign =
-    megaCampaign ??
-    allCampaigns.sort(
-      (a, b) => (b.participantCount ?? 0) - (a.participantCount ?? 0),
-    )[0];
+  const featuredCampaign = megaCampaign ?? allCampaigns[0];
 
   // Top 5 mobilizers from leaderboard
-  const allPoints = mockDb.pointsLedger.findMany();
+  const allPoints = await prisma.pointsLedgerEntry.findMany();
   const userScores: Record<string, number> = {};
   for (const entry of allPoints) {
     userScores[entry.userId] = (userScores[entry.userId] ?? 0) + entry.value;
@@ -43,8 +64,22 @@ export default function LandingPage() {
     .sort(([, a], [, b]) => b - a)
     .slice(0, 5);
 
+  const topUserMap = new Map(
+    (
+      await prisma.user.findMany({
+        where: { id: { in: topUserIds.map(([uid]) => uid) } },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePicture: true,
+        },
+      })
+    ).map((u) => [u.id, u]),
+  );
+
   const topMobilizers = topUserIds.map(([userId, score], idx) => {
-    const user = mockDb.users.findUnique({ where: { id: userId } });
+    const user = topUserMap.get(userId);
     const rank = getRankForScore(score);
     return {
       position: idx + 1,

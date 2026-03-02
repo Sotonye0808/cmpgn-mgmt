@@ -6,7 +6,8 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 
 const updateProfileSchema = z.object({
     firstName: z.string().min(1, "First name is required").max(50),
@@ -24,8 +25,8 @@ export async function GET() {
     try {
         const auth = await requireAuth();
         if (auth.error) return auth.error;
-        const user = mockDb.users.findUnique({ where: { id: auth.user.id } });
-        return successResponse(user);
+        const user = await prisma.user.findUnique({ where: { id: auth.user.id } });
+        return successResponse(serialize(user));
     } catch (err) {
         return handleApiError(err);
     }
@@ -43,7 +44,7 @@ export async function PATCH(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const updated = mockDb.users.update({
+        const updated = await prisma.user.update({
             where: { id: user.id },
             data: {
                 firstName: parsed.data.firstName,
@@ -53,12 +54,10 @@ export async function PATCH(request: NextRequest) {
                 }),
                 // Allow explicit clear (undefined) or set new number
                 whatsappNumber: parsed.data.whatsappNumber,
-                updatedAt: new Date().toISOString(),
             },
         });
 
-        mockDb.emit("users:changed");
-        return successResponse(updated);
+        return successResponse(serialize(updated));
     } catch (err) {
         return handleApiError(err);
     }

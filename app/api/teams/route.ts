@@ -38,10 +38,7 @@ export async function POST(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const team = await createTeam(
-            parsed.data,
-            auth.user.role as unknown as string
-        );
+        const team = await createTeam(parsed.data);
         return successResponse(team, 201);
     } catch (err) {
         return handleApiError(err);

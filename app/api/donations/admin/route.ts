@@ -15,13 +15,12 @@ export async function GET(request: NextRequest) {
         const campaignId = params.get("campaignId") ?? undefined;
         const search = params.get("search") ?? undefined;
 
-        const { data, total } = await listDonations(page, pageSize, {
-            status,
-            campaignId,
-            search,
-        });
+        const result = await listDonations(
+            { page, pageSize },
+            { status: status as DonationStatus | undefined, campaignId }
+        );
 
-        return paginatedResponse(data, total, page, pageSize);
+        return paginatedResponse(result.data, result.pagination.total, page, pageSize);
     } catch (err) {
         return handleApiError(err);
     }

@@ -1,5 +1,5 @@
-import { mockDb } from "@/lib/data/mockDb";
-import { mockCache } from "@/lib/data/mockCache";
+import { prisma } from "@/lib/prisma";
+import { redis } from "@/lib/redis";
 import {
     DEFAULT_TRUST_SCORE,
     TRUST_SCORE_MIN,
@@ -7,120 +7,116 @@ import {
     LINK_EVENT_RATE_LIMIT_WINDOW_MS,
 } from "@/lib/constants";
 import { FRAUD_RULES } from "@/modules/trust/config";
-import { nanoid } from "nanoid";
+import { serialize } from "@/lib/utils/serialize";
 
 // ─── Evaluate Event ───────────────────────────────────────────────────────────
 
 export async function evaluateEvent(event: LinkEvent): Promise<void> {
     if (!event.userId) return;
 
-    const cutoff = Date.now() - LINK_EVENT_RATE_LIMIT_WINDOW_MS * 60; // 1-hour window
-    const history = mockDb.linkEvents._data.filter(
-        (e) =>
-            e.userId === event.userId &&
-            new Date(e.createdAt).getTime() > cutoff
-    );
+    const cutoff = new Date(Date.now() - LINK_EVENT_RATE_LIMIT_WINDOW_MS * 60);
+    const history = await prisma.linkEvent.findMany({
+        where: {
+            userId: event.userId,
+            createdAt: { gt: cutoff },
+        },
+    });
 
-    const triggered = FRAUD_RULES.filter((rule) => rule.check(event, history));
+    // Convert Prisma results to match LinkEvent interface for fraud rules
+    const historyEvents = history.map((e) => serialize<LinkEvent>(e));
+
+    const triggered = FRAUD_RULES.filter((rule) => rule.check(event, historyEvents));
     if (triggered.length === 0) return;
 
-    const existing = mockDb.trustScores.findUnique({
+    const existing = await prisma.trustScore.findUnique({
         where: { userId: event.userId },
     });
 
     if (existing) {
-        const existingFlags = existing.flags as unknown as string[];
+        const existingFlags = existing.flags as string[];
         const newFlags = [
             ...new Set([
                 ...existingFlags,
-                ...triggered.map((r) => r.flag as unknown as string),
+                ...triggered.map((r) => r.flag as string),
             ]),
-        ] as unknown as TrustFlag[];
+        ];
 
         const totalPenalty = triggered.reduce((s, r) => s + r.penalty, 0);
-        const newScore = Math.max(
-            TRUST_SCORE_MIN,
-            existing.score - totalPenalty
-        );
+        const newScore = Math.max(TRUST_SCORE_MIN, existing.score - totalPenalty);
 
-        mockDb.trustScores.update({
+        await prisma.trustScore.update({
             where: { id: existing.id },
             data: {
                 score: newScore,
-                flags: newFlags,
-                updatedAt: new Date().toISOString(),
+                flags: newFlags as never,
             },
         });
     } else {
         const totalPenalty = triggered.reduce((s, r) => s + r.penalty, 0);
         const flags = triggered.map((r) => r.flag);
 
-        mockDb.trustScores.create({
+        await prisma.trustScore.create({
             data: {
-                id: nanoid(),
                 userId: event.userId,
                 score: Math.max(TRUST_SCORE_MIN, DEFAULT_TRUST_SCORE - totalPenalty),
-                flags: flags as unknown as TrustFlag[],
-                updatedAt: new Date().toISOString(),
+                flags: flags as never,
             },
         });
     }
 
-    mockCache.del(`trust:user:${event.userId}`);
-    mockDb.emit("trustScores:changed");
+    await redis.del(`trust:user:${event.userId}`);
 }
 
 // ─── Get User Trust Score ─────────────────────────────────────────────────────
 
 export async function getUserTrustScore(userId: string): Promise<TrustScore> {
     const cacheKey = `trust:user:${userId}`;
-    const cached = mockCache.get<TrustScore>(cacheKey);
+    const cached = await redis.get<TrustScore>(cacheKey);
     if (cached) return cached;
 
-    let score = mockDb.trustScores.findUnique({ where: { userId } });
+    let score = await prisma.trustScore.findUnique({ where: { userId } });
 
     if (!score) {
-        // Create a default score on first lookup
-        score = mockDb.trustScores.create({
+        score = await prisma.trustScore.create({
             data: {
-                id: nanoid(),
                 userId,
                 score: DEFAULT_TRUST_SCORE,
-                flags: [] as unknown as TrustFlag[],
-                updatedAt: new Date().toISOString(),
+                flags: [],
             },
         });
     }
 
-    mockCache.set(cacheKey, score, CACHE_TTL_TRUST);
-    return score;
+    const serialized = serialize<TrustScore>(score);
+    await redis.set(cacheKey, serialized, CACHE_TTL_TRUST);
+    return serialized;
 }
 
 // ─── Get Flagged Users (Admin) ────────────────────────────────────────────────
 
 export async function getFlaggedUsers(): Promise<TrustFlagRecord[]> {
     const cacheKey = "trust:flagged";
-    const cached = mockCache.get<TrustFlagRecord[]>(cacheKey);
+    const cached = await redis.get<TrustFlagRecord[]>(cacheKey);
     if (cached) return cached;
 
-    const flaggedScores = mockDb.trustScores._data.filter(
-        (ts) => (ts.flags as unknown as string[]).length > 0
-    );
-
-    const records: TrustFlagRecord[] = flaggedScores.map((ts) => {
-        const user = mockDb.users._data.find((u) => u.id === ts.userId);
-        return {
-            userId: ts.userId,
-            firstName: user?.firstName ?? "Unknown",
-            lastName: user?.lastName ?? "",
-            email: user?.email ?? "",
-            score: ts.score,
-            flags: ts.flags,
-            lastReviewedAt: ts.lastReviewedAt,
-        };
+    // Prisma doesn't support "array not empty" natively for enum arrays,
+    // so we fetch all and filter client-side.
+    const allScores = await prisma.trustScore.findMany({
+        include: { user: { select: { firstName: true, lastName: true, email: true } } },
     });
 
-    mockCache.set(cacheKey, records, CACHE_TTL_TRUST);
+    const records: TrustFlagRecord[] = allScores
+        .filter((ts) => (ts.flags as string[]).length > 0)
+        .map((ts) => ({
+            userId: ts.userId,
+            firstName: ts.user.firstName,
+            lastName: ts.user.lastName,
+            email: ts.user.email,
+            score: ts.score,
+            flags: ts.flags as unknown as TrustFlag[],
+            lastReviewedAt: ts.lastReviewedAt?.toISOString(),
+        }));
+
+    await redis.set(cacheKey, records, CACHE_TTL_TRUST);
     return records;
 }
 
@@ -131,31 +127,27 @@ export async function reviewFlag(
     resolution: "CLEAR" | "PENALIZE" | "ESCALATE",
     _adminId: string
 ): Promise<TrustScore> {
-    const existing = mockDb.trustScores.findUnique({ where: { userId } });
+    const existing = await prisma.trustScore.findUnique({ where: { userId } });
     if (!existing) throw new Error("Trust score not found");
 
-    const updates: Partial<TrustScore> = {
-        lastReviewedAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+    const updates: Record<string, unknown> = {
+        lastReviewedAt: new Date(),
     };
 
     if (resolution === "CLEAR") {
-        updates.flags = [] as unknown as TrustFlag[];
+        updates.flags = [];
         updates.score = DEFAULT_TRUST_SCORE;
     } else if (resolution === "PENALIZE") {
         updates.score = Math.max(TRUST_SCORE_MIN, existing.score - 20);
     }
-    // ESCALATE: just log the review time, no score change in mock
 
-    const updated = mockDb.trustScores.update({
+    const updated = await prisma.trustScore.update({
         where: { id: existing.id },
-        data: updates,
+        data: updates as never,
     });
-    if (!updated) throw new Error("Failed to update trust score");
 
-    mockCache.del(`trust:user:${userId}`);
-    mockCache.del("trust:flagged");
-    mockDb.emit("trustScores:changed");
+    await redis.del(`trust:user:${userId}`);
+    await redis.del("trust:flagged");
 
-    return updated;
+    return serialize<TrustScore>(updated);
 }
