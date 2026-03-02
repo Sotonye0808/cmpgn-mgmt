@@ -5,8 +5,11 @@ import { LANDING_CONTENT, NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
 import { mockDb } from "@/lib/data/mockDb";
 import { RANK_LEVELS } from "@/config/ranks";
+import { getPublicStats } from "@/lib/services/publicStatsService";
 import PublicCtaSection from "@/components/ui/PublicCtaSection";
 import PublicActiveCampaigns from "@/components/ui/PublicActiveCampaigns";
+import PublicStatsBar from "@/components/ui/PublicStatsBar";
+import FeaturedCampaignJoinButton from "@/components/ui/FeaturedCampaignJoinButton";
 
 function getRankForScore(score: number): (typeof RANK_LEVELS)[number] {
   let current = RANK_LEVELS[0];
@@ -17,6 +20,8 @@ function getRankForScore(score: number): (typeof RANK_LEVELS)[number] {
 }
 
 export default function LandingPage() {
+  const publicStats = getPublicStats();
+
   // Featured mega campaign (or highest-participant active campaign)
   const allCampaigns = mockDb.campaigns.findMany({
     where: { status: "ACTIVE" as unknown as CampaignStatus },
@@ -84,6 +89,9 @@ export default function LandingPage() {
           </Link>
         </div>
       </section>
+
+      {/* Live platform stats */}
+      <PublicStatsBar stats={publicStats} />
 
       {/* Featured Mission + Top 5 Soldiers — side-by-side on large screens */}
       {(featuredCampaign || topMobilizers.length > 0) && (
@@ -165,16 +173,18 @@ export default function LandingPage() {
                               <div className="w-full bg-ds-surface-elevated rounded-full h-2">
                                 <div
                                   className="bg-ds-brand-accent h-2 rounded-full transition-all bar-dynamic"
-                                  style={{
-                                    '--_bar-w': `${Math.min(
-                                      100,
-                                      Math.round(
-                                        (featuredCampaign.goalCurrent /
-                                          featuredCampaign.goalTarget) *
-                                          100,
-                                      ),
-                                    )}%`,
-                                  } as React.CSSProperties}
+                                  style={
+                                    {
+                                      "--_bar-w": `${Math.min(
+                                        100,
+                                        Math.round(
+                                          (featuredCampaign.goalCurrent /
+                                            featuredCampaign.goalTarget) *
+                                            100,
+                                        ),
+                                      )}%`,
+                                    } as React.CSSProperties
+                                  }
                                 />
                               </div>
                               <p className="text-xs text-ds-text-subtle mt-1">
@@ -187,6 +197,10 @@ export default function LandingPage() {
                               </p>
                             </div>
                           )}
+                        <FeaturedCampaignJoinButton
+                          campaignId={featuredCampaign.id}
+                          campaignTitle={featuredCampaign.title}
+                        />
                       </div>
                     </div>
                   </div>

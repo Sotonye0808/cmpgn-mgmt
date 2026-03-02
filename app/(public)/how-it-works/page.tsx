@@ -5,12 +5,14 @@ import {
   FAQ_ITEMS,
 } from "@/config/content";
 import { ROUTES } from "@/config/routes";
+import { getPublicStats } from "@/lib/services/publicStatsService";
 import PublicPageHero from "@/components/ui/PublicPageHero";
 import PublicStatsBar from "@/components/ui/PublicStatsBar";
 import PublicFaqAccordion from "@/components/ui/PublicFaqAccordion";
 import PublicCtaSection from "@/components/ui/PublicCtaSection";
 
 export default function HowItWorksPage() {
+  const publicStats = getPublicStats();
   return (
     <div className="min-h-screen">
       <PublicPageHero
@@ -18,7 +20,7 @@ export default function HowItWorksPage() {
         subheadline="Everything you need to know about deploying with the Digital Mobilization Army."
       />
 
-      <PublicStatsBar stats={LANDING_CONTENT.stats} />
+      <PublicStatsBar stats={publicStats} />
 
       {/* How It Works Steps */}
       <section className="py-14">
@@ -72,16 +74,18 @@ export default function HowItWorksPage() {
                 {/* Status circle */}
                 <div
                   className="w-10 h-10 rounded-full flex items-center justify-center text-white font-bold text-sm mb-3 shrink-0 bg-dynamic"
-                  style={{ '--_dc': stage.color } as React.CSSProperties}>
+                  style={{ "--_dc": stage.color } as React.CSSProperties}>
                   {stage.step}
                 </div>
                 {/* Status badge */}
                 <span
                   className="text-xs font-semibold px-2 py-0.5 rounded-full mb-2 text-dynamic"
-                  style={{
-                    '--_dc': stage.color,
-                    backgroundColor: `${stage.color}1A`,
-                  } as React.CSSProperties}>
+                  style={
+                    {
+                      "--_dc": stage.color,
+                      backgroundColor: `${stage.color}1A`,
+                    } as React.CSSProperties
+                  }>
                   {stage.statusLabel}
                 </span>
                 <h3 className="font-semibold text-ds-text-primary mb-1">

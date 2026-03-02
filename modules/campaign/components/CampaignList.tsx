@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Row, Col, Pagination, Segmented, Empty, message } from "antd";
+import { Pagination, Segmented, Empty, message } from "antd";
 import { ICONS } from "@/config/icons";
 import Spinner from "@/components/ui/Spinner";
 import CampaignCard from "./CampaignCard";
@@ -47,7 +47,9 @@ export default function CampaignList({
           setJoinedIds(new Set<string>(json.data.campaignIds));
         }
       })
-      .catch(() => { /* silent — fall through to empty */ });
+      .catch(() => {
+        /* silent — fall through to empty */
+      });
   }, [user]);
 
   const { campaigns, pagination, loading, error, refetch } = useCampaigns({
@@ -217,11 +219,11 @@ export default function CampaignList({
         </div>
       )}
 
-      {/* Grid */}
+      {/* Grid — horizontal scroll */}
       {!loading && view === "grid" && campaigns.length > 0 && (
-        <Row gutter={[16, 16]}>
+        <div className="flex gap-4 overflow-x-auto pb-3 -mx-1 px-1 scrollbar-thin scrollbar-track-transparent scrollbar-thumb-ds-border-base">
           {campaigns.map((campaign) => (
-            <Col key={campaign.id} xs={24} sm={12} lg={8}>
+            <div key={campaign.id} className="shrink-0 w-72">
               <CampaignCard
                 campaign={campaign}
                 onView={navigateToCampaign}
@@ -230,9 +232,9 @@ export default function CampaignList({
                 isJoined={joinedIds.has(campaign.id)}
                 isJoining={joiningId === campaign.id}
               />
-            </Col>
+            </div>
           ))}
-        </Row>
+        </div>
       )}
 
       {/* Pagination */}

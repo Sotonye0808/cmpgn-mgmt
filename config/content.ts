@@ -550,7 +550,7 @@ export const PRIVACY_PAGE_CONTENT = {
             key: "your-rights",
             heading: "Your Rights",
             paragraphs: [
-                "You have the right to access, correct, or request deletion of your personal data. To exercise these rights, contact us at support@dmhicc.org.",
+                "You have the right to access, correct, or request deletion of your personal data. To exercise these rights, contact us at churchministry@harvestersng.org.",
                 "You may request a copy of the data we hold about you at any time.",
             ],
         },
@@ -561,29 +561,7 @@ export const PRIVACY_PAGE_CONTENT = {
             paragraphs: [
                 "DMHicc uses only essential cookies and local storage. These are strictly necessary for the platform to function — they cannot be disabled without breaking core functionality.",
                 "We do not use advertising cookies, cross-site tracking cookies, or third-party analytics cookies.",
-            ],
-            cookieTable: [
-                {
-                    key: "access-token",
-                    name: "dmhicc_access",
-                    purpose: "Stores your JWT access token to authenticate API requests",
-                    type: "httpOnly cookie",
-                    duration: "15 minutes",
-                },
-                {
-                    key: "refresh-token",
-                    name: "dmhicc_refresh",
-                    purpose: "Stores your JWT refresh token to renew your session without re-login",
-                    type: "httpOnly cookie",
-                    duration: "7 days",
-                },
-                {
-                    key: "cookie-consent",
-                    name: "dmhicc_cookie_consent",
-                    purpose: "Remembers that you have dismissed the cookie notice",
-                    type: "localStorage",
-                    duration: "Persistent",
-                },
+                "We set two session-management cookies stored as secure, httpOnly HTTP cookies that are inaccessible to JavaScript: a short-lived access token used to authenticate API requests, and a longer-lived refresh token used to renew your session without requiring you to log in again. We also store a single browser preference flag in localStorage to record that you have acknowledged this cookie notice.",
             ],
         },
         {
@@ -597,7 +575,7 @@ export const PRIVACY_PAGE_CONTENT = {
             key: "contact",
             heading: "Contact",
             paragraphs: [
-                "For privacy-related enquiries, contact us at support@dmhicc.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
+                "For privacy-related enquiries, contact us at churchministry@harvestersng.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
             ],
         },
     ],
@@ -630,7 +608,7 @@ export const TERMS_PAGE_CONTENT = {
             paragraphs: [
                 "You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.",
                 "You must provide accurate information when registering. Impersonation or providing false information may result in immediate account suspension.",
-                "You must notify us promptly at support@dmhicc.org if you suspect unauthorised use of your account.",
+                "You must notify us promptly at churchministry@harvestersng.org if you suspect unauthorised use of your account.",
             ],
         },
         {
@@ -677,7 +655,7 @@ export const TERMS_PAGE_CONTENT = {
             heading: "Termination",
             paragraphs: [
                 "We reserve the right to suspend or terminate your account at any time for violations of these Terms or for conduct deemed harmful to the platform community.",
-                "You may request account deletion by contacting support@dmhicc.org.",
+                "You may request account deletion by contacting churchministry@harvestersng.org.",
             ],
         },
         {
@@ -699,7 +677,7 @@ export const TERMS_PAGE_CONTENT = {
             key: "contact",
             heading: "Contact",
             paragraphs: [
-                "Questions about these Terms? Contact us at support@dmhicc.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
+                "Questions about these Terms? Contact us at churchministry@harvestersng.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
             ],
         },
     ],

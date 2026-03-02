@@ -55,12 +55,12 @@ export default function PhoneInput({
   }
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-2 w-full">
       <Select<PhoneCountryCode>
         value={code}
         onChange={handleCodeChange}
         disabled={disabled}
-        className="w-32 shrink-0"
+        style={{ width: 130, flexShrink: 0 }}
         options={PHONE_COUNTRY_CODES.map((c) => ({
           value: c.value,
           label: c.label,
@@ -73,7 +73,7 @@ export default function PhoneInput({
         disabled={disabled}
         placeholder={placeholder}
         maxLength={15}
-        className="flex-1"
+        style={{ flex: 1 }}
         aria-label="Phone number"
       />
     </div>

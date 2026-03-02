@@ -8,6 +8,7 @@ export { default as CampaignFilters } from "./components/CampaignFilters";
 export { default as CampaignAdminActions } from "./components/CampaignAdminActions";
 export { default as CampaignAuditLog } from "./components/CampaignAuditLog";
 export { default as CampaignForm } from "./components/CampaignForm";
+export { default as MyCampaignsPanel } from "./components/MyCampaignsPanel";
 
 export { useCampaigns } from "./hooks/useCampaigns";
 export { useCampaign } from "./hooks/useCampaign";

@@ -71,11 +71,15 @@ export default function LeaderboardPodium({
                   "ring-2",
                   position === 1 ? "ring-yellow-400" : "ring-ds-border-strong",
                 )}>
-                {entry.firstName[0]}
+                {entry.firstName?.[0] ?? "?"}
               </Avatar>
               <div className="text-center">
                 <Link
-                  href={entry.userId === currentUserId ? ROUTES.SETTINGS : ROUTES.USER_DETAIL(entry.userId)}
+                  href={
+                    entry.userId === currentUserId
+                      ? ROUTES.SETTINGS
+                      : ROUTES.USER_DETAIL(entry.userId)
+                  }
                   className="text-sm font-semibold text-ds-text-primary hover:text-ds-brand-accent transition-colors leading-tight">
                   {entry.firstName}
                 </Link>

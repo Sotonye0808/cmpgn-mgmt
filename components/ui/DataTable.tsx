@@ -14,6 +14,7 @@ interface DataTableProps<T extends object> extends TableProps<T> {
  *
  * Enforces:
  *   - overflow-x-auto for mobile  (B5)
+ *   - AntD scroll.x for proper horizontal scrolling
  *   - opaque surface (glass on tables is a DS violation)
  *   - rounded-ds-xl container
  *   - DS-token row hover
@@ -33,6 +34,8 @@ export default function DataTable<T extends object>({
       <Table<T>
         {...props}
         className={cn("w-full", className)}
+        // scroll.x enables AntD's native horizontal scrolling; callers can override
+        scroll={props.scroll ?? { x: "max-content" }}
         rowClassName={(_, index) =>
           cn(
             "hover:bg-ds-brand-accent-subtle transition-colors",

@@ -62,6 +62,7 @@ export const ROUTES = {
             DETAIL: (id: string) => `/api/campaigns/${id}`,
             PARTICIPANTS: (id: string) => `/api/campaigns/${id}/participants`,
             JOINED: "/api/campaigns/joined",
+            ME: "/api/campaigns/me",
             AUDIT: (id: string) => `/api/campaigns/${id}/audit`,
         },
         SMART_LINKS: {
@@ -132,6 +133,9 @@ export const ROUTES = {
         },
         GROUPS: {
             BASE: "/api/groups",
+        },
+        PUBLIC: {
+            STATS: "/api/public/stats",
         },
         INVITE: {
             PREVIEW: (token: string) => `/api/invite/${token}`,

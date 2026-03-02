@@ -31,10 +31,14 @@ function isServer(): boolean {
 }
 
 function getPersistPaths(): { dir: string; file: string } {
-    // eslint-disable-next-line @typescript-eslint/no-require-imports
-    const p = require("path") as typeof import("path");
-    const dir = p.resolve(process.cwd(), ".data");
-    return { dir, file: p.join(dir, "db-persist.json") };
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-require-imports
+        const p = require("path") as typeof import("path");
+        const dir = p.resolve(process.cwd(), ".data");
+        return { dir, file: p.join(dir, "db-persist.json") };
+    } catch {
+        return { dir: "", file: "" };
+    }
 }
 
 function readPersistedData(): Record<string, unknown[]> | null {
@@ -43,7 +47,7 @@ function readPersistedData(): Record<string, unknown[]> | null {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const f = require("fs") as typeof import("fs");
         const { file } = getPersistPaths();
-        if (f.existsSync(file)) {
+        if (file && f.existsSync(file)) {
             const raw = f.readFileSync(file, "utf-8");
             return JSON.parse(raw) as Record<string, unknown[]>;
         }
@@ -59,6 +63,7 @@ function writePersistedData(data: Record<string, unknown[]>): void {
         // eslint-disable-next-line @typescript-eslint/no-require-imports
         const f = require("fs") as typeof import("fs");
         const { dir, file } = getPersistPaths();
+        if (!file) return;
         if (!f.existsSync(dir)) {
             f.mkdirSync(dir, { recursive: true });
         }
