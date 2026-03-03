@@ -218,6 +218,62 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
     return serialize<SmartLink>(updatedLink);
 }
 
+// ─── Increment share ──────────────────────────────────────────────────────────
+/**
+ * Called when a user explicitly shares their smart link.
+ * Increments Campaign.shareCount and logs a SHARE event.
+ */
+export async function incrementShare(slug: string): Promise<void> {
+    const link = await prisma.smartLink.findUnique({ where: { slug } });
+    if (!link || !link.isActive) return;
+
+    await prisma.$transaction(async (tx) => {
+        await tx.campaign.update({
+            where: { id: link.campaignId },
+            data: { shareCount: { increment: 1 } },
+        });
+
+        await tx.linkEvent.create({
+            data: {
+                linkId: link.id,
+                eventType: "SHARE" as never,
+                userId: link.userId,
+            },
+        });
+
+        // Award share points to the link owner
+        await tx.pointsLedgerEntry.create({
+            data: {
+                userId: link.userId,
+                campaignId: link.campaignId,
+                type: "IMPACT" as never,
+                value: 2,
+                description: "Smart link shared",
+            },
+        });
+    });
+
+    await Promise.all([
+        redis.del(`analytics:campaign:${link.campaignId}`),
+        redis.del("analytics:overview"),
+        redis.del(`points:summary:${link.userId}`),
+    ]);
+}
+
+// ─── Increment campaign view ──────────────────────────────────────────────────
+/**
+ * Called when a user navigates to the campaign detail page.
+ * Increments Campaign.viewCount — tracked per session via a server-side cookie.
+ */
+export async function incrementCampaignView(campaignId: string): Promise<void> {
+    await prisma.campaign.update({
+        where: { id: campaignId },
+        data: { viewCount: { increment: 1 } },
+    });
+
+    await redis.del(`analytics:campaign:${campaignId}`);
+}
+
 // ─── Log link event ────────────────────────────────────────────────────────────
 export async function logLinkEvent(input: LogEventInput): Promise<LinkEvent> {
     const event = await prisma.linkEvent.create({

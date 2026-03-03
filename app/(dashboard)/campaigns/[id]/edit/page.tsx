@@ -1,7 +1,7 @@
 "use client";
 
 import { use, useState } from "react";
-import { Spin, Alert } from "antd";
+import { Spin, Alert, message } from "antd";
 import { useRouter } from "next/navigation";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
 import CampaignForm from "@/modules/campaign/components/CampaignForm";
@@ -29,9 +29,12 @@ export default function CampaignEditPage({ params }: PageProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(values),
       });
-      if (res.ok) {
-        router.push(ROUTES.CAMPAIGN_DETAIL(id));
-      }
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Failed to save changes");
+      message.success("Campaign updated!");
+      router.push(ROUTES.CAMPAIGN_DETAIL(id));
+    } catch (e: unknown) {
+      message.error(e instanceof Error ? e.message : "Failed to save changes");
     } finally {
       setSaving(false);
     }

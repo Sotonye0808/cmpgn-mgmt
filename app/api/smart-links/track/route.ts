@@ -1,17 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
-import { incrementClick, logLinkEvent, getLinkBySlug } from "@/modules/links/services/linkService";
+import {
+    incrementClick,
+    incrementShare,
+    logLinkEvent,
+    getLinkBySlug,
+} from "@/modules/links/services/linkService";
 import { handleApiError } from "@/lib/utils/api";
 import { z } from "zod";
+
+// Supported tracking event types
+const TRACK_EVENT_TYPES = ["CLICK", "SHARE"] as const;
 
 const schema = z.object({
     slug: z.string().min(1),
     referrer: z.string().optional(),
+    type: z.enum(TRACK_EVENT_TYPES).optional().default("CLICK"),
 });
 
 /**
  * POST /api/smart-links/track
- * Called client-side from the smart link redirect page after JS loads.
- * Handles cookie-based dedup, click counting, point crediting, and event logging.
+ * Called client-side after JS loads. Handles CLICK and SHARE event types.
+ * - CLICK: cookie-based dedup, click counting, point crediting, event logging.
+ * - SHARE: campaign share counter, share event logging, share points.
  */
 export async function POST(request: NextRequest) {
     try {
@@ -21,11 +31,17 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ error: "Invalid payload" }, { status: 400 });
         }
 
-        const { slug, referrer } = parsed.data;
+        const { slug, referrer, type } = parsed.data;
         const ipAddress = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ?? undefined;
         const userAgent = request.headers.get("user-agent") ?? undefined;
 
-        // Cookie-based dedup — same logic as the old route handler
+        // ── SHARE path ────────────────────────────────────────────────────────
+        if (type === "SHARE") {
+            await incrementShare(slug);
+            return NextResponse.json({ ok: true });
+        }
+
+        // ── CLICK path (default) ──────────────────────────────────────────────
         const cookieName = `_uid_${slug}`;
         const cookieSeen = !!request.cookies.get(cookieName);
 
