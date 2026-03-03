@@ -6,7 +6,8 @@ import {
     successResponse,
     forbiddenResponse,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 
 export async function PATCH(
     _request: NextRequest,
@@ -18,17 +19,16 @@ export async function PATCH(
         const user = auth.user;
 
         const { id } = await params;
-        const notification = mockDb.notifications.findUnique({ where: { id } });
+        const notification = await prisma.appNotification.findUnique({ where: { id } });
         if (!notification) return notFoundResponse("Notification not found");
         if (notification.userId !== user.id) return forbiddenResponse();
 
-        const updated = mockDb.notifications.update({
+        const updated = await prisma.appNotification.update({
             where: { id },
             data: { isRead: true },
         });
 
-        mockDb.emit("notifications:changed");
-        return successResponse(updated);
+        return successResponse(serialize(updated));
     } catch (err) {
         return handleApiError(err);
     }

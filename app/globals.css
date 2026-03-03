@@ -310,6 +310,39 @@
     box-shadow: var(--ds-glow-accent-strong);
   }
 
+  /* Ambient glow backgrounds — extracted from inline styles in layouts */
+  .ambient-glow-dashboard {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  .ambient-glow-public {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  .ambient-glow-auth {
+    background: radial-gradient(
+      circle at top right,
+      rgba(124, 58, 237, 0.08) 0%,
+      rgba(124, 58, 237, 0.03) 25%,
+      transparent 70%
+    );
+  }
+
+  /* Progress bar with dynamic width via --_bar-w custom property */
+  .bar-dynamic {
+    width: var(--_bar-w);
+  }
+
   .scrollbar-hide {
     /* scrollbar-width: not supported in Chrome < 121, Safari — ::-webkit-scrollbar fallback below covers those */
     scrollbar-width: none;
@@ -334,6 +367,8 @@
   }
 
   .bg-dynamic-muted {
+    /* Fallback for older browsers without color-mix() support */
+    background-color: rgba(124, 58, 237, 0.08);
     background-color: color-mix(in srgb, var(--_dc) 10%, transparent);
   }
 
@@ -347,6 +382,20 @@
 
   .ring-dynamic {
     background: var(--_dc-ring);
+  }
+
+  /* ─── Public nav link color fix ───────────────────────────────────────────── */
+  /* AntD 5 injects `a { color: var(--ant-color-link) }` via CSS-in-JS which  */
+  /* re-injects on theme toggle and can win over Tailwind text-* classes at   */
+  /* equal injection order. These utility classes own the property explicitly. */
+  .public-nav-link {
+    color: var(--ds-text-secondary) !important;
+  }
+  .public-nav-link:hover {
+    color: var(--ds-brand-accent) !important;
+  }
+  .public-nav-cta {
+    color: #fff !important;
   }
 }
 
@@ -394,3 +443,79 @@ body {
     scroll-behavior: auto !important;
   }
 }
+
+/* ─────────────────────────────────────────────────────────
+   DataTable — Scoped AntD overrides (.ds-data-table)
+   Targeting AntD v5 stable class names. These do NOT use
+   raw Tailwind palette values — all colours are DS tokens.
+───────────────────────────────────────────────────────── */
+
+/* Strip AntD's built-in rounded corners — our wrapper handles them */
+.ds-data-table .ant-table {
+  border-radius: 0 !important;
+}
+.ds-data-table .ant-table-container {
+  border-radius: 0 !important;
+}
+
+/* Header background via DS tokens — adapts to dark mode */
+.ds-data-table .ant-table-thead > tr > th,
+.ds-data-table .ant-table-thead > tr > td {
+  background-color: var(--ds-surface-sunken) !important;
+  border-bottom: 1px solid var(--ds-border-base) !important;
+  color: var(--ds-text-secondary) !important;
+  font-size: 0.75rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+  padding-block: 10px !important;
+}
+
+/* Body row borders via DS tokens */
+.ds-data-table .ant-table-tbody > tr > td {
+  border-bottom: 1px solid var(--ds-border-subtle) !important;
+  color: var(--ds-text-primary) !important;
+  font-size: 0.875rem !important;
+  padding-block: 10px !important;
+}
+
+/* Remove bottom border on the last row */
+.ds-data-table .ant-table-tbody > tr:last-child > td {
+  border-bottom: none !important;
+}
+
+/* Row hover — DS brand accent subtle */
+.ds-data-table .ant-table-tbody > tr.ant-table-row:hover > td {
+  background-color: var(--ds-brand-accent-subtle) !important;
+}
+
+/* Thin, DS-styled scrollbar on the table body */
+.ds-data-table .ant-table-body {
+  scrollbar-width: thin;
+  scrollbar-color: var(--ds-border-strong) transparent;
+}
+.ds-data-table .ant-table-body::-webkit-scrollbar {
+  height: 5px;
+  width: 5px;
+}
+.ds-data-table .ant-table-body::-webkit-scrollbar-track {
+  background: transparent;
+}
+.ds-data-table .ant-table-body::-webkit-scrollbar-thumb {
+  background-color: var(--ds-border-strong);
+  border-radius: var(--ds-radius-full);
+}
+
+/* Pagination area */
+.ds-data-table .ant-pagination {
+  padding: 12px 16px !important;
+  margin: 0 !important;
+  border-top: 1px solid var(--ds-border-subtle) !important;
+}
+
+/* Empty state */
+.ds-data-table .ant-table-placeholder > td {
+  border-bottom: none !important;
+}
+

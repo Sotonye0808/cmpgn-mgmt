@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import bcrypt from "bcryptjs";
 import { loginSchema } from "@/lib/schemas/authSchemas";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
 import { signAccessToken, signRefreshToken, setAuthCookies } from "@/lib/utils/jwt";
 import {
     successResponse,
@@ -19,9 +19,9 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse(result.error.errors[0].message);
         }
 
-        const { email, password } = result.data;
+        const { email, password, rememberMe } = result.data;
 
-        const user = mockDb.users.findUnique({ where: { email } });
+        const user = await prisma.user.findUnique({ where: { email } });
         if (!user) {
             return unauthorizedResponse("Invalid email or password");
         }
@@ -40,13 +40,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role,
-            profilePicture: user.profilePicture,
+            role: user.role as UserRole,
+            profilePicture: user.profilePicture ?? undefined,
+            whatsappNumber: user.whatsappNumber ?? undefined,
         };
 
-        const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });
-        const refreshToken = signRefreshToken({ sub: user.id, email: user.email, role: user.role as string });
-        await setAuthCookies(accessToken, refreshToken);
+        const tokenPayload = { sub: user.id, email: user.email, role: user.role as string, rem: rememberMe };
+        const accessToken = signAccessToken(tokenPayload);
+        const refreshToken = signRefreshToken(tokenPayload);
+        await setAuthCookies(accessToken, refreshToken, rememberMe);
 
         return successResponse(authUser);
     } catch (error) {

@@ -6,9 +6,10 @@ import { cn } from "@/lib/utils/cn";
 
 type ModalProps = AntModalProps;
 
-export default function Modal({ className, ...props }: ModalProps) {
+export default function Modal({ className, centered = true, ...props }: ModalProps) {
   return (
     <AntModal
+      centered={centered}
       className={cn("rounded-ds-2xl overflow-hidden", className)}
       styles={{
         header: {
@@ -23,6 +24,12 @@ export default function Modal({ className, ...props }: ModalProps) {
         },
         body: {
           padding: "24px",
+        },
+        footer: {
+          padding: "12px 24px 20px",
+          borderTop: "1px solid var(--ds-border-base)",
+          background: "var(--ds-surface-elevated)",
+          margin: 0,
         },
       }}
       {...props}

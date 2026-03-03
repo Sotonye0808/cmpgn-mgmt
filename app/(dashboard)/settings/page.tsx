@@ -24,12 +24,18 @@ import TrustReviewModal from "@/modules/trust/components/TrustReviewModal";
 import { useFlaggedUsers } from "@/modules/trust/hooks/useTrust";
 import { GlobalLeaderboardAdminView } from "@/modules/leaderboard";
 import PageHeader from "@/components/ui/PageHeader";
+import AvatarPicker from "@/components/ui/AvatarPicker";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 const { Title, Text } = Typography;
 
 function ProfileSection() {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
+  const [avatarUrl, setAvatarUrl] = useState<string | undefined>(
+    user?.profilePicture
+  );
+  const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const [form] = Form.useForm();
 
   const initials = user
@@ -46,6 +52,8 @@ function ProfileSection() {
         body: JSON.stringify({
           firstName: values.firstName,
           lastName: values.lastName,
+          ...(avatarUrl && { profilePicture: avatarUrl }),
+          whatsappNumber: values.whatsappNumber ?? "",
         }),
       });
       const json = await res.json();
@@ -63,11 +71,20 @@ function ProfileSection() {
   return (
     <div className="space-y-6 max-w-xl">
       <div className="flex items-center gap-4">
-        <Avatar
-          size={64}
-          className="bg-ds-brand-accent text-white font-bold text-xl">
-          {initials}
-        </Avatar>
+        <div className="relative group">
+          <Avatar
+            size={64}
+            src={avatarUrl}
+            className="bg-ds-brand-accent text-white font-bold text-xl cursor-pointer"
+            onClick={() => setAvatarPickerOpen(!avatarPickerOpen)}>
+            {!avatarUrl && initials}
+          </Avatar>
+          <div
+            className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
+            onClick={() => setAvatarPickerOpen(!avatarPickerOpen)}>
+            <ICONS.edit className="text-white text-sm" />
+          </div>
+        </div>
         <div>
           <Text strong className="text-ds-text-primary block">
             {user?.firstName} {user?.lastName}
@@ -79,6 +96,22 @@ function ProfileSection() {
         </div>
       </div>
 
+      {avatarPickerOpen && (
+        <Card
+          size="small"
+          title="Choose Avatar"
+          bordered={false}
+          className="bg-ds-surface-base border border-ds-border-subtle">
+          <AvatarPicker
+            value={avatarUrl}
+            onChange={(url) => {
+              setAvatarUrl(url);
+              setAvatarPickerOpen(false);
+            }}
+          />
+        </Card>
+      )}
+
       <Form
         form={form}
         layout="vertical"
@@ -86,6 +119,7 @@ function ProfileSection() {
           firstName: user?.firstName,
           lastName: user?.lastName,
           email: user?.email,
+          whatsappNumber: user?.whatsappNumber,
         }}>
         <Row gutter={16}>
           <Col span={12}>
@@ -110,6 +144,18 @@ function ProfileSection() {
           name="email"
           rules={[{ required: true, type: "email" }]}>
           <Input prefix={<ICONS.mail />} disabled />
+        </Form.Item>
+        <Form.Item
+          label="WhatsApp Number"
+          name="whatsappNumber"
+          extra="Used for community updates and notifications"
+          rules={[
+            {
+              pattern: /^\+\d{7,19}$/,
+              message: "Enter a valid number, e.g. +2347012345678",
+            },
+          ]}>
+          <PhoneInput placeholder="7012345678" />
         </Form.Item>
         <Button
           type="primary"

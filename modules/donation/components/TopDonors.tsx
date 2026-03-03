@@ -1,7 +1,9 @@
 "use client";
 
 import { Avatar, Skeleton } from "antd";
+import Link from "next/link";
 import { DONATION_PAGE_CONTENT } from "@/config/content";
+import { ROUTES } from "@/config/routes";
 
 interface Donor {
   userId: string;
@@ -52,9 +54,11 @@ export default function TopDonors({
               className="bg-ds-brand-accent text-white shrink-0">
               {donor.firstName.charAt(0)}
             </Avatar>
-            <span className="flex-1 text-sm font-medium text-ds-text-primary truncate">
+            <Link
+              href={ROUTES.USER_DETAIL(donor.userId)}
+              className="flex-1 text-sm font-medium text-ds-text-primary hover:text-ds-brand-accent transition-colors truncate">
               {donor.firstName} {donor.lastName}
-            </span>
+            </Link>
             <span className="font-semibold text-ds-brand-accent font-ds-mono text-sm">
               {formatCurrency(donor.total, currency)}
             </span>

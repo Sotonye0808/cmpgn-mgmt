@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Input, Alert } from "antd";
+import { Form, Input, Alert, Checkbox } from "antd";
 import { Suspense, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -32,11 +32,15 @@ function LoginForm() {
     process.env.NEXT_PUBLIC_SHOW_DEV_CREDS === "true" ||
     process.env.NODE_ENV === "development";
 
-  const handleSubmit = async (values: { email: string; password: string }) => {
+  const handleSubmit = async (values: {
+    email: string;
+    password: string;
+    rememberMe?: boolean;
+  }) => {
     setLoading(true);
     setError(null);
     try {
-      await login(values.email, values.password);
+      await login(values.email, values.password, values.rememberMe ?? false);
       const redirect = searchParams.get("redirect");
       router.replace(
         redirect && redirect.startsWith("/") ? redirect : ROUTES.DASHBOARD,
@@ -105,6 +109,12 @@ function LoginForm() {
             size="large"
             className="rounded-ds-lg bg-ds-surface-sunken border-ds-border-base"
           />
+        </Form.Item>
+
+        <Form.Item name="rememberMe" valuePropName="checked" className="mb-2">
+          <Checkbox className="text-ds-text-secondary text-sm">
+            Remember me
+          </Checkbox>
         </Form.Item>
 
         <Button

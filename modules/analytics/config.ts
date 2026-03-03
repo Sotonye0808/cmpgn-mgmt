@@ -79,7 +79,12 @@ export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[]
     },
     {
         key: "top-performers",
-        label: "Top Performers",
+        label: "Top Soldiers",
+        allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "campaign-analytics",
+        label: "Campaign Analytics",
         allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
     {
@@ -91,5 +96,20 @@ export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[]
         key: "platform-overview",
         label: "Platform Overview",
         allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "team-analytics",
+        label: "Team Analytics",
+        allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "donation-analytics",
+        label: "Donation Analytics",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "proofs-overview",
+        label: "Deployment Proofs",
+        allowedRoles: [ROLE.SUPER_ADMIN],
     },
 ];

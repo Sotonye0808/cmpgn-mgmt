@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UsePointsOptions {
     campaignId?: string;
@@ -40,7 +40,7 @@ export function usePoints({ campaignId }: UsePointsOptions = {}): UsePointsRetur
     }, [campaignId]);
 
     useEffect(() => { fetch(); }, [fetch]);
-    useMockDbSubscription("pointsLedger", fetch);
+    useAutoRefresh("pointsLedger", fetch);
 
     return { summary, progress, loading, error, refetch: fetch };
 }

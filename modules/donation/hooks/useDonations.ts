@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ROUTES } from "@/config/routes";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseDonationsReturn {
     donations: Donation[];
@@ -43,7 +43,7 @@ export function useDonations(): UseDonationsReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("donations", fetch);
+    useAutoRefresh("donations", fetch);
 
     return { donations, total, loading, error, page, setPage, refresh: fetch };
 }
@@ -83,7 +83,7 @@ export function useFundraising(campaignId: string): UseFundraisingReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("donations", fetch);
+    useAutoRefresh("donations", fetch);
 
     return { stats, loading, error, refresh: fetch };
 }

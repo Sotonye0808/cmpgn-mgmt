@@ -27,7 +27,13 @@ export async function PUT(
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const updated = await changeUserRole(userId, parsed.data.role);
+        // Forward actor identity for privilege ceiling enforcement
+        const updated = await changeUserRole(
+            userId,
+            parsed.data.role,
+            auth.user.id,
+            auth.user.role as unknown as string
+        );
         return successResponse(updated);
     } catch (err) {
         return handleApiError(err);

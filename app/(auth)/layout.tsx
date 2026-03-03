@@ -1,6 +1,7 @@
 import { NAV_CONTENT } from "@/config/content";
 import PublicFooter from "@/components/layout/PublicFooter";
 import CookieConsent from "@/components/ui/CookieConsent";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function AuthLayout({
   children,
@@ -12,11 +13,7 @@ export default function AuthLayout({
       {/* Ambient background glow — gives glass surfaces something to blur against */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 80% 50% at 50% -10%, rgba(124,58,237,0.1) 0%, transparent 70%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(124,58,237,0.07) 0%, transparent 60%)",
-        }}
+        className="pointer-events-none fixed inset-0 -z-10 ambient-glow-auth"
       />
 
       {/* Centred card area */}
@@ -25,9 +22,7 @@ export default function AuthLayout({
           {/* Brand Name */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center gap-3">
-              <div className="w-10 h-10 rounded-ds-xl bg-ds-brand-accent glow-border flex items-center justify-center">
-                <span className="text-white font-bold text-lg">D</span>
-              </div>
+              <BrandLogo size="md" />
               <span className="text-2xl font-extrabold text-ds-text-primary">
                 {NAV_CONTENT.brandName}
               </span>

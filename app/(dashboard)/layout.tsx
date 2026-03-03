@@ -19,11 +19,7 @@ export default function DashboardLayout({
       {/* Ambient glow — gives glass nav + sidebar brand block something to blur against */}
       <div
         aria-hidden
-        className="pointer-events-none fixed inset-0 -z-10"
-        style={{
-          background:
-            "radial-gradient(ellipse 60% 30% at 50% 0%, rgba(124,58,237,0.09) 0%, transparent 60%), radial-gradient(ellipse 40% 50% at 0% 50%, rgba(124,58,237,0.05) 0%, transparent 55%)",
-        }}
+        className="pointer-events-none fixed inset-0 -z-10 ambient-glow-dashboard"
       />
       <Sidebar
         mobileOpen={mobileOpen}

@@ -6,19 +6,27 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { mockDb } from "@/lib/data/mockDb";
+import { prisma } from "@/lib/prisma";
+import { serialize } from "@/lib/utils/serialize";
 
 const updateProfileSchema = z.object({
     firstName: z.string().min(1, "First name is required").max(50),
     lastName: z.string().min(1, "Last name is required").max(50),
+    profilePicture: z.string().url("Must be a valid URL").optional(),
+    whatsappNumber: z
+        .string()
+        .regex(/^\+\d{1,4}\d{6,15}$/, "Invalid WhatsApp number format")
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export async function GET() {
     try {
         const auth = await requireAuth();
         if (auth.error) return auth.error;
-        const user = mockDb.users.findUnique({ where: { id: auth.user.id } });
-        return successResponse(user);
+        const user = await prisma.user.findUnique({ where: { id: auth.user.id } });
+        return successResponse(serialize(user));
     } catch (err) {
         return handleApiError(err);
     }
@@ -36,17 +44,20 @@ export async function PATCH(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
-        const updated = mockDb.users.update({
+        const updated = await prisma.user.update({
             where: { id: user.id },
             data: {
                 firstName: parsed.data.firstName,
                 lastName: parsed.data.lastName,
-                updatedAt: new Date().toISOString(),
+                ...(parsed.data.profilePicture !== undefined && {
+                    profilePicture: parsed.data.profilePicture,
+                }),
+                // Allow explicit clear (undefined) or set new number
+                whatsappNumber: parsed.data.whatsappNumber,
             },
         });
 
-        mockDb.emit("users:changed");
-        return successResponse(updated);
+        return successResponse(serialize(updated));
     } catch (err) {
         return handleApiError(err);
     }

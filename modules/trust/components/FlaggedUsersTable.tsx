@@ -5,6 +5,7 @@ import type { ColumnsType } from "antd/es/table";
 import DataTable from "@/components/ui/DataTable";
 import { TRUST_PAGE_CONTENT } from "@/config/content";
 import TrustScoreIndicator from "./TrustScoreIndicator";
+import { formatDate } from "@/lib/utils/format";
 
 interface Props {
   users: TrustFlagRecord[];
@@ -62,7 +63,7 @@ export default function FlaggedUsersTable({
       key: "lastReviewedAt",
       render: (d?: string) =>
         d ? (
-          new Date(d).toLocaleDateString()
+          formatDate(d)
         ) : (
           <span className="text-ds-text-subtle text-xs">Never</span>
         ),

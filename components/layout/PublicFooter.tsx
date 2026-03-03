@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { PUBLIC_FOOTER_CONTENT } from "@/config/content";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 /**
  * PublicFooter — shared footer for auth and public (landing) layouts.
@@ -16,9 +17,7 @@ export default function PublicFooter() {
           {/* Brand column */}
           <div className="md:col-span-1">
             <div className="flex items-center gap-2 mb-3">
-              <div className="w-7 h-7 rounded-ds-lg bg-ds-brand-accent glow-border flex items-center justify-center">
-                <span className="text-white font-bold text-xs">D</span>
-              </div>
+              <BrandLogo size="xs" glow={false} />
               <span className="font-bold text-ds-text-primary text-sm">
                 {PUBLIC_FOOTER_CONTENT.brand.name}
               </span>
@@ -52,7 +51,7 @@ export default function PublicFooter() {
         {/* Divider */}
         <div className="border-t border-ds-border-glass pt-6 flex flex-col sm:flex-row items-center justify-between gap-2">
           <p className="text-xs text-ds-text-disabled">
-            {PUBLIC_FOOTER_CONTENT.legal.copyright}
+            © {new Date().getFullYear()} {PUBLIC_FOOTER_CONTENT.legal.copyright.entity}
           </p>
           <div className="flex items-center gap-3 text-xs text-ds-text-disabled">
             <span>{PUBLIC_FOOTER_CONTENT.legal.rights}</span>

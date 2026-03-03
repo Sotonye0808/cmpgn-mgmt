@@ -9,11 +9,18 @@ export const registerSchema = z.object({
         .regex(/[0-9]/, "Password must contain a number"),
     firstName: z.string().min(2, "First name must be at least 2 characters").max(50),
     lastName: z.string().min(2, "Last name must be at least 2 characters").max(50),
+    whatsappNumber: z
+        .string()
+        .regex(/^\+\d{1,4}\d{6,15}$/, "Invalid WhatsApp number format")
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export const loginSchema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(1, "Password is required"),
+    rememberMe: z.boolean().optional().default(false),
 });
 
 export type RegisterInput = z.infer<typeof registerSchema>;

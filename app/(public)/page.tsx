@@ -1,27 +1,106 @@
 import Link from "next/link";
+import type { Metadata } from "next";
+import Image from "next/image";
 import { ROUTES } from "@/config/routes";
-import {
-  LANDING_CONTENT,
-  NAV_CONTENT,
-  HOW_IT_WORKS_STEPS,
-  FAQ_ITEMS,
-} from "@/config/content";
+import { LANDING_CONTENT, NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
+import { prisma } from "@/lib/prisma";
+import { RANK_LEVELS } from "@/config/ranks";
+import { getPublicStats } from "@/lib/services/publicStatsService";
+import { serializeArray } from "@/lib/utils/serialize";
+import PublicCtaSection from "@/components/ui/PublicCtaSection";
+import PublicActiveCampaigns from "@/components/ui/PublicActiveCampaigns";
+import PublicStatsBar from "@/components/ui/PublicStatsBar";
+import FeaturedCampaignJoinButton from "@/components/ui/FeaturedCampaignJoinButton";
+import { SITE_CONFIG, absoluteUrl, ogImages } from "@/config/seo";
 
-export default function LandingPage() {
-  const StatItem = ({ label, value }: { label: string; value: string }) => (
-    <div className="text-center">
-      <div className="text-3xl font-extrabold text-ds-brand-accent font-ds-mono">
-        {value}
-      </div>
-      <div className="text-sm text-ds-text-subtle mt-1">{label}</div>
-    </div>
+export const metadata: Metadata = {
+  title: LANDING_CONTENT.meta.title,
+  description: LANDING_CONTENT.meta.description,
+  alternates: { canonical: absoluteUrl("/") },
+  openGraph: {
+    type: "website",
+    url: absoluteUrl("/"),
+    title: LANDING_CONTENT.meta.title,
+    description: LANDING_CONTENT.meta.description,
+    siteName: SITE_CONFIG.name,
+    images: ogImages(),
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: LANDING_CONTENT.meta.title,
+    description: LANDING_CONTENT.meta.description,
+    images: [SITE_CONFIG.ogImage],
+  },
+};
+
+function getRankForScore(score: number): (typeof RANK_LEVELS)[number] {
+  let current = RANK_LEVELS[0];
+  for (const rank of RANK_LEVELS) {
+    if (score >= rank.minScore) current = rank;
+  }
+  return current;
+}
+
+export default async function LandingPage() {
+  const publicStats = await getPublicStats();
+
+  // Featured mega campaign (or highest-participant active campaign)
+  const rawCampaigns = await prisma.campaign.findMany({
+    where: { status: "ACTIVE" as never },
+    orderBy: { participantCount: "desc" },
+  });
+  const allCampaigns = serializeArray<Campaign>(rawCampaigns);
+  const megaCampaign = allCampaigns.find((c) => c.isMegaCampaign);
+  const featuredCampaign = megaCampaign ?? allCampaigns[0];
+
+  // Top 5 mobilizers from leaderboard
+  const allPoints = await prisma.pointsLedgerEntry.findMany();
+  const userScores: Record<string, number> = {};
+  for (const entry of allPoints) {
+    userScores[entry.userId] = (userScores[entry.userId] ?? 0) + entry.value;
+  }
+  const topUserIds = Object.entries(userScores)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 5);
+
+  const topUserMap = new Map(
+    (
+      await prisma.user.findMany({
+        where: { id: { in: topUserIds.map(([uid]) => uid) } },
+        select: {
+          id: true,
+          firstName: true,
+          lastName: true,
+          profilePicture: true,
+        },
+      })
+    ).map((u) => [u.id, u]),
   );
+
+  const topMobilizers = topUserIds.map(([userId, score], idx) => {
+    const user = topUserMap.get(userId);
+    const rank = getRankForScore(score);
+    return {
+      position: idx + 1,
+      firstName: user?.firstName ?? "Unknown",
+      lastName: user?.lastName ?? "",
+      profilePicture: user?.profilePicture,
+      score,
+      rank,
+    };
+  });
+
+  // Sub-campaign count for mega
+  const subCampaignCount = featuredCampaign?.isMegaCampaign
+    ? allCampaigns.filter((c) => c.parentCampaignId === featuredCampaign.id)
+        .length
+    : 0;
 
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="max-w-7xl mx-auto px-6 pt-20 pb-24 text-center">
+      <section className="max-w-7xl mx-auto px-6 pt-12 pb-10 text-center">
         <div className="inline-flex items-center gap-2 px-4 py-2 rounded-ds-full border border-ds-brand-accent/30 bg-ds-brand-accent-subtle text-ds-brand-accent text-sm font-medium mb-8">
           <ICONS.rocket className="text-base" />
           {NAV_CONTENT.brandTagline}
@@ -39,30 +118,205 @@ export default function LandingPage() {
             {LANDING_CONTENT.hero.cta}
           </Link>
           <Link
-            href={ROUTES.LOGIN}
+            href={ROUTES.HOW_IT_WORKS}
             className="px-8 py-4 border border-ds-border-base text-ds-text-primary rounded-ds-xl font-semibold text-lg hover:border-ds-brand-accent hover:text-ds-brand-accent transition-all">
             {LANDING_CONTENT.hero.ctaSecondary}
           </Link>
         </div>
       </section>
 
-      {/* Stats Bar */}
-      <section className="border-y border-ds-border-base py-12">
-        <div className="max-w-5xl mx-auto px-6 grid grid-cols-2 md:grid-cols-4 gap-8">
-          {LANDING_CONTENT.stats.map((stat) => (
-            <StatItem key={stat.key} label={stat.label} value={stat.value} />
-          ))}
-        </div>
-      </section>
+      {/* Live platform stats */}
+      <PublicStatsBar stats={publicStats} />
+
+      {/* Featured Campaign + Top 5 Members — side-by-side on large screens */}
+      {(featuredCampaign || topMobilizers.length > 0) && (
+        <section className="border-t border-ds-border-base py-14">
+          <div className="max-w-6xl mx-auto px-6">
+            <div className="grid lg:grid-cols-12 gap-10">
+              {/* Featured Campaign — 7/12 columns */}
+              {featuredCampaign && (
+                <div className="lg:col-span-7">
+                  <h2 className="text-2xl font-bold text-ds-text-primary mb-2">
+                    {LANDING_CONTENT.home.featuredSection.heading}
+                  </h2>
+                  <p className="text-ds-text-secondary mb-6 text-sm">
+                    {LANDING_CONTENT.home.featuredSection.subheading}
+                  </p>
+                  <div className="glass-surface rounded-ds-xl p-6 hover:glow-border transition-all">
+                    <div className="flex flex-col gap-6">
+                      {featuredCampaign.thumbnailUrl && (
+                        <Image
+                          src={featuredCampaign.thumbnailUrl}
+                          alt={featuredCampaign.title}
+                          className="w-full h-40 object-cover rounded-ds-lg"
+                          width={500}
+                          height={160}
+                        />
+                      )}
+                      <div>
+                        <div className="flex items-center gap-3 mb-3">
+                          {featuredCampaign.isMegaCampaign && (
+                            <span className="px-3 py-1 bg-ds-brand-accent text-white text-xs font-bold rounded-ds-full uppercase tracking-wider">
+                              MEGA
+                            </span>
+                          )}
+                          <span className="px-3 py-1 border border-ds-brand-accent/30 text-ds-brand-accent text-xs font-semibold rounded-ds-full">
+                            Active
+                          </span>
+                        </div>
+                        <h3 className="text-xl font-bold text-ds-text-primary mb-2">
+                          {featuredCampaign.title}
+                        </h3>
+                        <p className="text-ds-text-secondary text-sm mb-4 line-clamp-2">
+                          {featuredCampaign.description}
+                        </p>
+                        <div className="flex flex-wrap gap-6 text-sm">
+                          <div>
+                            <span className="text-ds-text-subtle">
+                              {LANDING_CONTENT.home.featuredSection.participantsLabel}{" "}
+                            </span>
+                            <span className="font-semibold text-ds-text-primary">
+                              {(
+                                featuredCampaign.participantCount ?? 0
+                              ).toLocaleString()}
+                            </span>
+                          </div>
+                          {featuredCampaign.goalTarget && (
+                            <div>
+                              <span className="text-ds-text-subtle">
+                                Goal:{" "}
+                              </span>
+                              <span className="font-semibold text-ds-text-primary">
+                                {featuredCampaign.goalTarget.toLocaleString()}
+                              </span>
+                            </div>
+                          )}
+                          {subCampaignCount > 0 && (
+                            <div>
+                              <span className="text-ds-text-subtle">
+                                {LANDING_CONTENT.home.featuredSection.subCampaignsLabel}{" "}
+                              </span>
+                              <span className="font-semibold text-ds-text-primary">
+                                {subCampaignCount}
+                              </span>
+                            </div>
+                          )}
+                        </div>
+                        {featuredCampaign.goalTarget &&
+                          featuredCampaign.goalCurrent != null && (
+                            <div className="mt-4">
+                              <div className="w-full bg-ds-surface-elevated rounded-full h-2">
+                                <div
+                                  className="bg-ds-brand-accent h-2 rounded-full transition-all bar-dynamic"
+                                  style={
+                                    {
+                                      "--_bar-w": `${Math.min(
+                                        100,
+                                        Math.round(
+                                          (featuredCampaign.goalCurrent /
+                                            featuredCampaign.goalTarget) *
+                                            100,
+                                        ),
+                                      )}%`,
+                                    } as React.CSSProperties
+                                  }
+                                />
+                              </div>
+                              <p className="text-xs text-ds-text-subtle mt-1">
+                                {Math.round(
+                                  (featuredCampaign.goalCurrent /
+                                    featuredCampaign.goalTarget) *
+                                    100,
+                                )}
+                                % progress
+                              </p>
+                            </div>
+                          )}
+                        <FeaturedCampaignJoinButton
+                          campaignId={featuredCampaign.id}
+                          campaignTitle={featuredCampaign.title}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Top 5 Mobilizers — 5/12 columns */}
+              {topMobilizers.length > 0 && (
+                <div className="lg:col-span-5">
+                  <h2 className="text-2xl font-bold text-ds-text-primary mb-2">
+                    {LANDING_CONTENT.home.topMobilizersSection.heading}
+                  </h2>
+                  <p className="text-ds-text-secondary mb-6 text-sm">
+                    {LANDING_CONTENT.home.topMobilizersSection.subheading}
+                  </p>
+                  <div className="space-y-3">
+                    {topMobilizers.map((soldier) => (
+                      <div
+                        key={soldier.position}
+                        className="glass-surface rounded-ds-xl p-4 flex items-center gap-4 hover:glow-border transition-all">
+                        <div className="w-9 h-9 rounded-full bg-ds-brand-accent/10 flex items-center justify-center font-extrabold text-ds-brand-accent text-sm shrink-0">
+                          #{soldier.position}
+                        </div>
+                        {soldier.profilePicture ? (
+                          <Image
+                            src={soldier.profilePicture}
+                            alt={soldier.firstName}
+                            className="w-9 h-9 rounded-full object-cover shrink-0"
+                            width={36}
+                            height={36}
+                          />
+                        ) : (
+                          <div className="w-9 h-9 rounded-full bg-ds-surface-elevated flex items-center justify-center shrink-0">
+                            <ICONS.user className="text-ds-text-subtle" />
+                          </div>
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <p className="font-semibold text-ds-text-primary truncate text-sm">
+                            {soldier.firstName} {soldier.lastName}
+                          </p>
+                          <p className="text-xs text-ds-text-subtle">
+                            {soldier.rank.badge} {soldier.rank.name}
+                          </p>
+                        </div>
+                        <div className="text-right shrink-0">
+                          <p className="font-bold text-ds-text-primary font-ds-mono text-sm">
+                            {soldier.score.toLocaleString()}
+                          </p>
+                          <p className="text-xs text-ds-text-subtle">pts</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+        </section>
+      )}
+
+      <PublicActiveCampaigns
+        campaigns={allCampaigns.slice(0, 6).map((c) => ({
+          id: c.id,
+          title: c.title,
+          description: c.description,
+          thumbnailUrl: c.thumbnailUrl,
+          mediaUrl: c.mediaUrl,
+          participantCount: c.participantCount,
+          goalTarget: c.goalTarget,
+          goalCurrent: c.goalCurrent,
+          isMegaCampaign: c.isMegaCampaign,
+        }))}
+      />
 
       {/* Features */}
-      <section className="max-w-7xl mx-auto px-6 py-24">
+      <section className="max-w-7xl mx-auto px-6 py-14">
         <h2 className="text-3xl font-bold text-ds-text-primary text-center mb-4">
-          Everything You Need to Mobilize at Scale
+          {LANDING_CONTENT.home.featuresSection.heading}
         </h2>
-        <p className="text-ds-text-secondary text-center max-w-xl mx-auto mb-16">
-          One platform for smart link distribution, referral tracking,
-          gamification, and analytics.
+        <p className="text-ds-text-secondary text-center max-w-xl mx-auto mb-12">
+          {LANDING_CONTENT.home.featuresSection.subheading}
         </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {LANDING_CONTENT.features.map((feature) => {
@@ -86,72 +340,18 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* How It Works */}
-      <section className="border-t border-ds-border-base py-24 bg-ds-surface-base/40">
-        <div className="max-w-5xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-ds-text-primary text-center mb-4">
-            How It Works
-          </h2>
-          <p className="text-ds-text-secondary text-center max-w-xl mx-auto mb-16">
-            Get up and running in minutes. No technical setup required.
-          </p>
-          <div className="grid md:grid-cols-4 gap-8">
-            {HOW_IT_WORKS_STEPS.map((step) => (
-              <div key={step.key} className="text-center">
-                <div className="w-12 h-12 rounded-full bg-ds-brand-accent text-white font-extrabold text-lg flex items-center justify-center mx-auto mb-4">
-                  {step.step}
-                </div>
-                <h3 className="font-semibold text-ds-text-primary mb-2">
-                  {step.title}
-                </h3>
-                <p className="text-sm text-ds-text-secondary leading-relaxed">
-                  {step.description}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* FAQ */}
-      <section className="max-w-3xl mx-auto px-6 py-24">
-        <h2 className="text-3xl font-bold text-ds-text-primary text-center mb-12">
-          Frequently Asked Questions
-        </h2>
-        <div className="space-y-4">
-          {FAQ_ITEMS.map((item) => (
-            <details
-              key={item.key}
-              className="glass-surface rounded-ds-xl p-6 group cursor-pointer">
-              <summary className="font-semibold text-ds-text-primary list-none flex items-center justify-between">
-                {item.question}
-                <ICONS.arrowDown className="text-ds-text-subtle group-open:rotate-180 transition-transform" />
-              </summary>
-              <p className="mt-4 text-ds-text-secondary text-sm leading-relaxed">
-                {item.answer}
-              </p>
-            </details>
-          ))}
-        </div>
-      </section>
-
-      {/* CTA Footer */}
-      <section className="border-t border-ds-border-base py-20 text-center">
-        <div className="max-w-2xl mx-auto px-6">
-          <h2 className="text-3xl font-bold text-ds-text-primary mb-4">
-            Ready to Mobilize?
-          </h2>
-          <p className="text-ds-text-secondary mb-8">
-            Join thousands of mobilizers already using DMHicc to track, grow,
-            and lead their digital campaigns.
-          </p>
-          <Link
-            href={ROUTES.REGISTER}
-            className="px-10 py-4 bg-ds-brand-accent text-white rounded-ds-xl font-semibold text-lg hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
-            {LANDING_CONTENT.hero.cta}
-          </Link>
-        </div>
-      </section>
+      <PublicCtaSection
+        heading={LANDING_CONTENT.home.ctaSection.heading}
+        body={LANDING_CONTENT.home.ctaSection.body}
+        buttons={[
+          { label: LANDING_CONTENT.hero.cta, href: ROUTES.REGISTER },
+          {
+            label: LANDING_CONTENT.hero.ctaSecondary,
+            href: ROUTES.HOW_IT_WORKS,
+            variant: "outline",
+          },
+        ]}
+      />
     </div>
   );
 }

@@ -2,56 +2,83 @@
 
 export const LANDING_CONTENT = {
     meta: {
-        title: "DMHicc — Digital Mobilization & Harvest Impact Campaign Center",
+        title: "DMHicc — Digital Mobilization Army",
         description:
-            "Transform your digital outreach into measurable campaign impact. Smart links, referral tracking, gamification, and real-time analytics.",
+            "Join Heaven's Digital Mobilizers. Smart campaign link distribution, referral tracking, rank progression, and real-time analytics.",
     },
     hero: {
-        headline: "Turn Digital Outreach Into Measurable Impact",
+        headline: "Digital Mobilization Army",
         subheadline:
-            "DMHicc gives every mobilizer a smart link, every campaign a lifecycle, and every leader a live dashboard.",
-        cta: "Get Started",
+            "Join Heaven's Digital Mobilizers. Every member gets a personal tracking link, every campaign has clear direction, and every leader has real-time insight.",
+        cta: "Enlist Now",
         ctaSecondary: "Learn More",
     },
     features: [
         {
-            key: "smart-links",
+            key: "ammunition",
             icon: "links" as const,
-            title: "Smart Link Engine",
+            title: "Campaign Link Distribution",
             description:
-                "Every user–campaign pair gets a unique trackable link. Monitor clicks, devices, and referrals in real time.",
+                "Every member–campaign pair gets a unique trackable link. Monitor reach, clicks, and conversions in real time.",
         },
         {
             key: "gamification",
             icon: "star" as const,
-            title: "Points & Gamification",
+            title: "Rank & Rewards",
             description:
-                "Earn Impact, Consistency, Leadership, and Reliability points. Climb the leaderboard.",
+                "Earn Impact, Consistency, Leadership, and Reliability points. Rise from Recruit to General.",
         },
         {
             key: "referrals",
             icon: "team" as const,
             title: "Referral Engine",
             description:
-                "Track who invited whom. Attribute referrals to inviters and campaigns automatically.",
+                "Track who referred whom. Attribute sign-ups to referrers and campaigns automatically.",
         },
         {
             key: "analytics",
             icon: "analytics" as const,
-            title: "Live Analytics",
+            title: "Real-Time Analytics",
             description:
-                "Real-time dashboards for mobilizers and admins. Engagement trends, top performers, and campaign health.",
+                "Live dashboards for members and leaders. Engagement trends, top performers, and campaign health.",
+        },
+        {
+            key: "proofs",
+            icon: "check" as const,
+            title: "Activity Verification",
+            description:
+                "Submit screenshot evidence after sharing your link. Verified proofs earn Reliability points and build your credibility score.",
         },
     ],
     stats: [
-        { key: "links", label: "Smart Links Tracked", value: "100M+" },
-        { key: "campaigns", label: "Active Campaigns", value: "500+" },
-        { key: "mobilizers", label: "Mobilizers", value: "10K+" },
+        { key: "ammo", label: "Links Deployed", value: "100M+" },
+        { key: "missions", label: "Active Campaigns", value: "500+" },
+        { key: "soldiers", label: "Digital Members", value: "10K+" },
         { key: "conversions", label: "Conversion Rate", value: "12%" },
     ],
     footer: {
         copyright: "© 2026 Harvesters International Christian Centre. DMHicc Platform.",
-        tagline: "Built for Digital Mobilization at Scale.",
+        tagline: "Built for Heaven's Digital Army.",
+    },
+    home: {
+        featuredSection: {
+            heading: "Featured Campaign",
+            subheading: "The flagship campaign currently gaining the most traction.",
+            participantsLabel: "Members:",
+            subCampaignsLabel: "Sub-Missions:",
+        },
+        topMobilizersSection: {
+            heading: "Top 5 Digital Members",
+            subheading: "The highest-ranking members across all campaigns.",
+        },
+        featuresSection: {
+            heading: "Everything You Need to Make an Impact",
+            subheading: "One platform for campaign link distribution, referral tracking, rank progression, and real-time analytics.",
+        },
+        ctaSection: {
+            heading: "Ready to Make an Impact?",
+            body: "Join thousands of digital members already using DMHicc to share, grow, and lead their campaigns.",
+        },
     },
 } as const;
 
@@ -77,8 +104,8 @@ export const AUTH_CONTENT = {
         devCredentialsTitle: "Quick Login (Dev Only)",
     },
     register: {
-        title: "Create Account",
-        subtitle: "Join DMHicc and start mobilizing",
+        title: "Enlist Now",
+        subtitle: "Join DMHicc's Digital Mobilization Army",
         firstNameLabel: "First Name",
         firstNamePlaceholder: "Adaeze",
         lastNameLabel: "Last Name",
@@ -95,17 +122,17 @@ export const AUTH_CONTENT = {
 
 export const DASHBOARD_CONTENT = {
     greeting: "Welcome back, {name}!",
-    subtitle: "Here's what's happening with your campaigns today.",
+    subtitle: "Here's your activity overview for today.",
     sections: {
-        activeCampaigns: "Active Campaigns",
-        myLinks: "My Smart Links",
+        activeCampaigns: "Active Missions",
+        myLinks: "My Links",
         recentActivity: "Recent Activity",
         leaderboard: "Leaderboard",
     },
     kpi: {
         totalPoints: "Total Points",
-        rank: "Current Rank",
-        activeCampaigns: "Active Campaigns",
+        rank: "Rank",
+        activeCampaigns: "Active Missions",
         referrals: "Referrals",
         linkClicks: "Link Clicks",
         donationsRaised: "Donations Raised",
@@ -114,11 +141,11 @@ export const DASHBOARD_CONTENT = {
 
 export const CAMPAIGN_CONTENT = {
     page: {
-        title: "Campaigns",
-        description: "Browse and participate in active campaigns",
-        emptyTitle: "No Campaigns Yet",
-        emptyDescription: "Check back soon for new campaigns to join.",
-        createButton: "New Campaign",
+        title: "Missions",
+        description: "Browse and join active campaigns",
+        emptyTitle: "No Missions Yet",
+        emptyDescription: "Check back soon for new missions to join.",
+        createButton: "New Mission",
     },
     status: {
         DRAFT: "Draft",
@@ -135,12 +162,12 @@ export const CAMPAIGN_CONTENT = {
         PARTICIPANTS: "Participants",
     },
     form: {
-        createTitle: "Create Campaign",
-        editTitle: "Edit Campaign",
-        titleLabel: "Campaign Title",
-        titlePlaceholder: "Enter a compelling campaign title",
+        createTitle: "Create Mission",
+        editTitle: "Edit Mission",
+        titleLabel: "Mission Title",
+        titlePlaceholder: "Enter a compelling mission title",
         descriptionLabel: "Description",
-        descriptionPlaceholder: "Brief description of this campaign",
+        descriptionPlaceholder: "Brief description of this mission",
         contentLabel: "Content",
         ctaTextLabel: "Call to Action Text",
         ctaTextPlaceholder: "e.g. Join Now",
@@ -151,17 +178,27 @@ export const CAMPAIGN_CONTENT = {
         endDateLabel: "End Date",
         mediaTypeLabel: "Media Type",
         mediaUrlLabel: "Media URL",
-        submitCreate: "Create Campaign",
+        parentCampaignLabel: "Parent Mega Mission (optional)",
+        isMegaCampaignLabel: "This is a Mega Mission",
+        submitCreate: "Create Mission",
         submitEdit: "Save Changes",
+    },
+    mega: {
+        badge: "MEGA",
+        subCampaignsTitle: "Sub-Missions",
+        subCampaignsEmpty: "No sub-missions yet.",
+    },
+    detail: {
+        submitProofButton: "Submit Activity Proof",
     },
 } as const;
 
 export const SMART_LINK_CONTENT = {
     page: {
-        title: "My Smart Links",
+        title: "My Links",
         description: "Your unique trackable links for each campaign",
-        emptyTitle: "No Smart Links Yet",
-        emptyDescription: "Join a campaign to generate your smart link.",
+        emptyTitle: "No Links Yet",
+        emptyDescription: "Join a campaign to receive your tracking link.",
     },
     card: {
         copyButton: "Copy Link",
@@ -177,50 +214,50 @@ export const SMART_LINK_CONTENT = {
 
 export const NAV_CONTENT = {
     brandName: "DMHicc",
-    brandTagline: "Campaign Center",
+    brandTagline: "Recruiting Online Souls",
 } as const;
 
 export const LEADERBOARD_PAGE_CONTENT = {
     title: "Leaderboard",
-    subtitle: "Top participants ranked by impact, consistency, leadership, and reliability.",
-    emptyState: "No participants yet. Join a campaign to appear on the leaderboard.",
+    subtitle: "Top members ranked by impact, consistency, leadership, and reliability.",
+    emptyState: "No members yet. Join a campaign to appear on the leaderboard.",
     myRankLabel: "Your Position",
 } as const;
 
 export const ENGAGEMENT_PAGE_CONTENT = {
     title: "My Engagement",
-    subtitle: "Track your reach, activity, and impact across all campaigns.",
+    subtitle: "Track your reach, activity, and impact across all missions.",
     timelineTitle: "Activity Over Time",
     statsTitle: "Overview",
 } as const;
 
 export const REFERRAL_PAGE_CONTENT = {
     title: "Referrals",
-    subtitle: "Track who you've invited and how your network is growing.",
-    linkPanelTitle: "Your Referral Link",
+    subtitle: "Track who you've referred and how your network is growing.",
+    linkPanelTitle: "Your Recruitment Link",
 } as const;
 
 export const POINTS_PAGE_CONTENT = {
     title: "Points & Rank",
-    subtitle: "Your gamification score breakdown and progress toward the next rank.",
+    subtitle: "Your score breakdown and progress toward the next rank.",
     summaryTitle: "Points Summary",
-    rankTitle: "Current Rank",
+    rankTitle: "Your Rank",
     ledgerTitle: "Points History",
 } as const;
 
 export const DONATION_PAGE_CONTENT = {
     title: "Donations",
-    subtitle: "Support campaigns and track your giving history.",
+    subtitle: "Support missions and track your giving history.",
     formTitle: "Make a Donation",
     amountLabel: "Amount",
-    campaignLabel: "Campaign",
+    campaignLabel: "Mission",
     messageLabel: "Message (optional)",
     messagePlaceholder: "Leave an encouraging message...",
     submitButton: "Donate Now",
     historyTitle: "My Donations",
     progressTitle: "Fundraising Progress",
     topDonorsTitle: "Top Donors",
-    emptyHistory: "You haven't donated yet. Support a campaign today!",
+    emptyHistory: "You haven't donated yet. Support a mission today!",
     currencies: ["NGN", "USD", "GBP"],
 } as const;
 
@@ -245,12 +282,16 @@ export const TRUST_PAGE_CONTENT = {
 
 export const ANALYTICS_PAGE_CONTENT = {
     title: "Analytics",
-    subtitle: "Your performance dashboard — engagement, points, referrals, and more.",
+    subtitle: "Your dashboard — engagement, points, referrals, and more.",
     kpiTitle: "Key Metrics",
     engagementTitle: "Engagement Timeline",
-    performersTitle: "Top Performers",
+    performersTitle: "Top Members",
     growthTitle: "Campaign Growth",
     overviewTitle: "Platform Overview",
+    campaignAnalyticsTitle: "Campaign Analytics",
+    campaignAnalyticsPlaceholder: "Select a campaign above to view detailed analytics.",
+    campaignAnalyticsEngagementLabel: "Engagement Trend",
+    campaignAnalyticsTopSoldiersLabel: "Top Members — This Campaign",
 } as const;
 
 export const SETTINGS_PAGE_CONTENT = {
@@ -259,15 +300,30 @@ export const SETTINGS_PAGE_CONTENT = {
     profileSection: "Profile",
     securitySection: "Security",
     adminSection: "Administration",
+    weaponsOfChoiceSection: "My Platforms",
+    weaponsOfChoiceDescription: "Select the social media platforms you share on.",
 } as const;
 
+export const SOCIAL_PLATFORMS_CONFIG = [
+    { key: "FACEBOOK", label: "Facebook", icon: "facebook" as const, color: "#1877F2" },
+    { key: "INSTAGRAM", label: "Instagram", icon: "instagram" as const, color: "#E4405F" },
+    { key: "TWITTER_X", label: "Twitter / X", icon: "twitterX" as const, color: "#1DA1F2" },
+    { key: "TIKTOK", label: "TikTok", icon: "tiktok" as const, color: "#000000" },
+    { key: "YOUTUBE", label: "YouTube", icon: "youtube" as const, color: "#FF0000" },
+    { key: "WHATSAPP", label: "WhatsApp", icon: "whatsapp" as const, color: "#25D366" },
+    { key: "SNAPCHAT", label: "Snapchat", icon: "snapchat" as const, color: "#FFFC00" },
+] as const;
+
 export const TEAM_PAGE_CONTENT = {
-    title: "Team",
+    title: "My Team",
     subtitle: "View and manage your team's participation and performance.",
     membersTitle: "Team Members",
     performanceTitle: "Team Performance",
     emptyState: "No team members found.",
-    roleFilter: "Filter by role",
+    noTeamMessage: "You are not currently part of a team.",
+    noTeamPrompt: "Ask your admin to add you to one.",
+    inviteLinkDescription: "Generate a shareable invite link for new team members (up to 10 uses).",
+    roleFilter: "Filter by rank",
 } as const;
 
 export const NOT_FOUND_CONTENT = {
@@ -276,6 +332,27 @@ export const NOT_FOUND_CONTENT = {
     subtitle: "The page you're looking for doesn't exist or has been moved.",
     backButton: "Go Back",
     homeButton: "Back to Dashboard",
+} as const;
+
+export const VIEW_PROOF_CONTENT = {
+    title: "Activity Proof",
+    subtitle: "Upload screenshots showing you've shared your campaign link on each platform.",
+    uploadButton: "Submit Proof",
+    modalTitle: "Upload Activity Proof",
+    platformLabel: "Platform Shared On",
+    screenshotLabel: "Screenshot",
+    screenshotPlaceholder: "Paste screenshot URL or upload",
+    submitButton: "Submit Proof",
+    status: {
+        PENDING: "Under Review",
+        APPROVED: "Verified",
+        REJECTED: "Rejected",
+    },
+    emptyState: "No activity proofs submitted yet.",
+    submitFromDetailButton: "Submit Activity Proof",
+    reviewTitle: "Review Activity Proofs",
+    approveButton: "Approve",
+    rejectButton: "Reject",
 } as const;
 
 export const USERS_PAGE_CONTENT = {
@@ -298,7 +375,7 @@ export const DASHBOARD_FOOTER_CONTENT = {
     platform: {
         name: "DMHicc",
         version: "1.0.0-mvp",
-        tagline: "Digital Mobilization & Harvest Impact Campaign Center",
+        tagline: "Digital Mobilization Army — Recruiting Online Souls",
     },
     quickLinks: [
         { key: "lobby", label: "Lobby", href: "/" },
@@ -307,14 +384,17 @@ export const DASHBOARD_FOOTER_CONTENT = {
         { key: "analytics", label: "Analytics", href: "/analytics" },
         { key: "donations", label: "Donations", href: "/donations" },
         { key: "settings", label: "Settings", href: "/settings" },
+        { key: "about", label: "About", href: "/about" },
+        { key: "privacy", label: "Privacy", href: "/privacy" },
+        { key: "terms", label: "Terms", href: "/terms" },
     ],
-    legal: "© 2026 DMHicc",
+    legal: { entity: "DMHicc" },
 } as const;
 
 export const PUBLIC_FOOTER_CONTENT = {
     brand: {
         name: "DMHicc",
-        tagline: "Digital Mobilization & Harvest Impact Campaign Center",
+        tagline: "Digital Mobilization Army — Recruiting Online Souls",
     },
     columns: [
         {
@@ -343,7 +423,7 @@ export const PUBLIC_FOOTER_CONTENT = {
         },
     ],
     legal: {
-        copyright: "© 2026 Harvesters International Christian Centre. DMHicc Platform.",
+        copyright: { entity: "Harvesters International Christian Centre. DMHicc Platform." },
         rights: "All rights reserved.",
     },
     developer: {
@@ -418,23 +498,23 @@ export const CONTACT_PAGE_CONTENT = {
             key: "email",
             icon: "mail" as const,
             label: "Email Support",
-            value: "support@dmhicc.org",
+            value: "churchministry@harvestersng.org",
             description: "For account issues, access requests, and general enquiries.",
-            action: { label: "Send Email", href: "mailto:support@dmhicc.org" },
+            action: { label: "Send Email", href: "mailto:churchministry@harvestersng.org" },
         },
         {
             key: "admin",
             icon: "settings" as const,
             label: "Platform Administration",
-            value: "admin@dmhicc.org",
+            value: "sdagogo@harvestersng.org",
             description: "For campaign creation, role management, and admin matters.",
-            action: { label: "Contact Admin", href: "mailto:admin@dmhicc.org" },
+            action: { label: "Contact Admin", href: "mailto:sdagogo@harvestersng.org" },
         },
         {
             key: "church",
             icon: "team" as const,
             label: "Harvesters ICC",
-            value: "info@harvesters.org.ng",
+            value: "churchministry@harvestersng.org",
             description: "For church-related enquiries and partnership matters.",
             action: { label: "Visit Website", href: "https://harvesters.org.ng" },
         },
@@ -497,7 +577,7 @@ export const PRIVACY_PAGE_CONTENT = {
             key: "your-rights",
             heading: "Your Rights",
             paragraphs: [
-                "You have the right to access, correct, or request deletion of your personal data. To exercise these rights, contact us at support@dmhicc.org.",
+                "You have the right to access, correct, or request deletion of your personal data. To exercise these rights, contact us at churchministry@harvestersng.org.",
                 "You may request a copy of the data we hold about you at any time.",
             ],
         },
@@ -508,29 +588,7 @@ export const PRIVACY_PAGE_CONTENT = {
             paragraphs: [
                 "DMHicc uses only essential cookies and local storage. These are strictly necessary for the platform to function — they cannot be disabled without breaking core functionality.",
                 "We do not use advertising cookies, cross-site tracking cookies, or third-party analytics cookies.",
-            ],
-            cookieTable: [
-                {
-                    key: "access-token",
-                    name: "dmhicc_access",
-                    purpose: "Stores your JWT access token to authenticate API requests",
-                    type: "httpOnly cookie",
-                    duration: "15 minutes",
-                },
-                {
-                    key: "refresh-token",
-                    name: "dmhicc_refresh",
-                    purpose: "Stores your JWT refresh token to renew your session without re-login",
-                    type: "httpOnly cookie",
-                    duration: "7 days",
-                },
-                {
-                    key: "cookie-consent",
-                    name: "dmhicc_cookie_consent",
-                    purpose: "Remembers that you have dismissed the cookie notice",
-                    type: "localStorage",
-                    duration: "Persistent",
-                },
+                "We set two session-management cookies stored as secure, httpOnly HTTP cookies that are inaccessible to JavaScript: a short-lived access token used to authenticate API requests, and a longer-lived refresh token used to renew your session without requiring you to log in again. We also store a single browser preference flag in localStorage to record that you have acknowledged this cookie notice.",
             ],
         },
         {
@@ -544,7 +602,7 @@ export const PRIVACY_PAGE_CONTENT = {
             key: "contact",
             heading: "Contact",
             paragraphs: [
-                "For privacy-related enquiries, contact us at support@dmhicc.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
+                "For privacy-related enquiries, contact us at churchministry@harvestersng.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
             ],
         },
     ],
@@ -577,7 +635,7 @@ export const TERMS_PAGE_CONTENT = {
             paragraphs: [
                 "You are responsible for maintaining the confidentiality of your login credentials and for all activities that occur under your account.",
                 "You must provide accurate information when registering. Impersonation or providing false information may result in immediate account suspension.",
-                "You must notify us promptly at support@dmhicc.org if you suspect unauthorised use of your account.",
+                "You must notify us promptly at churchministry@harvestersng.org if you suspect unauthorised use of your account.",
             ],
         },
         {
@@ -624,7 +682,7 @@ export const TERMS_PAGE_CONTENT = {
             heading: "Termination",
             paragraphs: [
                 "We reserve the right to suspend or terminate your account at any time for violations of these Terms or for conduct deemed harmful to the platform community.",
-                "You may request account deletion by contacting support@dmhicc.org.",
+                "You may request account deletion by contacting churchministry@harvestersng.org.",
             ],
         },
         {
@@ -646,7 +704,7 @@ export const TERMS_PAGE_CONTENT = {
             key: "contact",
             heading: "Contact",
             paragraphs: [
-                "Questions about these Terms? Contact us at support@dmhicc.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
+                "Questions about these Terms? Contact us at churchministry@harvestersng.org or write to: Harvesters International Christian Centre, Lagos, Nigeria.",
             ],
         },
     ],
@@ -654,28 +712,86 @@ export const TERMS_PAGE_CONTENT = {
 
 export const HOW_IT_WORKS_STEPS = [
     {
-        key: "join",
+        key: "enlist",
         step: "1",
         title: "Join a Campaign",
-        description: "Browse active campaigns and join those that align with your calling. Your smart link is generated instantly.",
+        description: "Browse active campaigns and join those that align with your calling. Your personal tracking link is issued instantly.",
     },
     {
-        key: "share",
+        key: "deploy",
         step: "2",
-        title: "Share Your Link",
-        description: "Distribute your unique trackable link across social media, email, and messaging platforms.",
+        title: "Share with Purpose",
+        description: "Download content, share your unique tracking link across your social media, and post your screenshots from the 24th hour.",
     },
     {
         key: "earn",
         step: "3",
         title: "Earn Points & Rank Up",
-        description: "Every click, referral, and conversion earns you points. Climb the leaderboard and unlock new rank badges.",
+        description: "Every click, referral, and conversion earns you points. Rise through the ranks from Recruit to General.",
+    },
+    {
+        key: "proof",
+        step: "4",
+        title: "Submit Activity Proof",
+        description: "After sharing, upload a screenshot as evidence. Approved proofs earn Reliability points and verify your activity to team leads.",
     },
     {
         key: "impact",
-        step: "4",
-        title: "Measure Your Impact",
-        description: "Real-time dashboards show your engagement stats, referral network, and fundraising contributions.",
+        step: "5",
+        title: "Track Your Impact",
+        description: "Real-time dashboards show your engagement stats, referral network, proof history, and fundraising contributions.",
+    },
+    {
+        key: "contribute",
+        step: "6",
+        title: "Make Your Contribution",
+        description: "Support missions financially by selecting a bank account, transferring your donation, and noting the reference number. Multiple currencies are supported across dedicated accounts.",
+    },
+    {
+        key: "submit-proof",
+        step: "7",
+        title: "Submit Your Proof",
+        description: "Upload a screenshot or receipt of your bank transfer as proof of payment. Your donation status moves to Received immediately and goes into the verification queue for Commanders to approve.",
+    },
+] as const;
+
+/** Proof pipeline stages — rendered on How It Works page */
+export const PROOF_PIPELINE_STAGES = [
+    {
+        key: "submit",
+        step: "1",
+        label: "Submit",
+        description: "Upload a screenshot of your shared campaign link on any platform.",
+        status: "PENDING" as const,
+        statusLabel: "Queued for Review",
+        color: "#F59E0B",
+    },
+    {
+        key: "review",
+        step: "2",
+        label: "Review",
+        description: "A Team Lead or Admin reviews the proof against the campaign requirements.",
+        status: "REVIEW" as const,
+        statusLabel: "Under Review",
+        color: "#3B82F6",
+    },
+    {
+        key: "approved",
+        step: "3a",
+        label: "Approved",
+        description: "Proof accepted — Reliability points are instantly credited to your rank score.",
+        status: "APPROVED" as const,
+        statusLabel: "Points Credited",
+        color: "#10B981",
+    },
+    {
+        key: "rejected",
+        step: "3b",
+        label: "Rejected",
+        description: "Proof did not meet requirements. Review any notes from your reviewer and resubmit.",
+        status: "REJECTED" as const,
+        statusLabel: "Resubmit",
+        color: "#EF4444",
     },
 ] as const;
 
@@ -683,26 +799,66 @@ export const FAQ_ITEMS = [
     {
         key: "what-is-dmhicc",
         question: "What is DMHicc?",
-        answer: "DMHicc is a digital mobilization platform that gives every participant a trackable smart link, points system, and live analytics — all within one campaign management center.",
+        answer: "DMHicc is the Digital Mobilization Army — a platform that gives every member a personal tracking link, a rank progression system, and live analytics — all in one place.",
     },
     {
         key: "who-can-join",
         question: "Who can join campaigns?",
-        answer: "Any registered user can browse and join active campaigns. Team Leads and Admins have additional tools for managing campaigns and participants.",
+        answer: "Any registered member can browse and join active campaigns. Team Leads and Admins have additional tools for managing campaigns and members.",
     },
     {
         key: "how-points-work",
-        question: "How do points work?",
-        answer: "Points are earned across four categories: Impact (clicks & conversions), Consistency (streaks), Leadership (referrals), and Reliability (goal completion). Your total determines your rank and leaderboard position.",
+        question: "How do military ranks work?",
+        answer: "Points are earned across four categories: Impact (clicks & conversions), Consistency (streaks), Leadership (referrals), and Reliability (campaign completion). Your total determines your rank — from Recruit all the way to General.",
     },
     {
-        key: "smart-links",
-        question: "What are smart links?",
-        answer: "Each user–campaign pair gets a unique short URL that tracks every click, share, and referral attribution automatically.",
+        key: "ammunition",
+        question: "What is a tracking link?",
+        answer: "Each member–campaign combination generates a unique short URL that tracks every click, share, and referral attribution automatically.",
     },
     {
         key: "donations",
         question: "How do donations work?",
-        answer: "Users can donate directly to campaigns with fundraising goals. Donations earn Leadership Points and surface on the campaign's fundraising leaderboard.",
+        answer: "Members can donate directly to campaigns with fundraising goals. Donations earn Leadership Points and surface on the campaign's fundraising leaderboard.",
+    },
+    {
+        key: "what-is-proof",
+        question: "What is an Activity Proof?",
+        answer: "An Activity Proof is a screenshot you upload showing that you've shared your campaign link on a social media platform, messaging app, or email. It's your evidence of real-world sharing.",
+    },
+    {
+        key: "proof-pipeline",
+        question: "How does the proof review pipeline work?",
+        answer: "After you submit a proof, it enters a PENDING queue. A Team Lead or Admin reviews it against the campaign requirements. If approved, Reliability Points are instantly credited to your rank. If rejected, you receive reviewer notes and can resubmit an improved proof.",
+    },
+    {
+        key: "proof-points",
+        question: "What points do I earn from proofs?",
+        answer: "Approved proofs earn Reliability Points — one of the four point categories that make up your rank score. The more consistently you submit verified proofs, the faster you advance through the ranks.",
+    },
+    {
+        key: "donation-flow",
+        question: "How do I make a donation?",
+        answer: "Navigate to the Donations page, select a campaign, choose a currency and bank account, transfer the specified amount, and then upload a screenshot of your transfer receipt as proof of payment. Your donation will be queued for admin verification.",
+    },
+    {
+        key: "proof-requirements",
+        question: "What are the proof requirements for donations?",
+        answer: "Upload a clear screenshot showing the bank transfer confirmation — including the amount, date, and reference number. Blurry or cropped images may be rejected. Admins review proofs within 24–48 hours.",
+    },
+    {
+        key: "verification-timeline",
+        question: "How long does donation verification take?",
+        answer: "Most donations are verified within 24–48 hours. Once an Admin approves your proof, the donation status changes to Verified and you receive Leadership Points for your contribution.",
+    },
+    {
+        key: "supported-currencies",
+        question: "What currencies are supported?",
+        answer: "We currently support NGN (Nigerian Naira), USD (US Dollar), and GBP (British Pound). Each currency has dedicated bank accounts. Select your preferred currency when making a donation to see available accounts.",
+    },
+    {
+        key: "team-invite-links",
+        question: "How do team invite links work?",
+        answer: "Team Leads and Admins can generate invite links with a set number of uses and an optional expiry date. Share the link with your contacts — when they click it, they join your team automatically. You can track usage from the Teams page.",
     },
 ] as const;

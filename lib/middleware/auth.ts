@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 import { verifyAccessToken } from "../utils/jwt";
-import { mockDb } from "../data/mockDb";
+import { prisma } from "../prisma";
 import { JWT_ACCESS_COOKIE } from "../constants";
 import { errorResponse, forbiddenResponse, unauthorizedResponse } from "../utils/api";
 import { NextResponse } from "next/server";
@@ -14,7 +14,7 @@ export async function getAuthenticatedUser(): Promise<AuthUser | null> {
         const payload = verifyAccessToken(token);
         if (!payload) return null;
 
-        const user = mockDb.users.findUnique({ where: { id: payload.sub } });
+        const user = await prisma.user.findUnique({ where: { id: payload.sub } });
         if (!user || !user.isActive) return null;
 
         return {
@@ -22,8 +22,9 @@ export async function getAuthenticatedUser(): Promise<AuthUser | null> {
             email: user.email,
             firstName: user.firstName,
             lastName: user.lastName,
-            role: user.role,
-            profilePicture: user.profilePicture,
+            role: user.role as UserRole,
+            profilePicture: user.profilePicture ?? undefined,
+            whatsappNumber: user.whatsappNumber ?? undefined,
         };
     } catch {
         return null;

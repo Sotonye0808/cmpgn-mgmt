@@ -14,8 +14,14 @@ export const SMART_LINK_SLUG_LENGTH = 7;
 export const JWT_ACCESS_SECRET = process.env.JWT_ACCESS_SECRET ?? "";
 export const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET ?? "";
 export const BCRYPT_SALT_ROUNDS = Number(process.env.BCRYPT_SALT_ROUNDS ?? 10);
-export const JWT_ACCESS_EXPIRY = "180m";
-export const JWT_REFRESH_EXPIRY = "7d";
+/** JWT string expiry. Access token lasts 4 hours. */
+export const JWT_ACCESS_EXPIRY = "4h";
+/** Access token lifetime in seconds — used for cookie maxAge alignment. */
+export const JWT_ACCESS_EXPIRY_SECONDS = 4 * 60 * 60; // 14 400 s
+/** JWT string expiry. Refresh token lasts 30 days. */
+export const JWT_REFRESH_EXPIRY = "30d";
+/** Refresh token lifetime in seconds — used for cookie maxAge alignment. */
+export const JWT_REFRESH_EXPIRY_SECONDS = 30 * 24 * 60 * 60; // 2 592 000 s
 export const JWT_ACCESS_COOKIE = "dmhicc_access";
 export const JWT_REFRESH_COOKIE = "dmhicc_refresh";
 

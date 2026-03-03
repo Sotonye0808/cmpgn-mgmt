@@ -1,12 +1,15 @@
 "use client";
 
 import { Avatar } from "antd";
+import Link from "next/link";
 import { formatNumber } from "@/lib/utils/format";
 import { RANK_LEVELS } from "@/config/ranks";
 import { cn } from "@/lib/utils/cn";
+import { ROUTES } from "@/config/routes";
 
 interface LeaderboardPodiumProps {
   entries: LeaderboardEntry[];
+  currentUserId?: string;
   className?: string;
 }
 
@@ -41,6 +44,7 @@ const PODIUM_CONFIG = [
 
 export default function LeaderboardPodium({
   entries,
+  currentUserId,
   className,
 }: LeaderboardPodiumProps) {
   if (entries.length < 3) return null;
@@ -67,12 +71,18 @@ export default function LeaderboardPodium({
                   "ring-2",
                   position === 1 ? "ring-yellow-400" : "ring-ds-border-strong",
                 )}>
-                {entry.firstName[0]}
+                {entry.firstName?.[0] ?? "?"}
               </Avatar>
               <div className="text-center">
-                <p className="text-sm font-semibold text-ds-text-primary leading-tight">
+                <Link
+                  href={
+                    entry.userId === currentUserId
+                      ? ROUTES.SETTINGS
+                      : ROUTES.USER_DETAIL(entry.userId)
+                  }
+                  className="text-sm font-semibold text-ds-text-primary hover:text-ds-brand-accent transition-colors leading-tight">
                   {entry.firstName}
-                </p>
+                </Link>
                 <p className="text-xs text-ds-text-subtle">
                   {rankLevel.badge} {rankLevel.name}
                 </p>

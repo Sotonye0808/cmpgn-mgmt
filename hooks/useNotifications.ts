@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useState } from "react";
-import { useMockDbSubscription } from "./useMockDbSubscription";
+import { useAutoRefresh } from "./useAutoRefresh";
 
 export function useNotifications() {
     const [notifications, setNotifications] = useState<AppNotification[]>([]);
@@ -25,7 +25,7 @@ export function useNotifications() {
     }, [fetchNotifications]);
 
     // Re-fetch when the notifications table changes (e.g. another tab or server push)
-    useMockDbSubscription("notifications", fetchNotifications);
+    useAutoRefresh("notifications", fetchNotifications);
 
     const markRead = useCallback(async (id: string) => {
         // Optimistic update

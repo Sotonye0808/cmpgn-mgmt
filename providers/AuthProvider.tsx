@@ -12,7 +12,11 @@ import { ROUTES } from "@/config/routes";
 interface AuthContextValue {
   user: AuthUser | null;
   isLoading: boolean;
-  login: (email: string, password: string) => Promise<void>;
+  login: (
+    email: string,
+    password: string,
+    rememberMe?: boolean,
+  ) => Promise<void>;
   logout: () => Promise<void>;
   hasRole: (roles: string[]) => boolean;
 }
@@ -29,6 +33,24 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (res.ok) {
         const json = await res.json();
         setUser(json.data ?? null);
+      } else if (res.status === 401) {
+        // Access cookie expired — attempt silent refresh using the refresh cookie
+        const refreshRes = await fetch(ROUTES.API.AUTH.REFRESH, {
+          method: "POST",
+        });
+        if (refreshRes.ok) {
+          // New access cookie has been set — retry /me
+          const retryRes = await fetch(ROUTES.API.AUTH.ME);
+          if (retryRes.ok) {
+            const json = await retryRes.json();
+            setUser(json.data ?? null);
+          } else {
+            setUser(null);
+          }
+        } else {
+          // Refresh also failed (expired or missing) — full logout
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
@@ -43,16 +65,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     fetchMe();
   }, [fetchMe]);
 
-  const login = useCallback(async (email: string, password: string) => {
-    const res = await fetch(ROUTES.API.AUTH.LOGIN, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error ?? "Login failed");
-    setUser(json.data);
-  }, []);
+  const login = useCallback(
+    async (email: string, password: string, rememberMe = false) => {
+      const res = await fetch(ROUTES.API.AUTH.LOGIN, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password, rememberMe }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Login failed");
+      setUser(json.data);
+    },
+    [],
+  );
 
   const logout = useCallback(async () => {
     await fetch(ROUTES.API.AUTH.LOGOUT, { method: "POST" });

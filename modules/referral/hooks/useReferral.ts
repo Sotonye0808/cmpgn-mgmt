@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseReferralOptions {
     campaignId?: string;
@@ -37,7 +37,7 @@ export function useReferral({ campaignId }: UseReferralOptions = {}): UseReferra
     }, [campaignId]);
 
     useEffect(() => { fetch(); }, [fetch]);
-    useMockDbSubscription("referrals", fetch);
+    useAutoRefresh("referrals", fetch);
 
     return { stats, loading, error, refetch: fetch };
 }

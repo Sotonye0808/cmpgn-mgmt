@@ -13,7 +13,9 @@ import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 
 export default function LinksPage() {
-  const [links, setLinks] = useState<SmartLink[]>([]);
+  const [links, setLinks] = useState<
+    (SmartLink & { campaignTitle?: string })[]
+  >([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
   const [campaigns, setCampaigns] = useState<{ id: string; title: string }[]>(

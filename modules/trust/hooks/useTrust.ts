@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { ROUTES } from "@/config/routes";
-import { useMockDbSubscription } from "@/hooks/useMockDbSubscription";
+import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
 interface UseTrustReturn {
     trustScore: TrustScore | null;
@@ -35,7 +35,7 @@ export function useTrustScore(): UseTrustReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("trustScores", fetch);
+    useAutoRefresh("trustScores", fetch);
 
     return { trustScore, loading, error, refresh: fetch };
 }
@@ -73,7 +73,7 @@ export function useFlaggedUsers(): UseFlaggedUsersReturn {
         fetch();
     }, [fetch]);
 
-    useMockDbSubscription("trustScores", fetch);
+    useAutoRefresh("trustScores", fetch);
 
     return { flaggedUsers, loading, error, refresh: fetch };
 }
