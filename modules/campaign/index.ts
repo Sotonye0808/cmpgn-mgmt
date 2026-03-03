@@ -1,4 +1,5 @@
-// Campaign module barrel export
+// Campaign module barrel — client-safe exports only
+// Services are imported directly from @/modules/campaign/services/campaignService by API routes
 export { default as CampaignCard } from "./components/CampaignCard";
 export { default as CampaignBanner } from "./components/CampaignBanner";
 export { default as CampaignStory } from "./components/CampaignStory";
@@ -12,7 +13,5 @@ export { default as MyCampaignsPanel } from "./components/MyCampaignsPanel";
 
 export { useCampaigns } from "./hooks/useCampaigns";
 export { useCampaign } from "./hooks/useCampaign";
-
-export * from "./services/campaignService";
 
 export { CAMPAIGN_SECTIONS, CAMPAIGN_FILTER_OPTIONS, CAMPAIGN_GOAL_OPTIONS, CAMPAIGN_MEDIA_OPTIONS, CAMPAIGN_STATUS_OPTIONS, CAMPAIGN_AUDIENCE_TAGS } from "./config";

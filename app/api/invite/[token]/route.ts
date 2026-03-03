@@ -4,7 +4,7 @@ import {
     notFoundResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { getInviteLink } from "@/modules/teams";
+import { getInviteLink } from "@/modules/teams/services/teamService";
 import { prisma } from "@/lib/prisma";
 
 export async function GET(

@@ -5,7 +5,7 @@ import {
     notFoundResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { getTeamMemberStats } from "@/modules/teams";
+import { getTeamMemberStats } from "@/modules/teams/services/teamService";
 
 // GET /api/teams/[id]/stats — Authenticated; returns per-member stats sorted by points
 export async function GET(

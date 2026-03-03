@@ -18,11 +18,11 @@ import {
 import { useAuth } from "@/hooks/useAuth";
 import { SETTINGS_PAGE_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
-import { UserManagementPanel } from "@/modules/users";
+import UserManagementPanel from "@/modules/users/components/UserManagementPanel";
 import FlaggedUsersTable from "@/modules/trust/components/FlaggedUsersTable";
 import TrustReviewModal from "@/modules/trust/components/TrustReviewModal";
 import { useFlaggedUsers } from "@/modules/trust/hooks/useTrust";
-import { GlobalLeaderboardAdminView } from "@/modules/leaderboard";
+import GlobalLeaderboardAdminView from "@/modules/leaderboard/components/GlobalLeaderboardAdminView";
 import PageHeader from "@/components/ui/PageHeader";
 import AvatarPicker from "@/components/ui/AvatarPicker";
 import PhoneInput from "@/components/ui/PhoneInput";
@@ -33,7 +33,7 @@ function ProfileSection() {
   const { user } = useAuth();
   const [saving, setSaving] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(
-    user?.profilePicture
+    user?.profilePicture,
   );
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
   const [form] = Form.useForm();

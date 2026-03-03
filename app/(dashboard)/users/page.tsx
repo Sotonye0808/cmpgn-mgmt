@@ -2,7 +2,7 @@
 
 import { useAuth } from "@/hooks/useAuth";
 import { USERS_PAGE_CONTENT } from "@/config/content";
-import { UserManagementPanel } from "@/modules/users";
+import UserManagementPanel from "@/modules/users/components/UserManagementPanel";
 import { Empty } from "antd";
 import PageHeader from "@/components/ui/PageHeader";
 

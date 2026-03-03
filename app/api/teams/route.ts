@@ -5,7 +5,7 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { listTeams, createTeam } from "@/modules/teams";
+import { listTeams, createTeam } from "@/modules/teams/services/teamService";
 import { z } from "zod";
 
 const createTeamSchema = z.object({

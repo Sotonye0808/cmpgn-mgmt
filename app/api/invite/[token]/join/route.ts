@@ -4,7 +4,7 @@ import {
     successResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { consumeInviteLink } from "@/modules/teams";
+import { consumeInviteLink } from "@/modules/teams/services/teamService";
 
 export async function POST(
     _request: NextRequest,
