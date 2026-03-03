@@ -10,13 +10,17 @@ export const SITE_CONFIG = {
     fullName: "DMHicc — Digital Mobilization Army",
     tagline: "Digital Mobilization Army",
     description:
-        "Join Heaven's Digital Mobilizers. Smart ammunition distribution, referral tracking, military rank progression, and real-time battle analytics.",
+        "Join Heaven's Digital Mobilizers. Smart campaign link distribution, referral tracking, rank progression, and real-time analytics.",
     url: SITE_URL,
     /** Absolute URL of the default OG share image (1200×630) */
     ogImage: `${SITE_URL}/og-default.png`,
     twitterHandle: "@dmhicc",
     /** Used as Next.js Metadata title template — "%s | DMHicc" */
     titleTemplate: "%s | DMHicc",
+    /** Brand logo image served from /public — used in nav, sidebar, footer */
+    logoUrl: "/logo.jpg",
+    /** Favicon path — used in <head> metadata */
+    faviconUrl: "/favicon.ico",
 };
 
 /** Build a full absolute URL from a path. */

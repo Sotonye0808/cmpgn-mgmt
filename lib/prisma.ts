@@ -13,8 +13,10 @@
 // remain fully typed throughout the codebase. The cast is safe because the
 // extended client is a strict superset — all PrismaClient methods are present.
 
-import { PrismaClient } from "../prisma/generated/client";
+import { PrismaClient, Prisma } from "../prisma/generated/client";
 import { withAccelerate } from "@prisma/extension-accelerate";
+
+export { Prisma };
 
 const globalForPrisma = globalThis as unknown as {
     prisma: PrismaClient | undefined;

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ROUTES } from "@/config/routes";
 import PublicFooter from "@/components/layout/PublicFooter";
 import CookieConsent from "@/components/ui/CookieConsent";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function PublicLayout({
   children,
@@ -19,9 +20,7 @@ export default function PublicLayout({
       <header className="glass-nav sticky top-0 z-40">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-ds-lg bg-ds-brand-accent glow-border flex items-center justify-center">
-              <span className="text-white font-bold text-sm">D</span>
-            </div>
+            <BrandLogo size="sm" />
             <span className="font-bold text-ds-text-primary">
               {NAV_CONTENT.brandName}
             </span>

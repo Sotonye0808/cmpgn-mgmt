@@ -1,5 +1,4 @@
-import { prisma } from "@/lib/prisma";
-import { Prisma } from "@prisma/client";
+import { prisma, Prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { serialize, serializeArray } from "@/lib/utils/serialize";
 import { CACHE_TTL_CAMPAIGN_LIST, DEFAULT_PAGE_SIZE } from "@/lib/constants";
@@ -24,8 +23,8 @@ async function recordAudit(
             actorId,
             actorRole,
             eventType: eventType as never,
-            before: (opts?.before ?? undefined) as Prisma.JsonValue | undefined,
-            after: (opts?.after ?? undefined) as Prisma.JsonValue | undefined,
+            before: (opts?.before ?? undefined) as Prisma.InputJsonValue | undefined,
+            after: (opts?.after ?? undefined) as Prisma.InputJsonValue | undefined,
             note: opts?.note,
         },
     });

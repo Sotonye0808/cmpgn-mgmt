@@ -9,6 +9,7 @@ import { NAV_CONTENT } from "@/config/content";
 import { ICONS } from "@/config/icons";
 import { useRole } from "@/hooks/useRole";
 import { cn } from "@/lib/utils/cn";
+import BrandLogo from "@/components/ui/BrandLogo";
 
 interface SidebarProps {
   /** Controls whether the mobile Drawer is open. Managed by DashboardLayout. */
@@ -37,9 +38,7 @@ function SidebarContent({
       {/* Brand — glass card treatment */}
       <div className="px-2 pt-3 pb-2 shrink-0">
         <div className="flex items-center gap-3 px-3 py-3 rounded-ds-lg glass-surface">
-          <div className="w-8 h-8 rounded-ds-lg bg-ds-brand-accent glow-border flex items-center justify-center shrink-0">
-            <span className="text-white font-bold text-sm">D</span>
-          </div>
+          <BrandLogo size="sm" />
           {!collapsed && (
             <div>
               <div className="font-bold text-ds-text-primary text-sm leading-tight">
