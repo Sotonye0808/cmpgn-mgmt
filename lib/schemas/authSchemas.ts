@@ -15,6 +15,12 @@ export const registerSchema = z.object({
         .optional()
         .or(z.literal(""))
         .transform((v) => (v === "" ? undefined : v)),
+    campus: z
+        .string()
+        .min(1, "Campus is required")
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export const loginSchema = z.object({

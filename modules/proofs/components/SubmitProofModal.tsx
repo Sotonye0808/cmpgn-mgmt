@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Form, Select, Alert } from "antd";
+import { Form, Select, Alert, InputNumber } from "antd";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
 import { PROOF_PLATFORM_OPTIONS, PROOFS_PAGE_CONTENT } from "../config";
@@ -20,6 +20,7 @@ interface FormValues {
   campaignId: string;
   platform: string;
   screenshotUrl: string;
+  viewCount?: number;
 }
 
 export default function SubmitProofModal({
@@ -70,6 +71,7 @@ export default function SubmitProofModal({
       smartLinkId: smartLink.id,
       platform: values.platform as SocialPlatform,
       screenshotUrl: values.screenshotUrl,
+      viewCount: values.viewCount,
     });
   };
 
@@ -148,6 +150,26 @@ export default function SubmitProofModal({
             placeholder="https://i.imgur.com/example.png"
             onChange={(e) =>
               form.setFieldValue("screenshotUrl", e.target.value)
+            }
+          />
+        </Form.Item>
+
+        {/* View Count (optional) */}
+        <Form.Item
+          name="viewCount"
+          label="View / Reach Count"
+          extra="How many views or people reached does your screenshot show? (Optional)">
+          <InputNumber
+            min={0}
+            placeholder="e.g. 1500"
+            className="w-full"
+            formatter={(value) =>
+              value
+                ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
+                : ""
+            }
+            parser={(value) =>
+              Number((value ?? "").replace(/,/g, "")) as 0
             }
           />
         </Form.Item>

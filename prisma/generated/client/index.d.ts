@@ -93,6 +93,11 @@ export type TeamInviteLink = $Result.DefaultSelection<Prisma.$TeamInviteLinkPayl
  * 
  */
 export type CampaignAuditEvent = $Result.DefaultSelection<Prisma.$CampaignAuditEventPayload>
+/**
+ * Model BugReport
+ * 
+ */
+export type BugReport = $Result.DefaultSelection<Prisma.$BugReportPayload>
 
 /**
  * Enums
@@ -229,6 +234,28 @@ export const NotificationType: {
 
 export type NotificationType = (typeof NotificationType)[keyof typeof NotificationType]
 
+
+export const BugReportCategory: {
+  UI_ISSUE: 'UI_ISSUE',
+  DATA_ISSUE: 'DATA_ISSUE',
+  PERFORMANCE: 'PERFORMANCE',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  ACCESS_AUTH: 'ACCESS_AUTH',
+  OTHER: 'OTHER'
+};
+
+export type BugReportCategory = (typeof BugReportCategory)[keyof typeof BugReportCategory]
+
+
+export const BugReportStatus: {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+};
+
+export type BugReportStatus = (typeof BugReportStatus)[keyof typeof BugReportStatus]
+
 }
 
 export type UserRole = $Enums.UserRole
@@ -278,6 +305,14 @@ export const CampaignAuditEventType: typeof $Enums.CampaignAuditEventType
 export type NotificationType = $Enums.NotificationType
 
 export const NotificationType: typeof $Enums.NotificationType
+
+export type BugReportCategory = $Enums.BugReportCategory
+
+export const BugReportCategory: typeof $Enums.BugReportCategory
+
+export type BugReportStatus = $Enums.BugReportStatus
+
+export const BugReportStatus: typeof $Enums.BugReportStatus
 
 /**
  * ##  Prisma Client ʲˢ
@@ -559,6 +594,16 @@ export class PrismaClient<
     * ```
     */
   get campaignAuditEvent(): Prisma.CampaignAuditEventDelegate<ExtArgs, ClientOptions>;
+
+  /**
+   * `prisma.bugReport`: Exposes CRUD operations for the **BugReport** model.
+    * Example usage:
+    * ```ts
+    * // Fetch zero or more BugReports
+    * const bugReports = await prisma.bugReport.findMany()
+    * ```
+    */
+  get bugReport(): Prisma.BugReportDelegate<ExtArgs, ClientOptions>;
 }
 
 export namespace Prisma {
@@ -1008,7 +1053,8 @@ export namespace Prisma {
     Group: 'Group',
     Team: 'Team',
     TeamInviteLink: 'TeamInviteLink',
-    CampaignAuditEvent: 'CampaignAuditEvent'
+    CampaignAuditEvent: 'CampaignAuditEvent',
+    BugReport: 'BugReport'
   };
 
   export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -1024,7 +1070,7 @@ export namespace Prisma {
       omit: GlobalOmitOptions
     }
     meta: {
-      modelProps: "user" | "campaign" | "campaignParticipation" | "smartLink" | "linkEvent" | "referral" | "donation" | "pointsLedgerEntry" | "leaderboardSnapshot" | "trustScore" | "appNotification" | "viewProof" | "group" | "team" | "teamInviteLink" | "campaignAuditEvent"
+      modelProps: "user" | "campaign" | "campaignParticipation" | "smartLink" | "linkEvent" | "referral" | "donation" | "pointsLedgerEntry" | "leaderboardSnapshot" | "trustScore" | "appNotification" | "viewProof" | "group" | "team" | "teamInviteLink" | "campaignAuditEvent" | "bugReport"
       txIsolationLevel: Prisma.TransactionIsolationLevel
     }
     model: {
@@ -2212,6 +2258,80 @@ export namespace Prisma {
           }
         }
       }
+      BugReport: {
+        payload: Prisma.$BugReportPayload<ExtArgs>
+        fields: Prisma.BugReportFieldRefs
+        operations: {
+          findUnique: {
+            args: Prisma.BugReportFindUniqueArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload> | null
+          }
+          findUniqueOrThrow: {
+            args: Prisma.BugReportFindUniqueOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          findFirst: {
+            args: Prisma.BugReportFindFirstArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload> | null
+          }
+          findFirstOrThrow: {
+            args: Prisma.BugReportFindFirstOrThrowArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          findMany: {
+            args: Prisma.BugReportFindManyArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>[]
+          }
+          create: {
+            args: Prisma.BugReportCreateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          createMany: {
+            args: Prisma.BugReportCreateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          createManyAndReturn: {
+            args: Prisma.BugReportCreateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>[]
+          }
+          delete: {
+            args: Prisma.BugReportDeleteArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          update: {
+            args: Prisma.BugReportUpdateArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          deleteMany: {
+            args: Prisma.BugReportDeleteManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateMany: {
+            args: Prisma.BugReportUpdateManyArgs<ExtArgs>
+            result: BatchPayload
+          }
+          updateManyAndReturn: {
+            args: Prisma.BugReportUpdateManyAndReturnArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>[]
+          }
+          upsert: {
+            args: Prisma.BugReportUpsertArgs<ExtArgs>
+            result: $Utils.PayloadToResult<Prisma.$BugReportPayload>
+          }
+          aggregate: {
+            args: Prisma.BugReportAggregateArgs<ExtArgs>
+            result: $Utils.Optional<AggregateBugReport>
+          }
+          groupBy: {
+            args: Prisma.BugReportGroupByArgs<ExtArgs>
+            result: $Utils.Optional<BugReportGroupByOutputType>[]
+          }
+          count: {
+            args: Prisma.BugReportCountArgs<ExtArgs>
+            result: $Utils.Optional<BugReportCountAggregateOutputType> | number
+          }
+        }
+      }
     }
   } & {
     other: {
@@ -2336,6 +2456,7 @@ export namespace Prisma {
     team?: TeamOmit
     teamInviteLink?: TeamInviteLinkOmit
     campaignAuditEvent?: CampaignAuditEventOmit
+    bugReport?: BugReportOmit
   }
 
   /* Types for Logging */
@@ -2797,6 +2918,7 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     profilePicture: string | null
     whatsappNumber: string | null
+    campus: string | null
     teamId: string | null
     trustScore: number | null
     isActive: boolean | null
@@ -2813,6 +2935,7 @@ export namespace Prisma {
     role: $Enums.UserRole | null
     profilePicture: string | null
     whatsappNumber: string | null
+    campus: string | null
     teamId: string | null
     trustScore: number | null
     isActive: boolean | null
@@ -2829,6 +2952,7 @@ export namespace Prisma {
     role: number
     profilePicture: number
     whatsappNumber: number
+    campus: number
     teamId: number
     trustScore: number
     isActive: number
@@ -2856,6 +2980,7 @@ export namespace Prisma {
     role?: true
     profilePicture?: true
     whatsappNumber?: true
+    campus?: true
     teamId?: true
     trustScore?: true
     isActive?: true
@@ -2872,6 +2997,7 @@ export namespace Prisma {
     role?: true
     profilePicture?: true
     whatsappNumber?: true
+    campus?: true
     teamId?: true
     trustScore?: true
     isActive?: true
@@ -2888,6 +3014,7 @@ export namespace Prisma {
     role?: true
     profilePicture?: true
     whatsappNumber?: true
+    campus?: true
     teamId?: true
     trustScore?: true
     isActive?: true
@@ -2992,6 +3119,7 @@ export namespace Prisma {
     role: $Enums.UserRole
     profilePicture: string | null
     whatsappNumber: string | null
+    campus: string | null
     teamId: string | null
     trustScore: number
     isActive: boolean
@@ -3028,6 +3156,7 @@ export namespace Prisma {
     role?: boolean
     profilePicture?: boolean
     whatsappNumber?: boolean
+    campus?: boolean
     teamId?: boolean
     trustScore?: boolean
     isActive?: boolean
@@ -3062,6 +3191,7 @@ export namespace Prisma {
     role?: boolean
     profilePicture?: boolean
     whatsappNumber?: boolean
+    campus?: boolean
     teamId?: boolean
     trustScore?: boolean
     isActive?: boolean
@@ -3080,6 +3210,7 @@ export namespace Prisma {
     role?: boolean
     profilePicture?: boolean
     whatsappNumber?: boolean
+    campus?: boolean
     teamId?: boolean
     trustScore?: boolean
     isActive?: boolean
@@ -3098,6 +3229,7 @@ export namespace Prisma {
     role?: boolean
     profilePicture?: boolean
     whatsappNumber?: boolean
+    campus?: boolean
     teamId?: boolean
     trustScore?: boolean
     isActive?: boolean
@@ -3106,7 +3238,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "firstName" | "lastName" | "role" | "profilePicture" | "whatsappNumber" | "teamId" | "trustScore" | "isActive" | "weaponsOfChoice" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
+  export type UserOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "email" | "passwordHash" | "firstName" | "lastName" | "role" | "profilePicture" | "whatsappNumber" | "campus" | "teamId" | "trustScore" | "isActive" | "weaponsOfChoice" | "createdAt" | "updatedAt", ExtArgs["result"]["user"]>
   export type UserInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     team?: boolean | User$teamArgs<ExtArgs>
     createdCampaigns?: boolean | User$createdCampaignsArgs<ExtArgs>
@@ -3162,6 +3294,7 @@ export namespace Prisma {
       role: $Enums.UserRole
       profilePicture: string | null
       whatsappNumber: string | null
+      campus: string | null
       teamId: string | null
       trustScore: number
       isActive: boolean
@@ -3615,6 +3748,7 @@ export namespace Prisma {
     readonly role: FieldRef<"User", 'UserRole'>
     readonly profilePicture: FieldRef<"User", 'String'>
     readonly whatsappNumber: FieldRef<"User", 'String'>
+    readonly campus: FieldRef<"User", 'String'>
     readonly teamId: FieldRef<"User", 'String'>
     readonly trustScore: FieldRef<"User", 'Int'>
     readonly isActive: FieldRef<"User", 'Boolean'>
@@ -16470,8 +16604,18 @@ export namespace Prisma {
 
   export type AggregateViewProof = {
     _count: ViewProofCountAggregateOutputType | null
+    _avg: ViewProofAvgAggregateOutputType | null
+    _sum: ViewProofSumAggregateOutputType | null
     _min: ViewProofMinAggregateOutputType | null
     _max: ViewProofMaxAggregateOutputType | null
+  }
+
+  export type ViewProofAvgAggregateOutputType = {
+    viewCount: number | null
+  }
+
+  export type ViewProofSumAggregateOutputType = {
+    viewCount: number | null
   }
 
   export type ViewProofMinAggregateOutputType = {
@@ -16481,6 +16625,7 @@ export namespace Prisma {
     smartLinkId: string | null
     platform: $Enums.SocialPlatform | null
     screenshotUrl: string | null
+    viewCount: number | null
     status: $Enums.ViewProofStatus | null
     reviewedById: string | null
     reviewedAt: Date | null
@@ -16496,6 +16641,7 @@ export namespace Prisma {
     smartLinkId: string | null
     platform: $Enums.SocialPlatform | null
     screenshotUrl: string | null
+    viewCount: number | null
     status: $Enums.ViewProofStatus | null
     reviewedById: string | null
     reviewedAt: Date | null
@@ -16511,6 +16657,7 @@ export namespace Prisma {
     smartLinkId: number
     platform: number
     screenshotUrl: number
+    viewCount: number
     status: number
     reviewedById: number
     reviewedAt: number
@@ -16521,6 +16668,14 @@ export namespace Prisma {
   }
 
 
+  export type ViewProofAvgAggregateInputType = {
+    viewCount?: true
+  }
+
+  export type ViewProofSumAggregateInputType = {
+    viewCount?: true
+  }
+
   export type ViewProofMinAggregateInputType = {
     id?: true
     userId?: true
@@ -16528,6 +16683,7 @@ export namespace Prisma {
     smartLinkId?: true
     platform?: true
     screenshotUrl?: true
+    viewCount?: true
     status?: true
     reviewedById?: true
     reviewedAt?: true
@@ -16543,6 +16699,7 @@ export namespace Prisma {
     smartLinkId?: true
     platform?: true
     screenshotUrl?: true
+    viewCount?: true
     status?: true
     reviewedById?: true
     reviewedAt?: true
@@ -16558,6 +16715,7 @@ export namespace Prisma {
     smartLinkId?: true
     platform?: true
     screenshotUrl?: true
+    viewCount?: true
     status?: true
     reviewedById?: true
     reviewedAt?: true
@@ -16605,6 +16763,18 @@ export namespace Prisma {
     /**
      * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
      * 
+     * Select which fields to average
+    **/
+    _avg?: ViewProofAvgAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to sum
+    **/
+    _sum?: ViewProofSumAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
      * Select which fields to find the minimum value
     **/
     _min?: ViewProofMinAggregateInputType
@@ -16635,6 +16805,8 @@ export namespace Prisma {
     take?: number
     skip?: number
     _count?: ViewProofCountAggregateInputType | true
+    _avg?: ViewProofAvgAggregateInputType
+    _sum?: ViewProofSumAggregateInputType
     _min?: ViewProofMinAggregateInputType
     _max?: ViewProofMaxAggregateInputType
   }
@@ -16646,6 +16818,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount: number | null
     status: $Enums.ViewProofStatus
     reviewedById: string | null
     reviewedAt: Date | null
@@ -16653,6 +16826,8 @@ export namespace Prisma {
     createdAt: Date
     updatedAt: Date
     _count: ViewProofCountAggregateOutputType | null
+    _avg: ViewProofAvgAggregateOutputType | null
+    _sum: ViewProofSumAggregateOutputType | null
     _min: ViewProofMinAggregateOutputType | null
     _max: ViewProofMaxAggregateOutputType | null
   }
@@ -16678,6 +16853,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
     reviewedAt?: boolean
@@ -16696,6 +16872,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
     reviewedAt?: boolean
@@ -16714,6 +16891,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
     reviewedAt?: boolean
@@ -16732,6 +16910,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
     reviewedAt?: boolean
@@ -16740,7 +16919,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ViewProofOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "campaignId" | "smartLinkId" | "platform" | "screenshotUrl" | "status" | "reviewedById" | "reviewedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["viewProof"]>
+  export type ViewProofOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "campaignId" | "smartLinkId" | "platform" | "screenshotUrl" | "viewCount" | "status" | "reviewedById" | "reviewedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["viewProof"]>
   export type ViewProofInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     reviewedBy?: boolean | ViewProof$reviewedByArgs<ExtArgs>
@@ -16771,6 +16950,7 @@ export namespace Prisma {
       smartLinkId: string
       platform: $Enums.SocialPlatform
       screenshotUrl: string
+      viewCount: number | null
       status: $Enums.ViewProofStatus
       reviewedById: string | null
       reviewedAt: Date | null
@@ -17209,6 +17389,7 @@ export namespace Prisma {
     readonly smartLinkId: FieldRef<"ViewProof", 'String'>
     readonly platform: FieldRef<"ViewProof", 'SocialPlatform'>
     readonly screenshotUrl: FieldRef<"ViewProof", 'String'>
+    readonly viewCount: FieldRef<"ViewProof", 'Int'>
     readonly status: FieldRef<"ViewProof", 'ViewProofStatus'>
     readonly reviewedById: FieldRef<"ViewProof", 'String'>
     readonly reviewedAt: FieldRef<"ViewProof", 'DateTime'>
@@ -22221,6 +22402,1092 @@ export namespace Prisma {
 
 
   /**
+   * Model BugReport
+   */
+
+  export type AggregateBugReport = {
+    _count: BugReportCountAggregateOutputType | null
+    _min: BugReportMinAggregateOutputType | null
+    _max: BugReportMaxAggregateOutputType | null
+  }
+
+  export type BugReportMinAggregateOutputType = {
+    id: string | null
+    category: $Enums.BugReportCategory | null
+    description: string | null
+    email: string | null
+    userId: string | null
+    userAgent: string | null
+    pageUrl: string | null
+    status: $Enums.BugReportStatus | null
+    resolvedAt: Date | null
+    adminNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BugReportMaxAggregateOutputType = {
+    id: string | null
+    category: $Enums.BugReportCategory | null
+    description: string | null
+    email: string | null
+    userId: string | null
+    userAgent: string | null
+    pageUrl: string | null
+    status: $Enums.BugReportStatus | null
+    resolvedAt: Date | null
+    adminNotes: string | null
+    createdAt: Date | null
+    updatedAt: Date | null
+  }
+
+  export type BugReportCountAggregateOutputType = {
+    id: number
+    category: number
+    description: number
+    email: number
+    userId: number
+    userAgent: number
+    pageUrl: number
+    status: number
+    resolvedAt: number
+    adminNotes: number
+    createdAt: number
+    updatedAt: number
+    _all: number
+  }
+
+
+  export type BugReportMinAggregateInputType = {
+    id?: true
+    category?: true
+    description?: true
+    email?: true
+    userId?: true
+    userAgent?: true
+    pageUrl?: true
+    status?: true
+    resolvedAt?: true
+    adminNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BugReportMaxAggregateInputType = {
+    id?: true
+    category?: true
+    description?: true
+    email?: true
+    userId?: true
+    userAgent?: true
+    pageUrl?: true
+    status?: true
+    resolvedAt?: true
+    adminNotes?: true
+    createdAt?: true
+    updatedAt?: true
+  }
+
+  export type BugReportCountAggregateInputType = {
+    id?: true
+    category?: true
+    description?: true
+    email?: true
+    userId?: true
+    userAgent?: true
+    pageUrl?: true
+    status?: true
+    resolvedAt?: true
+    adminNotes?: true
+    createdAt?: true
+    updatedAt?: true
+    _all?: true
+  }
+
+  export type BugReportAggregateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BugReport to aggregate.
+     */
+    where?: BugReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BugReports to fetch.
+     */
+    orderBy?: BugReportOrderByWithRelationInput | BugReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the start position
+     */
+    cursor?: BugReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BugReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BugReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Count returned BugReports
+    **/
+    _count?: true | BugReportCountAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the minimum value
+    **/
+    _min?: BugReportMinAggregateInputType
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/aggregations Aggregation Docs}
+     * 
+     * Select which fields to find the maximum value
+    **/
+    _max?: BugReportMaxAggregateInputType
+  }
+
+  export type GetBugReportAggregateType<T extends BugReportAggregateArgs> = {
+        [P in keyof T & keyof AggregateBugReport]: P extends '_count' | 'count'
+      ? T[P] extends true
+        ? number
+        : GetScalarType<T[P], AggregateBugReport[P]>
+      : GetScalarType<T[P], AggregateBugReport[P]>
+  }
+
+
+
+
+  export type BugReportGroupByArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    where?: BugReportWhereInput
+    orderBy?: BugReportOrderByWithAggregationInput | BugReportOrderByWithAggregationInput[]
+    by: BugReportScalarFieldEnum[] | BugReportScalarFieldEnum
+    having?: BugReportScalarWhereWithAggregatesInput
+    take?: number
+    skip?: number
+    _count?: BugReportCountAggregateInputType | true
+    _min?: BugReportMinAggregateInputType
+    _max?: BugReportMaxAggregateInputType
+  }
+
+  export type BugReportGroupByOutputType = {
+    id: string
+    category: $Enums.BugReportCategory
+    description: string
+    email: string
+    userId: string | null
+    userAgent: string | null
+    pageUrl: string | null
+    status: $Enums.BugReportStatus
+    resolvedAt: Date | null
+    adminNotes: string | null
+    createdAt: Date
+    updatedAt: Date
+    _count: BugReportCountAggregateOutputType | null
+    _min: BugReportMinAggregateOutputType | null
+    _max: BugReportMaxAggregateOutputType | null
+  }
+
+  type GetBugReportGroupByPayload<T extends BugReportGroupByArgs> = Prisma.PrismaPromise<
+    Array<
+      PickEnumerable<BugReportGroupByOutputType, T['by']> &
+        {
+          [P in ((keyof T) & (keyof BugReportGroupByOutputType))]: P extends '_count'
+            ? T[P] extends boolean
+              ? number
+              : GetScalarType<T[P], BugReportGroupByOutputType[P]>
+            : GetScalarType<T[P], BugReportGroupByOutputType[P]>
+        }
+      >
+    >
+
+
+  export type BugReportSelect<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    category?: boolean
+    description?: boolean
+    email?: boolean
+    userId?: boolean
+    userAgent?: boolean
+    pageUrl?: boolean
+    status?: boolean
+    resolvedAt?: boolean
+    adminNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["bugReport"]>
+
+  export type BugReportSelectCreateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    category?: boolean
+    description?: boolean
+    email?: boolean
+    userId?: boolean
+    userAgent?: boolean
+    pageUrl?: boolean
+    status?: boolean
+    resolvedAt?: boolean
+    adminNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["bugReport"]>
+
+  export type BugReportSelectUpdateManyAndReturn<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetSelect<{
+    id?: boolean
+    category?: boolean
+    description?: boolean
+    email?: boolean
+    userId?: boolean
+    userAgent?: boolean
+    pageUrl?: boolean
+    status?: boolean
+    resolvedAt?: boolean
+    adminNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }, ExtArgs["result"]["bugReport"]>
+
+  export type BugReportSelectScalar = {
+    id?: boolean
+    category?: boolean
+    description?: boolean
+    email?: boolean
+    userId?: boolean
+    userAgent?: boolean
+    pageUrl?: boolean
+    status?: boolean
+    resolvedAt?: boolean
+    adminNotes?: boolean
+    createdAt?: boolean
+    updatedAt?: boolean
+  }
+
+  export type BugReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "category" | "description" | "email" | "userId" | "userAgent" | "pageUrl" | "status" | "resolvedAt" | "adminNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["bugReport"]>
+
+  export type $BugReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    name: "BugReport"
+    objects: {}
+    scalars: $Extensions.GetPayloadResult<{
+      id: string
+      category: $Enums.BugReportCategory
+      description: string
+      email: string
+      userId: string | null
+      userAgent: string | null
+      pageUrl: string | null
+      status: $Enums.BugReportStatus
+      resolvedAt: Date | null
+      adminNotes: string | null
+      createdAt: Date
+      updatedAt: Date
+    }, ExtArgs["result"]["bugReport"]>
+    composites: {}
+  }
+
+  type BugReportGetPayload<S extends boolean | null | undefined | BugReportDefaultArgs> = $Result.GetResult<Prisma.$BugReportPayload, S>
+
+  type BugReportCountArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> =
+    Omit<BugReportFindManyArgs, 'select' | 'include' | 'distinct' | 'omit'> & {
+      select?: BugReportCountAggregateInputType | true
+    }
+
+  export interface BugReportDelegate<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> {
+    [K: symbol]: { types: Prisma.TypeMap<ExtArgs>['model']['BugReport'], meta: { name: 'BugReport' } }
+    /**
+     * Find zero or one BugReport that matches the filter.
+     * @param {BugReportFindUniqueArgs} args - Arguments to find a BugReport
+     * @example
+     * // Get one BugReport
+     * const bugReport = await prisma.bugReport.findUnique({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUnique<T extends BugReportFindUniqueArgs>(args: SelectSubset<T, BugReportFindUniqueArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "findUnique", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find one BugReport that matches the filter or throw an error with `error.code='P2025'`
+     * if no matches were found.
+     * @param {BugReportFindUniqueOrThrowArgs} args - Arguments to find a BugReport
+     * @example
+     * // Get one BugReport
+     * const bugReport = await prisma.bugReport.findUniqueOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findUniqueOrThrow<T extends BugReportFindUniqueOrThrowArgs>(args: SelectSubset<T, BugReportFindUniqueOrThrowArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BugReport that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportFindFirstArgs} args - Arguments to find a BugReport
+     * @example
+     * // Get one BugReport
+     * const bugReport = await prisma.bugReport.findFirst({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirst<T extends BugReportFindFirstArgs>(args?: SelectSubset<T, BugReportFindFirstArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "findFirst", GlobalOmitOptions> | null, null, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find the first BugReport that matches the filter or
+     * throw `PrismaKnownClientError` with `P2025` code if no matches were found.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportFindFirstOrThrowArgs} args - Arguments to find a BugReport
+     * @example
+     * // Get one BugReport
+     * const bugReport = await prisma.bugReport.findFirstOrThrow({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     */
+    findFirstOrThrow<T extends BugReportFindFirstOrThrowArgs>(args?: SelectSubset<T, BugReportFindFirstOrThrowArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "findFirstOrThrow", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Find zero or more BugReports that matches the filter.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportFindManyArgs} args - Arguments to filter and select certain fields only.
+     * @example
+     * // Get all BugReports
+     * const bugReports = await prisma.bugReport.findMany()
+     * 
+     * // Get first 10 BugReports
+     * const bugReports = await prisma.bugReport.findMany({ take: 10 })
+     * 
+     * // Only select the `id`
+     * const bugReportWithIdOnly = await prisma.bugReport.findMany({ select: { id: true } })
+     * 
+     */
+    findMany<T extends BugReportFindManyArgs>(args?: SelectSubset<T, BugReportFindManyArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "findMany", GlobalOmitOptions>>
+
+    /**
+     * Create a BugReport.
+     * @param {BugReportCreateArgs} args - Arguments to create a BugReport.
+     * @example
+     * // Create one BugReport
+     * const BugReport = await prisma.bugReport.create({
+     *   data: {
+     *     // ... data to create a BugReport
+     *   }
+     * })
+     * 
+     */
+    create<T extends BugReportCreateArgs>(args: SelectSubset<T, BugReportCreateArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "create", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Create many BugReports.
+     * @param {BugReportCreateManyArgs} args - Arguments to create many BugReports.
+     * @example
+     * // Create many BugReports
+     * const bugReport = await prisma.bugReport.createMany({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     *     
+     */
+    createMany<T extends BugReportCreateManyArgs>(args?: SelectSubset<T, BugReportCreateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Create many BugReports and returns the data saved in the database.
+     * @param {BugReportCreateManyAndReturnArgs} args - Arguments to create many BugReports.
+     * @example
+     * // Create many BugReports
+     * const bugReport = await prisma.bugReport.createManyAndReturn({
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Create many BugReports and only return the `id`
+     * const bugReportWithIdOnly = await prisma.bugReport.createManyAndReturn({
+     *   select: { id: true },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    createManyAndReturn<T extends BugReportCreateManyAndReturnArgs>(args?: SelectSubset<T, BugReportCreateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "createManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Delete a BugReport.
+     * @param {BugReportDeleteArgs} args - Arguments to delete one BugReport.
+     * @example
+     * // Delete one BugReport
+     * const BugReport = await prisma.bugReport.delete({
+     *   where: {
+     *     // ... filter to delete one BugReport
+     *   }
+     * })
+     * 
+     */
+    delete<T extends BugReportDeleteArgs>(args: SelectSubset<T, BugReportDeleteArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "delete", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Update one BugReport.
+     * @param {BugReportUpdateArgs} args - Arguments to update one BugReport.
+     * @example
+     * // Update one BugReport
+     * const bugReport = await prisma.bugReport.update({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    update<T extends BugReportUpdateArgs>(args: SelectSubset<T, BugReportUpdateArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "update", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+    /**
+     * Delete zero or more BugReports.
+     * @param {BugReportDeleteManyArgs} args - Arguments to filter BugReports to delete.
+     * @example
+     * // Delete a few BugReports
+     * const { count } = await prisma.bugReport.deleteMany({
+     *   where: {
+     *     // ... provide filter here
+     *   }
+     * })
+     * 
+     */
+    deleteMany<T extends BugReportDeleteManyArgs>(args?: SelectSubset<T, BugReportDeleteManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BugReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportUpdateManyArgs} args - Arguments to update one or more rows.
+     * @example
+     * // Update many BugReports
+     * const bugReport = await prisma.bugReport.updateMany({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: {
+     *     // ... provide data here
+     *   }
+     * })
+     * 
+     */
+    updateMany<T extends BugReportUpdateManyArgs>(args: SelectSubset<T, BugReportUpdateManyArgs<ExtArgs>>): Prisma.PrismaPromise<BatchPayload>
+
+    /**
+     * Update zero or more BugReports and returns the data updated in the database.
+     * @param {BugReportUpdateManyAndReturnArgs} args - Arguments to update many BugReports.
+     * @example
+     * // Update many BugReports
+     * const bugReport = await prisma.bugReport.updateManyAndReturn({
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * 
+     * // Update zero or more BugReports and only return the `id`
+     * const bugReportWithIdOnly = await prisma.bugReport.updateManyAndReturn({
+     *   select: { id: true },
+     *   where: {
+     *     // ... provide filter here
+     *   },
+     *   data: [
+     *     // ... provide data here
+     *   ]
+     * })
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * 
+     */
+    updateManyAndReturn<T extends BugReportUpdateManyAndReturnArgs>(args: SelectSubset<T, BugReportUpdateManyAndReturnArgs<ExtArgs>>): Prisma.PrismaPromise<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "updateManyAndReturn", GlobalOmitOptions>>
+
+    /**
+     * Create or update one BugReport.
+     * @param {BugReportUpsertArgs} args - Arguments to update or create a BugReport.
+     * @example
+     * // Update or create a BugReport
+     * const bugReport = await prisma.bugReport.upsert({
+     *   create: {
+     *     // ... data to create a BugReport
+     *   },
+     *   update: {
+     *     // ... in case it already exists, update
+     *   },
+     *   where: {
+     *     // ... the filter for the BugReport we want to update
+     *   }
+     * })
+     */
+    upsert<T extends BugReportUpsertArgs>(args: SelectSubset<T, BugReportUpsertArgs<ExtArgs>>): Prisma__BugReportClient<$Result.GetResult<Prisma.$BugReportPayload<ExtArgs>, T, "upsert", GlobalOmitOptions>, never, ExtArgs, GlobalOmitOptions>
+
+
+    /**
+     * Count the number of BugReports.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportCountArgs} args - Arguments to filter BugReports to count.
+     * @example
+     * // Count the number of BugReports
+     * const count = await prisma.bugReport.count({
+     *   where: {
+     *     // ... the filter for the BugReports we want to count
+     *   }
+     * })
+    **/
+    count<T extends BugReportCountArgs>(
+      args?: Subset<T, BugReportCountArgs>,
+    ): Prisma.PrismaPromise<
+      T extends $Utils.Record<'select', any>
+        ? T['select'] extends true
+          ? number
+          : GetScalarType<T['select'], BugReportCountAggregateOutputType>
+        : number
+    >
+
+    /**
+     * Allows you to perform aggregations operations on a BugReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportAggregateArgs} args - Select which aggregations you would like to apply and on what fields.
+     * @example
+     * // Ordered by age ascending
+     * // Where email contains prisma.io
+     * // Limited to the 10 users
+     * const aggregations = await prisma.user.aggregate({
+     *   _avg: {
+     *     age: true,
+     *   },
+     *   where: {
+     *     email: {
+     *       contains: "prisma.io",
+     *     },
+     *   },
+     *   orderBy: {
+     *     age: "asc",
+     *   },
+     *   take: 10,
+     * })
+    **/
+    aggregate<T extends BugReportAggregateArgs>(args: Subset<T, BugReportAggregateArgs>): Prisma.PrismaPromise<GetBugReportAggregateType<T>>
+
+    /**
+     * Group by BugReport.
+     * Note, that providing `undefined` is treated as the value not being there.
+     * Read more here: https://pris.ly/d/null-undefined
+     * @param {BugReportGroupByArgs} args - Group by arguments.
+     * @example
+     * // Group by city, order by createdAt, get count
+     * const result = await prisma.user.groupBy({
+     *   by: ['city', 'createdAt'],
+     *   orderBy: {
+     *     createdAt: true
+     *   },
+     *   _count: {
+     *     _all: true
+     *   },
+     * })
+     * 
+    **/
+    groupBy<
+      T extends BugReportGroupByArgs,
+      HasSelectOrTake extends Or<
+        Extends<'skip', Keys<T>>,
+        Extends<'take', Keys<T>>
+      >,
+      OrderByArg extends True extends HasSelectOrTake
+        ? { orderBy: BugReportGroupByArgs['orderBy'] }
+        : { orderBy?: BugReportGroupByArgs['orderBy'] },
+      OrderFields extends ExcludeUnderscoreKeys<Keys<MaybeTupleToUnion<T['orderBy']>>>,
+      ByFields extends MaybeTupleToUnion<T['by']>,
+      ByValid extends Has<ByFields, OrderFields>,
+      HavingFields extends GetHavingFields<T['having']>,
+      HavingValid extends Has<ByFields, HavingFields>,
+      ByEmpty extends T['by'] extends never[] ? True : False,
+      InputErrors extends ByEmpty extends True
+      ? `Error: "by" must not be empty.`
+      : HavingValid extends False
+      ? {
+          [P in HavingFields]: P extends ByFields
+            ? never
+            : P extends string
+            ? `Error: Field "${P}" used in "having" needs to be provided in "by".`
+            : [
+                Error,
+                'Field ',
+                P,
+                ` in "having" needs to be provided in "by"`,
+              ]
+        }[HavingFields]
+      : 'take' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "take", you also need to provide "orderBy"'
+      : 'skip' extends Keys<T>
+      ? 'orderBy' extends Keys<T>
+        ? ByValid extends True
+          ? {}
+          : {
+              [P in OrderFields]: P extends ByFields
+                ? never
+                : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+            }[OrderFields]
+        : 'Error: If you provide "skip", you also need to provide "orderBy"'
+      : ByValid extends True
+      ? {}
+      : {
+          [P in OrderFields]: P extends ByFields
+            ? never
+            : `Error: Field "${P}" in "orderBy" needs to be provided in "by"`
+        }[OrderFields]
+    >(args: SubsetIntersection<T, BugReportGroupByArgs, OrderByArg> & InputErrors): {} extends InputErrors ? GetBugReportGroupByPayload<T> : Prisma.PrismaPromise<InputErrors>
+  /**
+   * Fields of the BugReport model
+   */
+  readonly fields: BugReportFieldRefs;
+  }
+
+  /**
+   * The delegate class that acts as a "Promise-like" for BugReport.
+   * Why is this prefixed with `Prisma__`?
+   * Because we want to prevent naming conflicts as mentioned in
+   * https://github.com/prisma/prisma-client-js/issues/707
+   */
+  export interface Prisma__BugReportClient<T, Null = never, ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
+    readonly [Symbol.toStringTag]: "PrismaPromise"
+    /**
+     * Attaches callbacks for the resolution and/or rejection of the Promise.
+     * @param onfulfilled The callback to execute when the Promise is resolved.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of which ever callback is executed.
+     */
+    then<TResult1 = T, TResult2 = never>(onfulfilled?: ((value: T) => TResult1 | PromiseLike<TResult1>) | undefined | null, onrejected?: ((reason: any) => TResult2 | PromiseLike<TResult2>) | undefined | null): $Utils.JsPromise<TResult1 | TResult2>
+    /**
+     * Attaches a callback for only the rejection of the Promise.
+     * @param onrejected The callback to execute when the Promise is rejected.
+     * @returns A Promise for the completion of the callback.
+     */
+    catch<TResult = never>(onrejected?: ((reason: any) => TResult | PromiseLike<TResult>) | undefined | null): $Utils.JsPromise<T | TResult>
+    /**
+     * Attaches a callback that is invoked when the Promise is settled (fulfilled or rejected). The
+     * resolved value cannot be modified from the callback.
+     * @param onfinally The callback to execute when the Promise is settled (fulfilled or rejected).
+     * @returns A Promise for the completion of the callback.
+     */
+    finally(onfinally?: (() => void) | undefined | null): $Utils.JsPromise<T>
+  }
+
+
+
+
+  /**
+   * Fields of the BugReport model
+   */
+  interface BugReportFieldRefs {
+    readonly id: FieldRef<"BugReport", 'String'>
+    readonly category: FieldRef<"BugReport", 'BugReportCategory'>
+    readonly description: FieldRef<"BugReport", 'String'>
+    readonly email: FieldRef<"BugReport", 'String'>
+    readonly userId: FieldRef<"BugReport", 'String'>
+    readonly userAgent: FieldRef<"BugReport", 'String'>
+    readonly pageUrl: FieldRef<"BugReport", 'String'>
+    readonly status: FieldRef<"BugReport", 'BugReportStatus'>
+    readonly resolvedAt: FieldRef<"BugReport", 'DateTime'>
+    readonly adminNotes: FieldRef<"BugReport", 'String'>
+    readonly createdAt: FieldRef<"BugReport", 'DateTime'>
+    readonly updatedAt: FieldRef<"BugReport", 'DateTime'>
+  }
+    
+
+  // Custom InputTypes
+  /**
+   * BugReport findUnique
+   */
+  export type BugReportFindUniqueArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter, which BugReport to fetch.
+     */
+    where: BugReportWhereUniqueInput
+  }
+
+  /**
+   * BugReport findUniqueOrThrow
+   */
+  export type BugReportFindUniqueOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter, which BugReport to fetch.
+     */
+    where: BugReportWhereUniqueInput
+  }
+
+  /**
+   * BugReport findFirst
+   */
+  export type BugReportFindFirstArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter, which BugReport to fetch.
+     */
+    where?: BugReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BugReports to fetch.
+     */
+    orderBy?: BugReportOrderByWithRelationInput | BugReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BugReports.
+     */
+    cursor?: BugReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BugReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BugReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BugReports.
+     */
+    distinct?: BugReportScalarFieldEnum | BugReportScalarFieldEnum[]
+  }
+
+  /**
+   * BugReport findFirstOrThrow
+   */
+  export type BugReportFindFirstOrThrowArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter, which BugReport to fetch.
+     */
+    where?: BugReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BugReports to fetch.
+     */
+    orderBy?: BugReportOrderByWithRelationInput | BugReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for searching for BugReports.
+     */
+    cursor?: BugReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BugReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BugReports.
+     */
+    skip?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/distinct Distinct Docs}
+     * 
+     * Filter by unique combinations of BugReports.
+     */
+    distinct?: BugReportScalarFieldEnum | BugReportScalarFieldEnum[]
+  }
+
+  /**
+   * BugReport findMany
+   */
+  export type BugReportFindManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter, which BugReports to fetch.
+     */
+    where?: BugReportWhereInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/sorting Sorting Docs}
+     * 
+     * Determine the order of BugReports to fetch.
+     */
+    orderBy?: BugReportOrderByWithRelationInput | BugReportOrderByWithRelationInput[]
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination#cursor-based-pagination Cursor Docs}
+     * 
+     * Sets the position for listing BugReports.
+     */
+    cursor?: BugReportWhereUniqueInput
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Take `±n` BugReports from the position of the cursor.
+     */
+    take?: number
+    /**
+     * {@link https://www.prisma.io/docs/concepts/components/prisma-client/pagination Pagination Docs}
+     * 
+     * Skip the first `n` BugReports.
+     */
+    skip?: number
+    distinct?: BugReportScalarFieldEnum | BugReportScalarFieldEnum[]
+  }
+
+  /**
+   * BugReport create
+   */
+  export type BugReportCreateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * The data needed to create a BugReport.
+     */
+    data: XOR<BugReportCreateInput, BugReportUncheckedCreateInput>
+  }
+
+  /**
+   * BugReport createMany
+   */
+  export type BugReportCreateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to create many BugReports.
+     */
+    data: BugReportCreateManyInput | BugReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BugReport createManyAndReturn
+   */
+  export type BugReportCreateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelectCreateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * The data used to create many BugReports.
+     */
+    data: BugReportCreateManyInput | BugReportCreateManyInput[]
+    skipDuplicates?: boolean
+  }
+
+  /**
+   * BugReport update
+   */
+  export type BugReportUpdateArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * The data needed to update a BugReport.
+     */
+    data: XOR<BugReportUpdateInput, BugReportUncheckedUpdateInput>
+    /**
+     * Choose, which BugReport to update.
+     */
+    where: BugReportWhereUniqueInput
+  }
+
+  /**
+   * BugReport updateMany
+   */
+  export type BugReportUpdateManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * The data used to update BugReports.
+     */
+    data: XOR<BugReportUpdateManyMutationInput, BugReportUncheckedUpdateManyInput>
+    /**
+     * Filter which BugReports to update
+     */
+    where?: BugReportWhereInput
+    /**
+     * Limit how many BugReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BugReport updateManyAndReturn
+   */
+  export type BugReportUpdateManyAndReturnArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelectUpdateManyAndReturn<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * The data used to update BugReports.
+     */
+    data: XOR<BugReportUpdateManyMutationInput, BugReportUncheckedUpdateManyInput>
+    /**
+     * Filter which BugReports to update
+     */
+    where?: BugReportWhereInput
+    /**
+     * Limit how many BugReports to update.
+     */
+    limit?: number
+  }
+
+  /**
+   * BugReport upsert
+   */
+  export type BugReportUpsertArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * The filter to search for the BugReport to update in case it exists.
+     */
+    where: BugReportWhereUniqueInput
+    /**
+     * In case the BugReport found by the `where` argument doesn't exist, create a new BugReport with this data.
+     */
+    create: XOR<BugReportCreateInput, BugReportUncheckedCreateInput>
+    /**
+     * In case the BugReport was found with the provided `where` argument, update it with this data.
+     */
+    update: XOR<BugReportUpdateInput, BugReportUncheckedUpdateInput>
+  }
+
+  /**
+   * BugReport delete
+   */
+  export type BugReportDeleteArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+    /**
+     * Filter which BugReport to delete.
+     */
+    where: BugReportWhereUniqueInput
+  }
+
+  /**
+   * BugReport deleteMany
+   */
+  export type BugReportDeleteManyArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Filter which BugReports to delete
+     */
+    where?: BugReportWhereInput
+    /**
+     * Limit how many BugReports to delete.
+     */
+    limit?: number
+  }
+
+  /**
+   * BugReport without action
+   */
+  export type BugReportDefaultArgs<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
+    /**
+     * Select specific fields to fetch from the BugReport
+     */
+    select?: BugReportSelect<ExtArgs> | null
+    /**
+     * Omit specific fields from the BugReport
+     */
+    omit?: BugReportOmit<ExtArgs> | null
+  }
+
+
+  /**
    * Enums
    */
 
@@ -22243,6 +23510,7 @@ export namespace Prisma {
     role: 'role',
     profilePicture: 'profilePicture',
     whatsappNumber: 'whatsappNumber',
+    campus: 'campus',
     teamId: 'teamId',
     trustScore: 'trustScore',
     isActive: 'isActive',
@@ -22434,6 +23702,7 @@ export namespace Prisma {
     smartLinkId: 'smartLinkId',
     platform: 'platform',
     screenshotUrl: 'screenshotUrl',
+    viewCount: 'viewCount',
     status: 'status',
     reviewedById: 'reviewedById',
     reviewedAt: 'reviewedAt',
@@ -22499,6 +23768,24 @@ export namespace Prisma {
   };
 
   export type CampaignAuditEventScalarFieldEnum = (typeof CampaignAuditEventScalarFieldEnum)[keyof typeof CampaignAuditEventScalarFieldEnum]
+
+
+  export const BugReportScalarFieldEnum: {
+    id: 'id',
+    category: 'category',
+    description: 'description',
+    email: 'email',
+    userId: 'userId',
+    userAgent: 'userAgent',
+    pageUrl: 'pageUrl',
+    status: 'status',
+    resolvedAt: 'resolvedAt',
+    adminNotes: 'adminNotes',
+    createdAt: 'createdAt',
+    updatedAt: 'updatedAt'
+  };
+
+  export type BugReportScalarFieldEnum = (typeof BugReportScalarFieldEnum)[keyof typeof BugReportScalarFieldEnum]
 
 
   export const SortOrder: {
@@ -22800,6 +24087,34 @@ export namespace Prisma {
 
 
   /**
+   * Reference to a field of type 'BugReportCategory'
+   */
+  export type EnumBugReportCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BugReportCategory'>
+    
+
+
+  /**
+   * Reference to a field of type 'BugReportCategory[]'
+   */
+  export type ListEnumBugReportCategoryFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BugReportCategory[]'>
+    
+
+
+  /**
+   * Reference to a field of type 'BugReportStatus'
+   */
+  export type EnumBugReportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BugReportStatus'>
+    
+
+
+  /**
+   * Reference to a field of type 'BugReportStatus[]'
+   */
+  export type ListEnumBugReportStatusFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'BugReportStatus[]'>
+    
+
+
+  /**
    * Reference to a field of type 'Float'
    */
   export type FloatFieldRefInput<$PrismaModel> = FieldRefInputType<$PrismaModel, 'Float'>
@@ -22828,6 +24143,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     profilePicture?: StringNullableFilter<"User"> | string | null
     whatsappNumber?: StringNullableFilter<"User"> | string | null
+    campus?: StringNullableFilter<"User"> | string | null
     teamId?: StringNullableFilter<"User"> | string | null
     trustScore?: IntFilter<"User"> | number
     isActive?: BoolFilter<"User"> | boolean
@@ -22861,6 +24177,7 @@ export namespace Prisma {
     role?: SortOrder
     profilePicture?: SortOrderInput | SortOrder
     whatsappNumber?: SortOrderInput | SortOrder
+    campus?: SortOrderInput | SortOrder
     teamId?: SortOrderInput | SortOrder
     trustScore?: SortOrder
     isActive?: SortOrder
@@ -22897,6 +24214,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     profilePicture?: StringNullableFilter<"User"> | string | null
     whatsappNumber?: StringNullableFilter<"User"> | string | null
+    campus?: StringNullableFilter<"User"> | string | null
     teamId?: StringNullableFilter<"User"> | string | null
     trustScore?: IntFilter<"User"> | number
     isActive?: BoolFilter<"User"> | boolean
@@ -22930,6 +24248,7 @@ export namespace Prisma {
     role?: SortOrder
     profilePicture?: SortOrderInput | SortOrder
     whatsappNumber?: SortOrderInput | SortOrder
+    campus?: SortOrderInput | SortOrder
     teamId?: SortOrderInput | SortOrder
     trustScore?: SortOrder
     isActive?: SortOrder
@@ -22955,6 +24274,7 @@ export namespace Prisma {
     role?: EnumUserRoleWithAggregatesFilter<"User"> | $Enums.UserRole
     profilePicture?: StringNullableWithAggregatesFilter<"User"> | string | null
     whatsappNumber?: StringNullableWithAggregatesFilter<"User"> | string | null
+    campus?: StringNullableWithAggregatesFilter<"User"> | string | null
     teamId?: StringNullableWithAggregatesFilter<"User"> | string | null
     trustScore?: IntWithAggregatesFilter<"User"> | number
     isActive?: BoolWithAggregatesFilter<"User"> | boolean
@@ -23910,6 +25230,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    viewCount?: IntNullableFilter<"ViewProof"> | number | null
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -23928,6 +25249,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    viewCount?: SortOrderInput | SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
@@ -23949,6 +25271,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    viewCount?: IntNullableFilter<"ViewProof"> | number | null
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -23967,6 +25290,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    viewCount?: SortOrderInput | SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
@@ -23974,8 +25298,10 @@ export namespace Prisma {
     createdAt?: SortOrder
     updatedAt?: SortOrder
     _count?: ViewProofCountOrderByAggregateInput
+    _avg?: ViewProofAvgOrderByAggregateInput
     _max?: ViewProofMaxOrderByAggregateInput
     _min?: ViewProofMinOrderByAggregateInput
+    _sum?: ViewProofSumOrderByAggregateInput
   }
 
   export type ViewProofScalarWhereWithAggregatesInput = {
@@ -23988,6 +25314,7 @@ export namespace Prisma {
     smartLinkId?: StringWithAggregatesFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformWithAggregatesFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringWithAggregatesFilter<"ViewProof"> | string
+    viewCount?: IntNullableWithAggregatesFilter<"ViewProof"> | number | null
     status?: EnumViewProofStatusWithAggregatesFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableWithAggregatesFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableWithAggregatesFilter<"ViewProof"> | Date | string | null
@@ -24294,6 +25621,93 @@ export namespace Prisma {
     createdAt?: DateTimeWithAggregatesFilter<"CampaignAuditEvent"> | Date | string
   }
 
+  export type BugReportWhereInput = {
+    AND?: BugReportWhereInput | BugReportWhereInput[]
+    OR?: BugReportWhereInput[]
+    NOT?: BugReportWhereInput | BugReportWhereInput[]
+    id?: StringFilter<"BugReport"> | string
+    category?: EnumBugReportCategoryFilter<"BugReport"> | $Enums.BugReportCategory
+    description?: StringFilter<"BugReport"> | string
+    email?: StringFilter<"BugReport"> | string
+    userId?: StringNullableFilter<"BugReport"> | string | null
+    userAgent?: StringNullableFilter<"BugReport"> | string | null
+    pageUrl?: StringNullableFilter<"BugReport"> | string | null
+    status?: EnumBugReportStatusFilter<"BugReport"> | $Enums.BugReportStatus
+    resolvedAt?: DateTimeNullableFilter<"BugReport"> | Date | string | null
+    adminNotes?: StringNullableFilter<"BugReport"> | string | null
+    createdAt?: DateTimeFilter<"BugReport"> | Date | string
+    updatedAt?: DateTimeFilter<"BugReport"> | Date | string
+  }
+
+  export type BugReportOrderByWithRelationInput = {
+    id?: SortOrder
+    category?: SortOrder
+    description?: SortOrder
+    email?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    pageUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    adminNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BugReportWhereUniqueInput = Prisma.AtLeast<{
+    id?: string
+    AND?: BugReportWhereInput | BugReportWhereInput[]
+    OR?: BugReportWhereInput[]
+    NOT?: BugReportWhereInput | BugReportWhereInput[]
+    category?: EnumBugReportCategoryFilter<"BugReport"> | $Enums.BugReportCategory
+    description?: StringFilter<"BugReport"> | string
+    email?: StringFilter<"BugReport"> | string
+    userId?: StringNullableFilter<"BugReport"> | string | null
+    userAgent?: StringNullableFilter<"BugReport"> | string | null
+    pageUrl?: StringNullableFilter<"BugReport"> | string | null
+    status?: EnumBugReportStatusFilter<"BugReport"> | $Enums.BugReportStatus
+    resolvedAt?: DateTimeNullableFilter<"BugReport"> | Date | string | null
+    adminNotes?: StringNullableFilter<"BugReport"> | string | null
+    createdAt?: DateTimeFilter<"BugReport"> | Date | string
+    updatedAt?: DateTimeFilter<"BugReport"> | Date | string
+  }, "id">
+
+  export type BugReportOrderByWithAggregationInput = {
+    id?: SortOrder
+    category?: SortOrder
+    description?: SortOrder
+    email?: SortOrder
+    userId?: SortOrderInput | SortOrder
+    userAgent?: SortOrderInput | SortOrder
+    pageUrl?: SortOrderInput | SortOrder
+    status?: SortOrder
+    resolvedAt?: SortOrderInput | SortOrder
+    adminNotes?: SortOrderInput | SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+    _count?: BugReportCountOrderByAggregateInput
+    _max?: BugReportMaxOrderByAggregateInput
+    _min?: BugReportMinOrderByAggregateInput
+  }
+
+  export type BugReportScalarWhereWithAggregatesInput = {
+    AND?: BugReportScalarWhereWithAggregatesInput | BugReportScalarWhereWithAggregatesInput[]
+    OR?: BugReportScalarWhereWithAggregatesInput[]
+    NOT?: BugReportScalarWhereWithAggregatesInput | BugReportScalarWhereWithAggregatesInput[]
+    id?: StringWithAggregatesFilter<"BugReport"> | string
+    category?: EnumBugReportCategoryWithAggregatesFilter<"BugReport"> | $Enums.BugReportCategory
+    description?: StringWithAggregatesFilter<"BugReport"> | string
+    email?: StringWithAggregatesFilter<"BugReport"> | string
+    userId?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
+    userAgent?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
+    pageUrl?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
+    status?: EnumBugReportStatusWithAggregatesFilter<"BugReport"> | $Enums.BugReportStatus
+    resolvedAt?: DateTimeNullableWithAggregatesFilter<"BugReport"> | Date | string | null
+    adminNotes?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
+    createdAt?: DateTimeWithAggregatesFilter<"BugReport"> | Date | string
+    updatedAt?: DateTimeWithAggregatesFilter<"BugReport"> | Date | string
+  }
+
   export type UserCreateInput = {
     id?: string
     email: string
@@ -24303,6 +25717,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -24335,6 +25750,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -24367,6 +25783,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -24399,6 +25816,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -24431,6 +25849,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -24448,6 +25867,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -24464,6 +25884,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -25499,6 +26920,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -25516,6 +26938,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -25529,6 +26952,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25546,6 +26970,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25561,6 +26986,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -25574,6 +27000,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -25588,6 +27015,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -25911,6 +27339,111 @@ export namespace Prisma {
     createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
   }
 
+  export type BugReportCreateInput = {
+    id?: string
+    category: $Enums.BugReportCategory
+    description: string
+    email: string
+    userId?: string | null
+    userAgent?: string | null
+    pageUrl?: string | null
+    status?: $Enums.BugReportStatus
+    resolvedAt?: Date | string | null
+    adminNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BugReportUncheckedCreateInput = {
+    id?: string
+    category: $Enums.BugReportCategory
+    description: string
+    email: string
+    userId?: string | null
+    userAgent?: string | null
+    pageUrl?: string | null
+    status?: $Enums.BugReportStatus
+    resolvedAt?: Date | string | null
+    adminNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BugReportUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumBugReportCategoryFieldUpdateOperationsInput | $Enums.BugReportCategory
+    description?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BugReportUncheckedUpdateInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumBugReportCategoryFieldUpdateOperationsInput | $Enums.BugReportCategory
+    description?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BugReportCreateManyInput = {
+    id?: string
+    category: $Enums.BugReportCategory
+    description: string
+    email: string
+    userId?: string | null
+    userAgent?: string | null
+    pageUrl?: string | null
+    status?: $Enums.BugReportStatus
+    resolvedAt?: Date | string | null
+    adminNotes?: string | null
+    createdAt?: Date | string
+    updatedAt?: Date | string
+  }
+
+  export type BugReportUpdateManyMutationInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumBugReportCategoryFieldUpdateOperationsInput | $Enums.BugReportCategory
+    description?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
+  export type BugReportUncheckedUpdateManyInput = {
+    id?: StringFieldUpdateOperationsInput | string
+    category?: EnumBugReportCategoryFieldUpdateOperationsInput | $Enums.BugReportCategory
+    description?: StringFieldUpdateOperationsInput | string
+    email?: StringFieldUpdateOperationsInput | string
+    userId?: NullableStringFieldUpdateOperationsInput | string | null
+    userAgent?: NullableStringFieldUpdateOperationsInput | string | null
+    pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
+    resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+    adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
+    createdAt?: DateTimeFieldUpdateOperationsInput | Date | string
+    updatedAt?: DateTimeFieldUpdateOperationsInput | Date | string
+  }
+
   export type StringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -26117,6 +27650,7 @@ export namespace Prisma {
     role?: SortOrder
     profilePicture?: SortOrder
     whatsappNumber?: SortOrder
+    campus?: SortOrder
     teamId?: SortOrder
     trustScore?: SortOrder
     isActive?: SortOrder
@@ -26138,6 +27672,7 @@ export namespace Prisma {
     role?: SortOrder
     profilePicture?: SortOrder
     whatsappNumber?: SortOrder
+    campus?: SortOrder
     teamId?: SortOrder
     trustScore?: SortOrder
     isActive?: SortOrder
@@ -26154,6 +27689,7 @@ export namespace Prisma {
     role?: SortOrder
     profilePicture?: SortOrder
     whatsappNumber?: SortOrder
+    campus?: SortOrder
     teamId?: SortOrder
     trustScore?: SortOrder
     isActive?: SortOrder
@@ -27100,12 +28636,17 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrder
     reviewedAt?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ViewProofAvgOrderByAggregateInput = {
+    viewCount?: SortOrder
   }
 
   export type ViewProofMaxOrderByAggregateInput = {
@@ -27115,6 +28656,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrder
     reviewedAt?: SortOrder
@@ -27130,12 +28672,17 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrder
     reviewedAt?: SortOrder
     notes?: SortOrder
     createdAt?: SortOrder
     updatedAt?: SortOrder
+  }
+
+  export type ViewProofSumOrderByAggregateInput = {
+    viewCount?: SortOrder
   }
 
   export type EnumSocialPlatformWithAggregatesFilter<$PrismaModel = never> = {
@@ -27406,6 +28953,85 @@ export namespace Prisma {
     _count?: NestedIntNullableFilter<$PrismaModel>
     _min?: NestedJsonNullableFilter<$PrismaModel>
     _max?: NestedJsonNullableFilter<$PrismaModel>
+  }
+
+  export type EnumBugReportCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportCategory | EnumBugReportCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportCategoryFilter<$PrismaModel> | $Enums.BugReportCategory
+  }
+
+  export type EnumBugReportStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportStatus | EnumBugReportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportStatusFilter<$PrismaModel> | $Enums.BugReportStatus
+  }
+
+  export type BugReportCountOrderByAggregateInput = {
+    id?: SortOrder
+    category?: SortOrder
+    description?: SortOrder
+    email?: SortOrder
+    userId?: SortOrder
+    userAgent?: SortOrder
+    pageUrl?: SortOrder
+    status?: SortOrder
+    resolvedAt?: SortOrder
+    adminNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BugReportMaxOrderByAggregateInput = {
+    id?: SortOrder
+    category?: SortOrder
+    description?: SortOrder
+    email?: SortOrder
+    userId?: SortOrder
+    userAgent?: SortOrder
+    pageUrl?: SortOrder
+    status?: SortOrder
+    resolvedAt?: SortOrder
+    adminNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type BugReportMinOrderByAggregateInput = {
+    id?: SortOrder
+    category?: SortOrder
+    description?: SortOrder
+    email?: SortOrder
+    userId?: SortOrder
+    userAgent?: SortOrder
+    pageUrl?: SortOrder
+    status?: SortOrder
+    resolvedAt?: SortOrder
+    adminNotes?: SortOrder
+    createdAt?: SortOrder
+    updatedAt?: SortOrder
+  }
+
+  export type EnumBugReportCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportCategory | EnumBugReportCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportCategoryWithAggregatesFilter<$PrismaModel> | $Enums.BugReportCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBugReportCategoryFilter<$PrismaModel>
+    _max?: NestedEnumBugReportCategoryFilter<$PrismaModel>
+  }
+
+  export type EnumBugReportStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportStatus | EnumBugReportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportStatusWithAggregatesFilter<$PrismaModel> | $Enums.BugReportStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBugReportStatusFilter<$PrismaModel>
+    _max?: NestedEnumBugReportStatusFilter<$PrismaModel>
   }
 
   export type UserCreateweaponsOfChoiceInput = {
@@ -29110,6 +30736,14 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutAuditEventsInput, UserUpdateWithoutAuditEventsInput>, UserUncheckedUpdateWithoutAuditEventsInput>
   }
 
+  export type EnumBugReportCategoryFieldUpdateOperationsInput = {
+    set?: $Enums.BugReportCategory
+  }
+
+  export type EnumBugReportStatusFieldUpdateOperationsInput = {
+    set?: $Enums.BugReportStatus
+  }
+
   export type NestedStringFilter<$PrismaModel = never> = {
     equals?: string | StringFieldRefInput<$PrismaModel>
     in?: string[] | ListStringFieldRefInput<$PrismaModel>
@@ -29601,6 +31235,40 @@ export namespace Prisma {
     not?: InputJsonValue | JsonFieldRefInput<$PrismaModel> | JsonNullValueFilter
   }
 
+  export type NestedEnumBugReportCategoryFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportCategory | EnumBugReportCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportCategoryFilter<$PrismaModel> | $Enums.BugReportCategory
+  }
+
+  export type NestedEnumBugReportStatusFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportStatus | EnumBugReportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportStatusFilter<$PrismaModel> | $Enums.BugReportStatus
+  }
+
+  export type NestedEnumBugReportCategoryWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportCategory | EnumBugReportCategoryFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportCategory[] | ListEnumBugReportCategoryFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportCategoryWithAggregatesFilter<$PrismaModel> | $Enums.BugReportCategory
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBugReportCategoryFilter<$PrismaModel>
+    _max?: NestedEnumBugReportCategoryFilter<$PrismaModel>
+  }
+
+  export type NestedEnumBugReportStatusWithAggregatesFilter<$PrismaModel = never> = {
+    equals?: $Enums.BugReportStatus | EnumBugReportStatusFieldRefInput<$PrismaModel>
+    in?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    notIn?: $Enums.BugReportStatus[] | ListEnumBugReportStatusFieldRefInput<$PrismaModel>
+    not?: NestedEnumBugReportStatusWithAggregatesFilter<$PrismaModel> | $Enums.BugReportStatus
+    _count?: NestedIntFilter<$PrismaModel>
+    _min?: NestedEnumBugReportStatusFilter<$PrismaModel>
+    _max?: NestedEnumBugReportStatusFilter<$PrismaModel>
+  }
+
   export type TeamCreateWithoutMembersInput = {
     id?: string
     name: string
@@ -30040,6 +31708,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -30055,6 +31724,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -30078,6 +31748,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -30094,6 +31765,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -30564,6 +32236,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    viewCount?: IntNullableFilter<"ViewProof"> | number | null
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -30660,6 +32333,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -30691,6 +32365,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -31102,6 +32777,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -31117,6 +32793,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -31187,6 +32864,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -31218,6 +32896,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -31490,6 +33169,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -31521,6 +33201,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -31659,6 +33340,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -31690,6 +33372,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -31818,6 +33501,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -31849,6 +33533,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -32029,6 +33714,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32060,6 +33746,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32304,6 +33991,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32335,6 +34023,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -32371,6 +34060,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32402,6 +34092,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -32540,6 +34231,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32571,6 +34263,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32613,6 +34306,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32644,6 +34338,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -32772,6 +34467,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32803,6 +34499,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -32930,6 +34627,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -32961,6 +34659,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -33008,6 +34707,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33039,6 +34739,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33178,6 +34879,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33209,6 +34911,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33240,6 +34943,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33271,6 +34975,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -33409,6 +35114,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33440,6 +35146,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33568,6 +35275,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33599,6 +35307,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -33737,6 +35446,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33768,6 +35478,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -33896,6 +35607,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -33927,6 +35639,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -33974,6 +35687,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34005,6 +35719,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -34036,6 +35751,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34067,6 +35783,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -34114,6 +35831,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34145,6 +35863,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -34176,6 +35895,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34207,6 +35927,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -34243,6 +35964,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34274,6 +35996,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -34412,6 +36135,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34443,6 +36167,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -34485,6 +36210,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34516,6 +36242,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -34728,6 +36455,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34759,6 +36487,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34882,6 +36611,7 @@ export namespace Prisma {
     role?: EnumUserRoleFilter<"User"> | $Enums.UserRole
     profilePicture?: StringNullableFilter<"User"> | string | null
     whatsappNumber?: StringNullableFilter<"User"> | string | null
+    campus?: StringNullableFilter<"User"> | string | null
     teamId?: StringNullableFilter<"User"> | string | null
     trustScore?: IntFilter<"User"> | number
     isActive?: BoolFilter<"User"> | boolean
@@ -34942,6 +36672,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -34973,6 +36704,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -35053,6 +36785,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -35084,6 +36817,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -35206,6 +36940,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -35237,6 +36972,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     teamId?: string | null
     trustScore?: number
     isActive?: boolean
@@ -35381,6 +37117,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -35412,6 +37149,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     teamId?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
@@ -35573,6 +37311,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -35588,6 +37327,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -36042,6 +37782,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36057,6 +37798,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36071,6 +37813,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36084,6 +37827,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36100,6 +37844,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36114,6 +37859,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36295,6 +38041,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    viewCount?: number | null
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -36636,6 +38383,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36651,6 +38399,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36665,6 +38414,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -36819,6 +38569,7 @@ export namespace Prisma {
     role?: $Enums.UserRole
     profilePicture?: string | null
     whatsappNumber?: string | null
+    campus?: string | null
     trustScore?: number
     isActive?: boolean
     weaponsOfChoice?: UserCreateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -36847,6 +38598,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -36878,6 +38630,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]
@@ -36909,6 +38662,7 @@ export namespace Prisma {
     role?: EnumUserRoleFieldUpdateOperationsInput | $Enums.UserRole
     profilePicture?: NullableStringFieldUpdateOperationsInput | string | null
     whatsappNumber?: NullableStringFieldUpdateOperationsInput | string | null
+    campus?: NullableStringFieldUpdateOperationsInput | string | null
     trustScore?: IntFieldUpdateOperationsInput | number
     isActive?: BoolFieldUpdateOperationsInput | boolean
     weaponsOfChoice?: UserUpdateweaponsOfChoiceInput | $Enums.SocialPlatform[]

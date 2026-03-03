@@ -33,12 +33,17 @@ function withNowrap<T extends object>(
     const c = col as ColumnType<T>;
     const prevOnCell = c.onCell;
     const prevOnHeaderCell = c.onHeaderCell;
+    // Caller's explicit ellipsis: false wins; otherwise default ON.
+    const useEllipsis = c.ellipsis ?? true;
     return {
-      // Default ellipsis on — callers explicitly pass ellipsis: false to opt out
-      ellipsis: c.ellipsis ?? true,
       ...c,
+      ellipsis: useEllipsis,
       onCell: (record: T, index?: number) => ({
-        style: { whiteSpace: "nowrap" as const, verticalAlign: "middle" },
+        style: {
+          whiteSpace: useEllipsis ? ("nowrap" as const) : ("normal" as const),
+          verticalAlign: "middle",
+          ...(useEllipsis ? {} : { overflowWrap: "anywhere" as const }),
+        },
         ...(prevOnCell ? prevOnCell(record, index) : {}),
       }),
       onHeaderCell: (column) => ({
@@ -76,8 +81,10 @@ export default function DataTable<T extends object>({
   return (
     <div
       className={cn(
-        // No overflow-x-auto here — AntD manages horizontal overflow internally
-        "w-full rounded-ds-xl border border-ds-border-base bg-ds-surface-elevated",
+        // overflow-hidden is INTENTIONAL: it clips the corners to match the
+        // rounded border AND lets AntD's INTERNAL scroll container (.ant-table-body)
+        // handle horizontal + vertical overflow. Do NOT add overflow-x-auto here.
+        "w-full overflow-hidden rounded-ds-xl border border-ds-border-base bg-ds-surface-elevated",
         wrapperClassName,
       )}>
       <Table<T>

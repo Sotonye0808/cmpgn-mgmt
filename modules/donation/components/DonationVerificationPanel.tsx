@@ -11,8 +11,10 @@ import {
   Descriptions,
   message,
   Space,
+  Popconfirm,
 } from "antd";
 import type { ColumnsType } from "antd/es/table";
+import type { TableRowSelection } from "antd/es/table/interface";
 import Link from "next/link";
 import DataTable from "@/components/ui/DataTable";
 import { ICONS } from "@/config/icons";
@@ -45,6 +47,8 @@ export default function DonationVerificationPanel() {
   const [selectedDonation, setSelectedDonation] =
     useState<EnrichedDonation | null>(null);
   const [verifying, setVerifying] = useState(false);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<React.Key[]>([]);
+  const [batchVerifying, setBatchVerifying] = useState(false);
 
   const fetchDonations = useCallback(async () => {
     setLoading(true);
@@ -99,6 +103,45 @@ export default function DonationVerificationPanel() {
     } finally {
       setVerifying(false);
     }
+  };
+
+  // ─── Batch verify / reject ─────────────────────────────────────────────────
+
+  const handleBatchVerify = async (action: "VERIFIED" | "REJECTED") => {
+    if (selectedRowKeys.length === 0) return;
+    setBatchVerifying(true);
+    try {
+      const res = await fetch(ROUTES.API.DONATIONS.BATCH_VERIFY, {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedRowKeys as string[], action }),
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.error ?? `Batch ${action.toLowerCase()} failed`);
+      }
+      const json = await res.json();
+      const result = json.data as { updated: number; skipped: number };
+      message.success(
+        `${result.updated} donation${result.updated !== 1 ? "s" : ""} ${action === "VERIFIED" ? "verified" : "rejected"}${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`,
+      );
+      setSelectedRowKeys([]);
+      fetchDonations();
+    } catch (e) {
+      message.error(e instanceof Error ? e.message : "Unknown error");
+    } finally {
+      setBatchVerifying(false);
+    }
+  };
+
+  // Only allow selecting donations in verifiable states
+  const rowSelection: TableRowSelection<EnrichedDonation> = {
+    selectedRowKeys,
+    onChange: (keys) => setSelectedRowKeys(keys),
+    getCheckboxProps: (record) => ({
+      disabled:
+        record.status !== "RECEIVED" && record.status !== "PENDING",
+    }),
   };
 
   const columns: ColumnsType<EnrichedDonation> = [
@@ -210,12 +253,49 @@ export default function DonationVerificationPanel() {
         />
       </div>
 
+      {/* Batch action bar */}
+      {selectedRowKeys.length > 0 && (
+        <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-ds-surface-glass border border-ds-border">
+          <span className="text-sm text-ds-text-primary font-medium">
+            {selectedRowKeys.length} donation{selectedRowKeys.length !== 1 ? "s" : ""} selected
+          </span>
+          <div className="flex-1" />
+          <Popconfirm
+            title={`Verify ${selectedRowKeys.length} donation${selectedRowKeys.length !== 1 ? "s" : ""}?`}
+            onConfirm={() => handleBatchVerify("VERIFIED")}
+            okText="Yes"
+            cancelText="No">
+            <Button
+              type="primary"
+              size="small"
+              loading={batchVerifying}
+              icon={<ICONS.check />}>
+              Verify Selected
+            </Button>
+          </Popconfirm>
+          <Popconfirm
+            title={`Reject ${selectedRowKeys.length} donation${selectedRowKeys.length !== 1 ? "s" : ""}?`}
+            onConfirm={() => handleBatchVerify("REJECTED")}
+            okText="Yes"
+            cancelText="No">
+            <Button
+              danger
+              size="small"
+              loading={batchVerifying}
+              icon={<ICONS.close />}>
+              Reject Selected
+            </Button>
+          </Popconfirm>
+        </div>
+      )}
+
       {/* Table */}
       <DataTable<EnrichedDonation>
         columns={columns}
         dataSource={donations}
         rowKey="id"
         loading={loading}
+        rowSelection={rowSelection}
         pagination={{
           current: page,
           total,

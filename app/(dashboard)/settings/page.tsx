@@ -13,6 +13,7 @@ import {
   Col,
   Divider,
   Tag,
+  Select,
   message,
 } from "antd";
 import { useAuth } from "@/hooks/useAuth";
@@ -26,6 +27,7 @@ import GlobalLeaderboardAdminView from "@/modules/leaderboard/components/GlobalL
 import PageHeader from "@/components/ui/PageHeader";
 import AvatarPicker from "@/components/ui/AvatarPicker";
 import PhoneInput from "@/components/ui/PhoneInput";
+import { CAMPUS_OPTIONS } from "@/config/campuses";
 
 const { Title, Text } = Typography;
 
@@ -54,6 +56,7 @@ function ProfileSection() {
           lastName: values.lastName,
           ...(avatarUrl && { profilePicture: avatarUrl }),
           whatsappNumber: values.whatsappNumber ?? "",
+          campus: values.campus ?? "",
         }),
       });
       const json = await res.json();
@@ -120,6 +123,7 @@ function ProfileSection() {
           lastName: user?.lastName,
           email: user?.email,
           whatsappNumber: user?.whatsappNumber,
+          campus: user?.campus,
         }}>
         <Row gutter={16}>
           <Col span={12}>
@@ -156,6 +160,15 @@ function ProfileSection() {
             },
           ]}>
           <PhoneInput placeholder="7012345678" />
+        </Form.Item>
+        <Form.Item label="Campus" name="campus">
+          <Select
+            placeholder="Select your campus"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={[...CAMPUS_OPTIONS]}
+          />
         </Form.Item>
         <Button
           type="primary"

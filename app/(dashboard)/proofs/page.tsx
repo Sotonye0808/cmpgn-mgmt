@@ -84,7 +84,6 @@ export default function ProofsPage() {
           <ProofReviewPanel
             key="team-proofs"
             campaigns={campaigns ?? []}
-            userMap={{}}
           />
         );
 

@@ -64,6 +64,34 @@ export const KPI_CARDS: (KpiCardConfig & { allowedRoles: RoleValue[] })[] = [
         color: "#F97316",
         allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
+    {
+        key: "totalClicks",
+        label: "Platform Clicks",
+        icon: "links",
+        color: "#2563EB",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "totalShares",
+        label: "Platform Shares",
+        icon: "share",
+        color: "#059669",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "totalSmartLinks",
+        label: "Smart Links Created",
+        icon: "links",
+        color: "#7C3AED",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "totalReferrals",
+        label: "Total Referrals",
+        icon: "team",
+        color: "#DC2626",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
 ];
 
 export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[] = [

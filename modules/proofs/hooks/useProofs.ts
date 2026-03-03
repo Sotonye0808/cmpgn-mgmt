@@ -2,11 +2,19 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
-import { fetchProofs, submitProof, reviewProof, type ReviewProofInput } from "../services/proofService";
+import {
+    fetchProofs,
+    submitProof,
+    reviewProof,
+    batchReviewProofs,
+    type ReviewProofInput,
+    type BatchReviewInput,
+    type BatchReviewResult,
+} from "../services/proofService";
 
 // ─── useProofs ────────────────────────────────────────────────────────────────
 // Fetches proofs for the current user (or all proofs for admin).
-// Optionally scoped to a single campaign.
+// Optionally scoped to a single campaign or "team" scope for team leads.
 
 interface UseProofsReturn {
     proofs: ViewProof[];
@@ -15,7 +23,7 @@ interface UseProofsReturn {
     refresh: () => void;
 }
 
-export function useProofs(campaignId?: string): UseProofsReturn {
+export function useProofs(campaignId?: string, scope?: "team"): UseProofsReturn {
     const [proofs, setProofs] = useState<ViewProof[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
@@ -24,14 +32,14 @@ export function useProofs(campaignId?: string): UseProofsReturn {
         setLoading(true);
         setError(null);
         try {
-            const data = await fetchProofs(campaignId);
+            const data = await fetchProofs(campaignId, scope);
             setProofs(data);
         } catch (e) {
             setError(e instanceof Error ? e.message : "Failed to load proofs");
         } finally {
             setLoading(false);
         }
-    }, [campaignId]);
+    }, [campaignId, scope]);
 
     useEffect(() => { fetch(); }, [fetch]);
     useAutoRefresh("viewProofs", fetch);
@@ -109,4 +117,37 @@ export function useReviewProof(onSuccess?: () => void): UseReviewProofReturn {
     );
 
     return { review, loading, error };
+}
+
+// ─── useBatchReviewProof ──────────────────────────────────────────────────────
+
+interface UseBatchReviewProofReturn {
+    batchReview: (input: BatchReviewInput) => Promise<BatchReviewResult | undefined>;
+    loading: boolean;
+    error: string | null;
+}
+
+export function useBatchReviewProof(onSuccess?: () => void): UseBatchReviewProofReturn {
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const batchReview = useCallback(
+        async (input: BatchReviewInput): Promise<BatchReviewResult | undefined> => {
+            setLoading(true);
+            setError(null);
+            try {
+                const result = await batchReviewProofs(input);
+                onSuccess?.();
+                return result;
+            } catch (e) {
+                setError(e instanceof Error ? e.message : "Failed to batch review proofs");
+                return undefined;
+            } finally {
+                setLoading(false);
+            }
+        },
+        [onSuccess],
+    );
+
+    return { batchReview, loading, error };
 }

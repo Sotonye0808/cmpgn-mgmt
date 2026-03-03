@@ -55,10 +55,17 @@ export default function ProofCard({
         </span>
       </div>
 
-      {/* Platform + date */}
+      {/* Platform + date + views */}
       <div className="flex items-center justify-between text-xs text-ds-text-subtle">
         <span className="font-medium">{platformLabel.replace("_", " ")}</span>
-        <span>{formatDate(proof.createdAt)}</span>
+        <div className="flex items-center gap-3">
+          {proof.viewCount != null && proof.viewCount > 0 && (
+            <span className="text-ds-brand-accent font-semibold">
+              {proof.viewCount.toLocaleString()} views
+            </span>
+          )}
+          <span>{formatDate(proof.createdAt)}</span>
+        </div>
       </div>
 
       {/* Screenshot */}

@@ -45,6 +45,7 @@ export const POINTS_CONFIG = {
     TEAM_MILESTONE: { type: "LEADERSHIP" as const, value: 50 },
     GOAL_MET: { type: "RELIABILITY" as const, value: 30 },
     REPORT_ACCURATE: { type: "RELIABILITY" as const, value: 10 },
+    PROOF_APPROVED: { type: "RELIABILITY" as const, value: 15 },
 } as const;
 
 // ─── Trust Score ─────────────────────────────────────────────────────────────

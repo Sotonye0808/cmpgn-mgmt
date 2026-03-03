@@ -177,18 +177,23 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
         await redis.set(seenKey, true, 86_400_000); // 24h in ms
     }
 
-    const updatedLink = await prisma.smartLink.update({
-        where: { id: link.id },
-        data: {
-            clickCount: { increment: 1 },
-            uniqueClickCount: alreadySeen ? undefined : { increment: 1 },
-        },
-    });
+    // Update SmartLink counters + Campaign counter + award points atomically
+    const updatedLink = await prisma.$transaction(async (tx) => {
+        const updated = await tx.smartLink.update({
+            where: { id: link.id },
+            data: {
+                clickCount: { increment: 1 },
+                uniqueClickCount: alreadySeen ? undefined : { increment: 1 },
+            },
+        });
 
-    await redis.del(`smartlink:slug:${slug}`);
+        // Propagate click to campaign-level counter
+        await tx.campaign.update({
+            where: { id: link.campaignId },
+            data: { clickCount: { increment: 1 } },
+        });
 
-    // Distribute click points via transaction
-    await prisma.$transaction(async (tx) => {
+        // Distribute click points
         await tx.pointsLedgerEntry.create({
             data: {
                 userId: link.userId,
@@ -198,8 +203,17 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
                 description: "Smart link click received",
             },
         });
-        await redis.del(`points:summary:${link.userId}`);
+
+        return updated;
     });
+
+    // Invalidate caches
+    await Promise.all([
+        redis.del(`smartlink:slug:${slug}`),
+        redis.del(`points:summary:${link.userId}`),
+        redis.del(`analytics:campaign:${link.campaignId}`),
+        redis.del("analytics:overview"),
+    ]);
 
     return serialize<SmartLink>(updatedLink);
 }

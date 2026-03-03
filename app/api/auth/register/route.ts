@@ -15,7 +15,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse(result.error.errors[0].message);
         }
 
-        const { email, password, firstName, lastName, whatsappNumber } = result.data;
+        const { email, password, firstName, lastName, whatsappNumber, campus } = result.data;
 
         // Check if email already exists
         const existing = await prisma.user.findUnique({ where: { email } });
@@ -36,6 +36,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
                     trustScore: 100,
                     isActive: true,
                     ...(whatsappNumber && { whatsappNumber }),
+                    ...(campus && { campus }),
                 },
             });
 
@@ -58,6 +59,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             role: user.role as UserRole,
             profilePicture: user.profilePicture ?? undefined,
             whatsappNumber: user.whatsappNumber ?? undefined,
+            campus: user.campus ?? undefined,
         };
 
         const accessToken = signAccessToken({ sub: user.id, email: user.email, role: user.role as string });

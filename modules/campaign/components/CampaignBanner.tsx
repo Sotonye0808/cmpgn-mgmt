@@ -161,11 +161,18 @@ export default function CampaignBanner({
       {renderMedia()}
 
       {/* Content */}
-      <div className="p-5">
-        <h2 className="text-xl lg:text-2xl font-bold text-ds-text-primary mb-2">
+      <div className="p-5 overflow-hidden">
+        <h2 className="text-xl lg:text-2xl font-bold text-ds-text-primary mb-2 break-words">
           {campaign.title}
         </h2>
-        <p className="text-ds-text-secondary mb-4">{campaign.description}</p>
+        <p className="text-ds-text-secondary mb-4 break-words whitespace-pre-wrap">{campaign.description}</p>
+
+        {/* Long-form content — only displayed for TEXT media type */}
+        {campaign.mediaType === "TEXT" && campaign.content && (
+          <div className="prose prose-sm text-ds-text-secondary mb-4 break-words whitespace-pre-wrap overflow-wrap-anywhere">
+            {campaign.content}
+          </div>
+        )}
 
         {/* Target Audience */}
         {campaign.targetAudience && campaign.targetAudience.length > 0 && (
@@ -191,8 +198,8 @@ export default function CampaignBanner({
         )}
 
         {/* Stats Footer */}
-        <div className="flex items-center justify-between pt-4 border-t border-ds-border-base">
-          <div className="flex items-center gap-5">
+        <div className="flex flex-wrap items-center gap-4 pt-4 border-t border-ds-border-base">
+          <div className="flex flex-wrap items-center gap-x-5 gap-y-2">
             <Tooltip title="Views">
               <div className="flex items-center gap-1.5 text-ds-text-secondary text-sm">
                 <ICONS.view className="text-base" />
@@ -230,7 +237,7 @@ export default function CampaignBanner({
           </div>
 
           {showActions && (
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2 ml-auto">
               {(campaign.mediaType === "IMAGE" || campaign.mediaType === "VIDEO") && campaign.mediaUrl && (
                 <Tooltip title="Download media">
                   <a

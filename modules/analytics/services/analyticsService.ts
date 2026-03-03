@@ -258,25 +258,72 @@ export async function getOverviewAnalytics(): Promise<OverviewAnalytics> {
     const cached = await redis.get<OverviewAnalytics>(cacheKey);
     if (cached) return cached;
 
-    const [totalUsers, activeCampaigns, totalDonationsCount, pointEntries, topCampaignsRaw] =
-        await Promise.all([
-            prisma.user.count(),
-            prisma.campaign.count({ where: { status: "ACTIVE" as never } }),
-            prisma.donation.count(),
-            prisma.pointsLedgerEntry.aggregate({ _sum: { value: true } }),
-            prisma.campaign.findMany({
-                where: { status: "ACTIVE" as never },
-                orderBy: { participantCount: "desc" },
-                take: 5,
-                select: { id: true, title: true, participantCount: true },
-            }),
-        ]);
+    const toNum = (val: unknown): number => {
+        if (val !== null && typeof val === "object" && typeof (val as { toNumber(): number }).toNumber === "function") {
+            return (val as { toNumber(): number }).toNumber();
+        }
+        return Number(val);
+    };
+
+    const [
+        totalUsers,
+        activeCampaigns,
+        totalDonationsCount,
+        donationAmountAgg,
+        pointEntries,
+        totalSmartLinks,
+        totalReferrals,
+        linkEventCounts,
+        topCampaignsRaw,
+    ] = await Promise.all([
+        prisma.user.count(),
+        prisma.campaign.count({ where: { status: "ACTIVE" as never } }),
+        prisma.donation.count(),
+        prisma.donation.aggregate({
+            _sum: { amount: true },
+            where: { status: { in: ["VERIFIED", "RECEIVED"] as never[] } },
+        }),
+        prisma.pointsLedgerEntry.aggregate({ _sum: { value: true } }),
+        prisma.smartLink.count(),
+        prisma.referral.count(),
+        prisma.linkEvent.groupBy({
+            by: ["eventType"],
+            _count: { id: true },
+        }),
+        prisma.campaign.findMany({
+            where: { status: "ACTIVE" as never },
+            orderBy: { participantCount: "desc" },
+            take: 5,
+            select: { id: true, title: true, participantCount: true },
+        }),
+    ]);
+
+    // Parse link event counts by type
+    const eventCountMap = new Map(
+        linkEventCounts.map((e) => [e.eventType, e._count.id])
+    );
+    const totalClicks = eventCountMap.get("CLICK") ?? 0;
+    const totalShares = eventCountMap.get("SHARE") ?? 0;
+    const totalViews = eventCountMap.get("VIEW") ?? 0;
+    const totalConversions = eventCountMap.get("CONVERSION") ?? 0;
+
+    // Engagement rate: conversions / clicks (if any)
+    const engagementRate = totalClicks > 0
+        ? Number(((totalConversions / totalClicks) * 100).toFixed(1))
+        : 0;
 
     const result: OverviewAnalytics = {
         totalUsers,
         activeCampaigns,
         totalDonations: totalDonationsCount,
+        totalDonationAmount: toNum(donationAmountAgg._sum.amount ?? 0),
         totalPoints: pointEntries._sum.value ?? 0,
+        totalClicks,
+        totalShares,
+        totalViews,
+        totalSmartLinks,
+        totalReferrals,
+        engagementRate,
         topCampaigns: topCampaignsRaw.map((c) => ({
             id: c.id,
             title: c.title,

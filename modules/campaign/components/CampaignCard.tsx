@@ -69,6 +69,19 @@ export default function CampaignCard({
         </div>
       );
     }
+    // TEXT / LINK types — show uploaded thumbnail if available
+    if (campaign.thumbnailUrl) {
+      return (
+        <div className="relative w-full h-44 bg-gradient-to-br from-ds-brand-accent-subtle to-ds-surface-elevated">
+          <Image
+            src={campaign.thumbnailUrl}
+            alt={campaign.title}
+            fill
+            className="object-cover"
+          />
+        </div>
+      );
+    }
     return (
       <div className="w-full h-44 bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 flex items-center justify-center">
         <div className="text-center text-white p-6">
@@ -194,7 +207,7 @@ export default function CampaignCard({
             {/* Action row — stopPropagation so card click doesn't also fire */}
             {(onJoin || onView || onShare) && (
               <div
-                className="flex items-center justify-between gap-2 pt-2 mt-1 border-t border-ds-border-base"
+                className="flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-ds-border-base"
                 onClick={(e) => e.stopPropagation()}>
                 {onView && (
                   <button

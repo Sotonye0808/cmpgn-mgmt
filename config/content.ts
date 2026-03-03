@@ -114,6 +114,8 @@ export const AUTH_CONTENT = {
         emailPlaceholder: "you@example.com",
         passwordLabel: "Password",
         passwordPlaceholder: "Min. 8 characters",
+        campusLabel: "Campus",
+        campusPlaceholder: "Select your campus",
         submitButton: "Create Account",
         loginPrompt: "Already have an account?",
         loginLink: "Sign in",
@@ -178,6 +180,11 @@ export const CAMPAIGN_CONTENT = {
         endDateLabel: "End Date",
         mediaTypeLabel: "Media Type",
         mediaUrlLabel: "Media URL",
+        thumbnailLabel: "Thumbnail Image",
+        thumbnailHint: "Upload a preview image for social sharing and campaign cards.",
+        uploadLabel: "Upload Media",
+        uploadHint: "Upload an image or video for this campaign.",
+        contentHint: "The main body text displayed to members.",
         parentCampaignLabel: "Parent Mega Mission (optional)",
         isMegaCampaignLabel: "This is a Mega Mission",
         submitCreate: "Create Mission",
@@ -387,6 +394,7 @@ export const DASHBOARD_FOOTER_CONTENT = {
         { key: "about", label: "About", href: "/about" },
         { key: "privacy", label: "Privacy", href: "/privacy" },
         { key: "terms", label: "Terms", href: "/terms" },
+        { key: "report-bug", label: "Report Bug", href: "/report-bug" },
     ],
     legal: { entity: "DMHicc" },
 } as const;
@@ -403,6 +411,7 @@ export const PUBLIC_FOOTER_CONTENT = {
             links: [
                 { key: "about", label: "About", href: "/about" },
                 { key: "contact", label: "Contact", href: "/contact" },
+                { key: "report-bug", label: "Report Bug", href: "/report-bug" },
             ],
         },
         {
@@ -861,4 +870,50 @@ export const FAQ_ITEMS = [
         question: "How do team invite links work?",
         answer: "Team Leads and Admins can generate invite links with a set number of uses and an optional expiry date. Share the link with your contacts — when they click it, they join your team automatically. You can track usage from the Teams page.",
     },
+] as const;
+
+// ─── Bug Report Page ─────────────────────────────────────────────────────────
+
+export const BUG_REPORT_CONTENT = {
+    meta: {
+        title: "Report a Bug",
+        description: "Help us improve DMHicc by reporting issues you encounter.",
+    },
+    hero: {
+        eyebrow: "Help Us Improve",
+        headline: "Report a Bug",
+        subheadline: "Found something that doesn't work as expected? Let us know and we'll fix it.",
+    },
+    form: {
+        categoryLabel: "Category",
+        categoryPlaceholder: "Select a category",
+        descriptionLabel: "Description",
+        descriptionPlaceholder: "Describe the issue you encountered in as much detail as possible — what you were doing, what you expected, and what happened instead.",
+        emailLabel: "Email Address",
+        emailPlaceholder: "your@email.com",
+        emailHint: "So we can follow up if we need more details.",
+        submitLabel: "Submit Report",
+        submittingLabel: "Submitting…",
+    },
+    success: {
+        title: "Report Submitted",
+        message: "Thank you for helping us improve DMHicc. Our team will review your report and address it as soon as possible.",
+        backLabel: "Back to Home",
+    },
+} as const;
+
+export const BUG_REPORT_CATEGORIES = [
+    { key: "UI_ISSUE", label: "UI / Visual Issue", description: "Layout broken, elements misaligned, styling problems" },
+    { key: "DATA_ISSUE", label: "Data Issue", description: "Incorrect numbers, missing data, stale information" },
+    { key: "PERFORMANCE", label: "Performance", description: "Slow loading, timeouts, unresponsive pages" },
+    { key: "FEATURE_REQUEST", label: "Feature Request", description: "Something you'd like us to add or improve" },
+    { key: "ACCESS_AUTH", label: "Access / Authentication", description: "Login issues, permissions errors, locked out" },
+    { key: "OTHER", label: "Other", description: "Anything else not covered above" },
+] as const;
+
+export const BUG_REPORT_STATUSES = [
+    { key: "OPEN", label: "Open", color: "#3B82F6" },
+    { key: "IN_PROGRESS", label: "In Progress", color: "#F59E0B" },
+    { key: "RESOLVED", label: "Resolved", color: "#10B981" },
+    { key: "CLOSED", label: "Closed", color: "#6B7280" },
 ] as const;
