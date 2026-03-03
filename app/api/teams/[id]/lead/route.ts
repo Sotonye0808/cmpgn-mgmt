@@ -5,7 +5,7 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { setTeamLead } from "@/modules/teams";
+import { setTeamLead } from "@/modules/teams/services/teamService";
 import { z } from "zod";
 
 const setLeadSchema = z.object({

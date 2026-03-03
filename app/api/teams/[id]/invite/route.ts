@@ -5,7 +5,7 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { generateInviteLink } from "@/modules/teams";
+import { generateInviteLink } from "@/modules/teams/services/teamService";
 import { prisma } from "@/lib/prisma";
 import { z } from "zod";
 

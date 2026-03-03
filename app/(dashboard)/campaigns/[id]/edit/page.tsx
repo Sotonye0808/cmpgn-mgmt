@@ -4,7 +4,7 @@ import { use, useState } from "react";
 import { Spin, Alert } from "antd";
 import { useRouter } from "next/navigation";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
-import { CampaignForm } from "@/modules/campaign";
+import CampaignForm from "@/modules/campaign/components/CampaignForm";
 import { CAMPAIGN_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import { ICONS } from "@/config/icons";

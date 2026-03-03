@@ -1,4 +1,5 @@
-export { getLeaderboard, getUserRank, refreshSnapshot, getTeamLeaderboard, getGroupLeaderboard } from "./services/leaderboardService";
+// Leaderboard module barrel — client-safe exports only
+// Services are imported directly from @/modules/leaderboard/services/leaderboardService by API routes
 export { useLeaderboard } from "./hooks/useLeaderboard";
 export { default as LeaderboardTable } from "./components/LeaderboardTable";
 export { default as LeaderboardPodium } from "./components/LeaderboardPodium";

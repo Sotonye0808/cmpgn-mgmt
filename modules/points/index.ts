@@ -1,4 +1,5 @@
-export { award, getPointsSummary, getRank, getRankProgress, getLedger } from "./services/pointsService";
+// Points module — client-safe exports only
+// Services are imported directly from @/modules/points/services/pointsService by API routes
 export { usePoints } from "./hooks/usePoints";
 export { default as PointsSummaryCard } from "./components/PointsSummaryCard";
 export { default as RankBadge } from "./components/RankBadge";

@@ -516,7 +516,7 @@ export const CONTACT_PAGE_CONTENT = {
             label: "Harvesters ICC",
             value: "churchministry@harvestersng.org",
             description: "For church-related enquiries and partnership matters.",
-            action: { label: "Visit Website", href: "https://harvesters.org.ng" },
+            action: { label: "Visit Website", href: "https://harvestersng.org" },
         },
     ],
     note: {

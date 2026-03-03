@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import { ICONS } from "@/config/icons";
-import { CampaignForm } from "@/modules/campaign";
+import CampaignForm from "@/modules/campaign/components/CampaignForm";
 import { CAMPAIGN_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/hooks/useAuth";

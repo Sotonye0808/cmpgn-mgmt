@@ -1,22 +1,5 @@
-// Teams module barrel
-export {
-    createGroup,
-    listGroups,
-    getGroup,
-    getGroupWithTeams,
-    createTeam,
-    listTeams,
-    getTeam,
-    getTeamWithMembers,
-    addMemberToTeam,
-    removeMemberFromTeam,
-    setTeamLead,
-    generateInviteLink,
-    getInviteLink,
-    consumeInviteLink,
-    deactivateInviteLink,
-    getTeamMemberStats,
-} from "./services/teamService";
+// Teams module barrel — client-safe exports only
+// Services are imported directly from @/modules/teams/services/teamService by API routes
 export type { TeamMemberStat } from "./services/teamService";
 export { useTeams } from "./hooks/useTeams";
 export { default as TeamCard } from "./components/TeamCard";

@@ -5,7 +5,7 @@ import {
     notFoundResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { getTeamWithMembers } from "@/modules/teams";
+import { getTeamWithMembers } from "@/modules/teams/services/teamService";
 
 export async function GET(
     _request: NextRequest,

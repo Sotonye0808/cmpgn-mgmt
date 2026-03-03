@@ -1,14 +1,5 @@
-// Donation module
-export {
-    recordDonation,
-    getCampaignFundraisingStats,
-    getUserDonations,
-    getDonationById,
-    uploadDonationProof,
-    verifyDonation,
-    listDonations,
-    getDonationAnalytics,
-} from "./services/donationService";
+// Donation module — client-safe exports only
+// Services are imported directly from @/modules/donation/services/donationService by API routes
 export { useDonations, useFundraising } from "./hooks/useDonations";
 export { default as DonationForm } from "./components/DonationForm";
 export { default as FundraisingProgress } from "./components/FundraisingProgress";
