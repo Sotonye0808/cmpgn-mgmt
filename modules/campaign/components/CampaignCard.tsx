@@ -206,6 +206,20 @@ export default function CampaignCard({
                   </button>
                 )}
                 <div className="flex items-center gap-1.5 ml-auto">
+                  {(campaign.mediaType === "IMAGE" || campaign.mediaType === "VIDEO") && campaign.mediaUrl && (
+                    <Tooltip title="Download media">
+                      <a
+                        href={campaign.mediaUrl}
+                        download
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Download campaign media"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
+                        <ICONS.download className="text-xs" />
+                      </a>
+                    </Tooltip>
+                  )}
                   {onShare && (
                     <button
                       type="button"

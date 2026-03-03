@@ -10,6 +10,7 @@ import { ICONS } from "@/config/icons";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/config/routes";
 import { formatDate } from "@/lib/utils/format";
+import { VIEW_PROOF_CONTENT } from "@/config/content";
 import Card from "@/components/ui/Card";
 import SubmitProofModal from "@/modules/proofs/components/SubmitProofModal";
 import CampaignAuditLog from "@/modules/campaign/components/CampaignAuditLog";
@@ -166,7 +167,7 @@ export default function CampaignDetailPage() {
             variant="primary"
             icon={<ICONS.camera />}
             onClick={() => setSubmitProofOpen(true)}>
-            Submit Proof of Deployment
+            {VIEW_PROOF_CONTENT.submitFromDetailButton}
           </Button>
         </div>
       )}

@@ -231,6 +231,20 @@ export default function CampaignBanner({
 
           {showActions && (
             <div className="flex items-center gap-2">
+              {(campaign.mediaType === "IMAGE" || campaign.mediaType === "VIDEO") && campaign.mediaUrl && (
+                <Tooltip title="Download media">
+                  <a
+                    href={campaign.mediaUrl}
+                    download
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    aria-label="Download campaign media"
+                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-ds-lg border border-ds-border-base text-ds-text-secondary hover:text-ds-brand-accent hover:border-ds-brand-accent transition-all">
+                    <ICONS.download className="text-base" />
+                    <span>Download</span>
+                  </a>
+                </Tooltip>
+              )}
               <Button
                 variant="secondary"
                 icon={<ICONS.share />}

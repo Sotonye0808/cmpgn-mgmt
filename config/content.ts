@@ -4,12 +4,12 @@ export const LANDING_CONTENT = {
     meta: {
         title: "DMHicc — Digital Mobilization Army",
         description:
-            "Join Heaven's Digital Mobilizers. Smart ammunition distribution, referral tracking, military rank progression, and real-time battle analytics.",
+            "Join Heaven's Digital Mobilizers. Smart campaign link distribution, referral tracking, rank progression, and real-time analytics.",
     },
     hero: {
         headline: "Digital Mobilization Army",
         subheadline:
-            "Join Heaven's Digital Mobilizers. Every soldier gets ammunition, every campaign has a mission, and every commander has a live war room.",
+            "Join Heaven's Digital Mobilizers. Every member gets a personal tracking link, every campaign has clear direction, and every leader has real-time insight.",
         cta: "Enlist Now",
         ctaSecondary: "Learn More",
     },
@@ -17,48 +17,68 @@ export const LANDING_CONTENT = {
         {
             key: "ammunition",
             icon: "links" as const,
-            title: "Ammunition Distribution",
+            title: "Campaign Link Distribution",
             description:
-                "Every soldier–mission pair gets unique trackable ammunition. Monitor deployment, reach, and conversions in real time.",
+                "Every member–campaign pair gets a unique trackable link. Monitor reach, clicks, and conversions in real time.",
         },
         {
             key: "gamification",
             icon: "star" as const,
-            title: "Military Rank Progression",
+            title: "Rank & Rewards",
             description:
                 "Earn Impact, Consistency, Leadership, and Reliability points. Rise from Recruit to General.",
         },
         {
             key: "referrals",
             icon: "team" as const,
-            title: "Recruitment Engine",
+            title: "Referral Engine",
             description:
-                "Track who recruited whom. Attribute enlistments to recruiters and missions automatically.",
+                "Track who referred whom. Attribute sign-ups to referrers and campaigns automatically.",
         },
         {
             key: "analytics",
             icon: "analytics" as const,
-            title: "War Room Analytics",
+            title: "Real-Time Analytics",
             description:
-                "Real-time command dashboards for soldiers and commanders. Battle trends, top performers, and mission health.",
+                "Live dashboards for members and leaders. Engagement trends, top performers, and campaign health.",
         },
         {
             key: "proofs",
             icon: "check" as const,
-            title: "Proof of Deployment",
+            title: "Activity Verification",
             description:
-                "Submit screenshot evidence after deploying your ammunition. Verified proofs earn Reliability points and build your credibility score.",
+                "Submit screenshot evidence after sharing your link. Verified proofs earn Reliability points and build your credibility score.",
         },
     ],
     stats: [
-        { key: "ammo", label: "Ammunition Deployed", value: "100M+" },
-        { key: "missions", label: "Active Missions", value: "500+" },
-        { key: "soldiers", label: "Digital Soldiers", value: "10K+" },
+        { key: "ammo", label: "Links Deployed", value: "100M+" },
+        { key: "missions", label: "Active Campaigns", value: "500+" },
+        { key: "soldiers", label: "Digital Members", value: "10K+" },
         { key: "conversions", label: "Conversion Rate", value: "12%" },
     ],
     footer: {
         copyright: "© 2026 Harvesters International Christian Centre. DMHicc Platform.",
         tagline: "Built for Heaven's Digital Army.",
+    },
+    home: {
+        featuredSection: {
+            heading: "Featured Campaign",
+            subheading: "The flagship campaign currently gaining the most traction.",
+            participantsLabel: "Members:",
+            subCampaignsLabel: "Sub-Missions:",
+        },
+        topMobilizersSection: {
+            heading: "Top 5 Digital Members",
+            subheading: "The highest-ranking members across all campaigns.",
+        },
+        featuresSection: {
+            heading: "Everything You Need to Make an Impact",
+            subheading: "One platform for campaign link distribution, referral tracking, rank progression, and real-time analytics.",
+        },
+        ctaSection: {
+            heading: "Ready to Make an Impact?",
+            body: "Join thousands of digital members already using DMHicc to share, grow, and lead their campaigns.",
+        },
     },
 } as const;
 
@@ -71,8 +91,8 @@ export const DEV_CREDENTIALS = [
 
 export const AUTH_CONTENT = {
     login: {
-        title: "Welcome Back, Soldier",
-        subtitle: "Sign in to your DMHicc command dashboard",
+        title: "Welcome Back",
+        subtitle: "Sign in to your DMHicc dashboard",
         emailLabel: "Email Address",
         emailPlaceholder: "you@example.com",
         passwordLabel: "Password",
@@ -102,19 +122,19 @@ export const AUTH_CONTENT = {
 
 export const DASHBOARD_CONTENT = {
     greeting: "Welcome back, {name}!",
-    subtitle: "Here's the status of your missions today, soldier.",
+    subtitle: "Here's your activity overview for today.",
     sections: {
         activeCampaigns: "Active Missions",
-        myLinks: "My Ammunition",
+        myLinks: "My Links",
         recentActivity: "Recent Activity",
         leaderboard: "Leaderboard",
     },
     kpi: {
         totalPoints: "Total Points",
-        rank: "Military Rank",
+        rank: "Rank",
         activeCampaigns: "Active Missions",
-        referrals: "Recruits",
-        linkClicks: "Ammo Hits",
+        referrals: "Referrals",
+        linkClicks: "Link Clicks",
         donationsRaised: "Donations Raised",
     },
 } as const;
@@ -122,7 +142,7 @@ export const DASHBOARD_CONTENT = {
 export const CAMPAIGN_CONTENT = {
     page: {
         title: "Missions",
-        description: "Browse and enlist in active missions",
+        description: "Browse and join active campaigns",
         emptyTitle: "No Missions Yet",
         emptyDescription: "Check back soon for new missions to join.",
         createButton: "New Mission",
@@ -136,10 +156,10 @@ export const CAMPAIGN_CONTENT = {
     },
     goalType: {
         SHARES: "Shares",
-        CLICKS: "Hits",
-        REFERRALS: "Recruits",
+        CLICKS: "Clicks",
+        REFERRALS: "Referrals",
         DONATIONS: "Donations",
-        PARTICIPANTS: "Soldiers",
+        PARTICIPANTS: "Participants",
     },
     form: {
         createTitle: "Create Mission",
@@ -150,7 +170,7 @@ export const CAMPAIGN_CONTENT = {
         descriptionPlaceholder: "Brief description of this mission",
         contentLabel: "Content",
         ctaTextLabel: "Call to Action Text",
-        ctaTextPlaceholder: "e.g. Deploy Now",
+        ctaTextPlaceholder: "e.g. Join Now",
         ctaUrlLabel: "Call to Action URL",
         goalTypeLabel: "Goal Type",
         goalTargetLabel: "Goal Target",
@@ -168,21 +188,24 @@ export const CAMPAIGN_CONTENT = {
         subCampaignsTitle: "Sub-Missions",
         subCampaignsEmpty: "No sub-missions yet.",
     },
+    detail: {
+        submitProofButton: "Submit Activity Proof",
+    },
 } as const;
 
 export const SMART_LINK_CONTENT = {
     page: {
-        title: "My Ammunition",
-        description: "Your unique trackable ammunition for each mission",
-        emptyTitle: "No Ammunition Yet",
-        emptyDescription: "Join a mission to receive your ammunition.",
+        title: "My Links",
+        description: "Your unique trackable links for each campaign",
+        emptyTitle: "No Links Yet",
+        emptyDescription: "Join a campaign to receive your tracking link.",
     },
     card: {
         copyButton: "Copy Link",
         copiedButton: "Copied!",
-        clicks: "Hits",
+        clicks: "Clicks",
         conversions: "Conversions",
-        referrals: "Recruits",
+        referrals: "Referrals",
         expiry: "Expires",
         expired: "Expired",
         active: "Active",
@@ -196,8 +219,8 @@ export const NAV_CONTENT = {
 
 export const LEADERBOARD_PAGE_CONTENT = {
     title: "Leaderboard",
-    subtitle: "Top soldiers ranked by impact, consistency, leadership, and reliability.",
-    emptyState: "No soldiers yet. Enlist in a mission to appear on the leaderboard.",
+    subtitle: "Top members ranked by impact, consistency, leadership, and reliability.",
+    emptyState: "No members yet. Join a campaign to appear on the leaderboard.",
     myRankLabel: "Your Position",
 } as const;
 
@@ -209,16 +232,16 @@ export const ENGAGEMENT_PAGE_CONTENT = {
 } as const;
 
 export const REFERRAL_PAGE_CONTENT = {
-    title: "Recruitment",
-    subtitle: "Track who you've recruited and how your platoon is growing.",
+    title: "Referrals",
+    subtitle: "Track who you've referred and how your network is growing.",
     linkPanelTitle: "Your Recruitment Link",
 } as const;
 
 export const POINTS_PAGE_CONTENT = {
     title: "Points & Rank",
-    subtitle: "Your battle score breakdown and progress toward the next military rank.",
+    subtitle: "Your score breakdown and progress toward the next rank.",
     summaryTitle: "Points Summary",
-    rankTitle: "Military Rank",
+    rankTitle: "Your Rank",
     ledgerTitle: "Points History",
 } as const;
 
@@ -258,17 +281,17 @@ export const TRUST_PAGE_CONTENT = {
 } as const;
 
 export const ANALYTICS_PAGE_CONTENT = {
-    title: "War Room",
-    subtitle: "Your command dashboard — engagement, points, recruits, and more.",
+    title: "Analytics",
+    subtitle: "Your dashboard — engagement, points, referrals, and more.",
     kpiTitle: "Key Metrics",
     engagementTitle: "Engagement Timeline",
-    performersTitle: "Top Soldiers",
-    growthTitle: "Mission Growth",
+    performersTitle: "Top Members",
+    growthTitle: "Campaign Growth",
     overviewTitle: "Platform Overview",
     campaignAnalyticsTitle: "Campaign Analytics",
     campaignAnalyticsPlaceholder: "Select a campaign above to view detailed analytics.",
     campaignAnalyticsEngagementLabel: "Engagement Trend",
-    campaignAnalyticsTopSoldiersLabel: "Top Soldiers — This Campaign",
+    campaignAnalyticsTopSoldiersLabel: "Top Members — This Campaign",
 } as const;
 
 export const SETTINGS_PAGE_CONTENT = {
@@ -277,8 +300,8 @@ export const SETTINGS_PAGE_CONTENT = {
     profileSection: "Profile",
     securitySection: "Security",
     adminSection: "Administration",
-    weaponsOfChoiceSection: "Weapons of Choice",
-    weaponsOfChoiceDescription: "Select the social media platforms you deploy your ammunition on.",
+    weaponsOfChoiceSection: "My Platforms",
+    weaponsOfChoiceDescription: "Select the social media platforms you share on.",
 } as const;
 
 export const SOCIAL_PLATFORMS_CONFIG = [
@@ -292,11 +315,14 @@ export const SOCIAL_PLATFORMS_CONFIG = [
 ] as const;
 
 export const TEAM_PAGE_CONTENT = {
-    title: "Squad",
-    subtitle: "View and manage your squad's participation and performance.",
-    membersTitle: "Squad Members",
-    performanceTitle: "Squad Performance",
-    emptyState: "No squad members found.",
+    title: "My Team",
+    subtitle: "View and manage your team's participation and performance.",
+    membersTitle: "Team Members",
+    performanceTitle: "Team Performance",
+    emptyState: "No team members found.",
+    noTeamMessage: "You are not currently part of a team.",
+    noTeamPrompt: "Ask your admin to add you to one.",
+    inviteLinkDescription: "Generate a shareable invite link for new team members (up to 10 uses).",
     roleFilter: "Filter by rank",
 } as const;
 
@@ -309,11 +335,11 @@ export const NOT_FOUND_CONTENT = {
 } as const;
 
 export const VIEW_PROOF_CONTENT = {
-    title: "Proof of Deployment",
-    subtitle: "Upload screenshots proving you deployed your ammunition on each platform.",
+    title: "Activity Proof",
+    subtitle: "Upload screenshots showing you've shared your campaign link on each platform.",
     uploadButton: "Submit Proof",
-    modalTitle: "Upload Deployment Proof",
-    platformLabel: "Platform Deployed On",
+    modalTitle: "Upload Activity Proof",
+    platformLabel: "Platform Shared On",
     screenshotLabel: "Screenshot",
     screenshotPlaceholder: "Paste screenshot URL or upload",
     submitButton: "Submit Proof",
@@ -322,8 +348,9 @@ export const VIEW_PROOF_CONTENT = {
         APPROVED: "Verified",
         REJECTED: "Rejected",
     },
-    emptyState: "No deployment proofs submitted yet.",
-    reviewTitle: "Review Deployment Proofs",
+    emptyState: "No activity proofs submitted yet.",
+    submitFromDetailButton: "Submit Activity Proof",
+    reviewTitle: "Review Activity Proofs",
     approveButton: "Approve",
     rejectButton: "Reject",
 } as const;
@@ -687,32 +714,32 @@ export const HOW_IT_WORKS_STEPS = [
     {
         key: "enlist",
         step: "1",
-        title: "Enlist in a Mission",
-        description: "Browse active missions and enlist in those that align with your calling. Your ammunition is issued instantly.",
+        title: "Join a Campaign",
+        description: "Browse active campaigns and join those that align with your calling. Your personal tracking link is issued instantly.",
     },
     {
         key: "deploy",
         step: "2",
-        title: "Deploy Your Ammunition",
-        description: "Distribute your unique trackable ammunition across your weapon of choice — social media, email, and messaging platforms.",
+        title: "Share with Purpose",
+        description: "Download content, share your unique tracking link across your social media, and post your screenshots from the 24th hour.",
     },
     {
         key: "earn",
         step: "3",
         title: "Earn Points & Rank Up",
-        description: "Every hit, recruit, and conversion earns you points. Rise through the military ranks from Recruit to General.",
+        description: "Every click, referral, and conversion earns you points. Rise through the ranks from Recruit to General.",
     },
     {
         key: "proof",
         step: "4",
-        title: "Submit Deployment Proof",
-        description: "After deploying, upload a screenshot as evidence. Approved proofs earn Reliability points and verify your activity to commanders.",
+        title: "Submit Activity Proof",
+        description: "After sharing, upload a screenshot as evidence. Approved proofs earn Reliability points and verify your activity to team leads.",
     },
     {
         key: "impact",
         step: "5",
-        title: "Report to the War Room",
-        description: "Real-time command dashboards show your battle stats, recruitment network, proof history, and fundraising contributions.",
+        title: "Track Your Impact",
+        description: "Real-time dashboards show your engagement stats, referral network, proof history, and fundraising contributions.",
     },
     {
         key: "contribute",
@@ -734,7 +761,7 @@ export const PROOF_PIPELINE_STAGES = [
         key: "submit",
         step: "1",
         label: "Submit",
-        description: "Upload a screenshot of your deployed ammunition on any platform.",
+        description: "Upload a screenshot of your shared campaign link on any platform.",
         status: "PENDING" as const,
         statusLabel: "Queued for Review",
         color: "#F59E0B",
@@ -743,7 +770,7 @@ export const PROOF_PIPELINE_STAGES = [
         key: "review",
         step: "2",
         label: "Review",
-        description: "A Team Lead or Commander verifies the proof against the campaign requirements.",
+        description: "A Team Lead or Admin reviews the proof against the campaign requirements.",
         status: "REVIEW" as const,
         statusLabel: "Under Review",
         color: "#3B82F6",
@@ -761,7 +788,7 @@ export const PROOF_PIPELINE_STAGES = [
         key: "rejected",
         step: "3b",
         label: "Rejected",
-        description: "Proof did not meet requirements. Review any notes from your commander and resubmit.",
+        description: "Proof did not meet requirements. Review any notes from your reviewer and resubmit.",
         status: "REJECTED" as const,
         statusLabel: "Resubmit",
         color: "#EF4444",
@@ -772,57 +799,57 @@ export const FAQ_ITEMS = [
     {
         key: "what-is-dmhicc",
         question: "What is DMHicc?",
-        answer: "DMHicc is the Digital Mobilization Army — a platform that issues every soldier trackable ammunition, a military rank progression system, and live war room analytics — all within one command center.",
+        answer: "DMHicc is the Digital Mobilization Army — a platform that gives every member a personal tracking link, a rank progression system, and live analytics — all in one place.",
     },
     {
         key: "who-can-join",
-        question: "Who can enlist in missions?",
-        answer: "Any registered soldier can browse and enlist in active missions. Team Leads and Commanders have additional tools for managing missions and soldiers.",
+        question: "Who can join campaigns?",
+        answer: "Any registered member can browse and join active campaigns. Team Leads and Admins have additional tools for managing campaigns and members.",
     },
     {
         key: "how-points-work",
         question: "How do military ranks work?",
-        answer: "Points are earned across four categories: Impact (hits & conversions), Consistency (streaks), Leadership (recruits), and Reliability (mission completion). Your total determines your military rank — from Recruit all the way to General.",
+        answer: "Points are earned across four categories: Impact (clicks & conversions), Consistency (streaks), Leadership (referrals), and Reliability (campaign completion). Your total determines your rank — from Recruit all the way to General.",
     },
     {
         key: "ammunition",
-        question: "What is ammunition?",
-        answer: "Each soldier–mission pair receives unique trackable ammunition (a short URL) that tracks every hit, share, and recruitment attribution automatically.",
+        question: "What is a tracking link?",
+        answer: "Each member–campaign combination generates a unique short URL that tracks every click, share, and referral attribution automatically.",
     },
     {
         key: "donations",
         question: "How do donations work?",
-        answer: "Soldiers can donate directly to missions with fundraising goals. Donations earn Leadership Points and surface on the mission's fundraising leaderboard.",
+        answer: "Members can donate directly to campaigns with fundraising goals. Donations earn Leadership Points and surface on the campaign's fundraising leaderboard.",
     },
     {
         key: "what-is-proof",
-        question: "What is a Deployment Proof?",
-        answer: "A Deployment Proof is a screenshot you upload showing that you've posted your ammunition (trackable link) on a social media platform, messaging app, or email. It's your evidence of real-world deployment.",
+        question: "What is an Activity Proof?",
+        answer: "An Activity Proof is a screenshot you upload showing that you've shared your campaign link on a social media platform, messaging app, or email. It's your evidence of real-world sharing.",
     },
     {
         key: "proof-pipeline",
         question: "How does the proof review pipeline work?",
-        answer: "After you submit a proof, it enters a PENDING queue. A Team Lead or Commander reviews it against the mission requirements. If approved, Reliability Points are instantly credited to your rank. If rejected, you receive commander notes and can resubmit an improved proof.",
+        answer: "After you submit a proof, it enters a PENDING queue. A Team Lead or Admin reviews it against the campaign requirements. If approved, Reliability Points are instantly credited to your rank. If rejected, you receive reviewer notes and can resubmit an improved proof.",
     },
     {
         key: "proof-points",
         question: "What points do I earn from proofs?",
-        answer: "Approved proofs earn Reliability Points — one of the four point categories that make up your military rank score. The more consistently you submit verified proofs, the faster you advance through the ranks.",
+        answer: "Approved proofs earn Reliability Points — one of the four point categories that make up your rank score. The more consistently you submit verified proofs, the faster you advance through the ranks.",
     },
     {
         key: "donation-flow",
         question: "How do I make a donation?",
-        answer: "Navigate to the Donations page, select a mission, choose a currency and bank account, transfer the specified amount, and then upload a screenshot of your transfer receipt as proof of payment. Your donation will be queued for commander verification.",
+        answer: "Navigate to the Donations page, select a campaign, choose a currency and bank account, transfer the specified amount, and then upload a screenshot of your transfer receipt as proof of payment. Your donation will be queued for admin verification.",
     },
     {
         key: "proof-requirements",
         question: "What are the proof requirements for donations?",
-        answer: "Upload a clear screenshot showing the bank transfer confirmation — including the amount, date, and reference number. Blurry or cropped images may be rejected. Commanders review proofs within 24–48 hours.",
+        answer: "Upload a clear screenshot showing the bank transfer confirmation — including the amount, date, and reference number. Blurry or cropped images may be rejected. Admins review proofs within 24–48 hours.",
     },
     {
         key: "verification-timeline",
         question: "How long does donation verification take?",
-        answer: "Most donations are verified within 24–48 hours. Once a Commander approves your proof, the donation status changes to Verified and you receive Leadership Points for your contribution.",
+        answer: "Most donations are verified within 24–48 hours. Once an Admin approves your proof, the donation status changes to Verified and you receive Leadership Points for your contribution.",
     },
     {
         key: "supported-currencies",
@@ -832,6 +859,6 @@ export const FAQ_ITEMS = [
     {
         key: "team-invite-links",
         question: "How do team invite links work?",
-        answer: "Team Leads and Commanders can generate invite links with a set number of uses and an optional expiry date. Share the link with your recruits — when they click it, they join your team automatically. You can track usage from the Teams page.",
+        answer: "Team Leads and Admins can generate invite links with a set number of uses and an optional expiry date. Share the link with your contacts — when they click it, they join your team automatically. You can track usage from the Teams page.",
     },
 ] as const;

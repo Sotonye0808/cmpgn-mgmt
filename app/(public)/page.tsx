@@ -128,7 +128,7 @@ export default async function LandingPage() {
       {/* Live platform stats */}
       <PublicStatsBar stats={publicStats} />
 
-      {/* Featured Mission + Top 5 Soldiers — side-by-side on large screens */}
+      {/* Featured Campaign + Top 5 Members — side-by-side on large screens */}
       {(featuredCampaign || topMobilizers.length > 0) && (
         <section className="border-t border-ds-border-base py-14">
           <div className="max-w-6xl mx-auto px-6">
@@ -137,10 +137,10 @@ export default async function LandingPage() {
               {featuredCampaign && (
                 <div className="lg:col-span-7">
                   <h2 className="text-2xl font-bold text-ds-text-primary mb-2">
-                    Featured Mission
+                    {LANDING_CONTENT.home.featuredSection.heading}
                   </h2>
                   <p className="text-ds-text-secondary mb-6 text-sm">
-                    The flagship operation currently mobilizing the army.
+                    {LANDING_CONTENT.home.featuredSection.subheading}
                   </p>
                   <div className="glass-surface rounded-ds-xl p-6 hover:glow-border transition-all">
                     <div className="flex flex-col gap-6">
@@ -173,7 +173,7 @@ export default async function LandingPage() {
                         <div className="flex flex-wrap gap-6 text-sm">
                           <div>
                             <span className="text-ds-text-subtle">
-                              Soldiers:{" "}
+                              {LANDING_CONTENT.home.featuredSection.participantsLabel}{" "}
                             </span>
                             <span className="font-semibold text-ds-text-primary">
                               {(
@@ -194,7 +194,7 @@ export default async function LandingPage() {
                           {subCampaignCount > 0 && (
                             <div>
                               <span className="text-ds-text-subtle">
-                                Sub-Missions:{" "}
+                                {LANDING_CONTENT.home.featuredSection.subCampaignsLabel}{" "}
                               </span>
                               <span className="font-semibold text-ds-text-primary">
                                 {subCampaignCount}
@@ -246,10 +246,10 @@ export default async function LandingPage() {
               {topMobilizers.length > 0 && (
                 <div className="lg:col-span-5">
                   <h2 className="text-2xl font-bold text-ds-text-primary mb-2">
-                    Top 5 Digital Soldiers
+                    {LANDING_CONTENT.home.topMobilizersSection.heading}
                   </h2>
                   <p className="text-ds-text-secondary mb-6 text-sm">
-                    The highest-ranking soldiers across all missions.
+                    {LANDING_CONTENT.home.topMobilizersSection.subheading}
                   </p>
                   <div className="space-y-3">
                     {topMobilizers.map((soldier) => (
@@ -313,11 +313,10 @@ export default async function LandingPage() {
       {/* Features */}
       <section className="max-w-7xl mx-auto px-6 py-14">
         <h2 className="text-3xl font-bold text-ds-text-primary text-center mb-4">
-          Everything You Need to Deploy at Scale
+          {LANDING_CONTENT.home.featuresSection.heading}
         </h2>
         <p className="text-ds-text-secondary text-center max-w-xl mx-auto mb-12">
-          One command center for ammunition distribution, recruitment tracking,
-          military rank progression, and war room analytics.
+          {LANDING_CONTENT.home.featuresSection.subheading}
         </p>
         <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           {LANDING_CONTENT.features.map((feature) => {
@@ -342,8 +341,8 @@ export default async function LandingPage() {
       </section>
 
       <PublicCtaSection
-        heading="Ready to Enlist?"
-        body="Join thousands of digital soldiers already using DMHicc to deploy, recruit, and lead their missions."
+        heading={LANDING_CONTENT.home.ctaSection.heading}
+        body={LANDING_CONTENT.home.ctaSection.body}
         buttons={[
           { label: LANDING_CONTENT.hero.cta, href: ROUTES.REGISTER },
           {

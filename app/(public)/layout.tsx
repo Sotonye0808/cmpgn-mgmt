@@ -30,17 +30,17 @@ export default function PublicLayout({
           <div className="flex items-center gap-3">
             <Link
               href={ROUTES.HOW_IT_WORKS}
-              className="text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
+              className="public-nav-link text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
               How It Works
             </Link>
             <Link
               href={ROUTES.LOGIN}
-              className="text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
+              className="public-nav-link text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
               Sign In
             </Link>
             <Link
               href={ROUTES.REGISTER}
-              className="px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
+              className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
               Enlist Now
             </Link>
           </div>

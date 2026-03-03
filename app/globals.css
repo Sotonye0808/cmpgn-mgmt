@@ -383,6 +383,20 @@
   .ring-dynamic {
     background: var(--_dc-ring);
   }
+
+  /* ─── Public nav link color fix ───────────────────────────────────────────── */
+  /* AntD 5 injects `a { color: var(--ant-color-link) }` via CSS-in-JS which  */
+  /* re-injects on theme toggle and can win over Tailwind text-* classes at   */
+  /* equal injection order. These utility classes own the property explicitly. */
+  .public-nav-link {
+    color: var(--ds-text-secondary) !important;
+  }
+  .public-nav-link:hover {
+    color: var(--ds-brand-accent) !important;
+  }
+  .public-nav-cta {
+    color: #fff !important;
+  }
 }
 
 /* ─────────────────────────────────────────────────────────

@@ -204,15 +204,15 @@ export default function TeamPage() {
                 </p>
             </div>
 
-            {/* No-team empty state — shown to non-admin users not yet in a squad */}
+            {/* No-team empty state — shown to non-admin users not yet in a team */}
             {!userHasTeam && !isAdmin && (
                 <div className="rounded-ds-xl border border-ds-border-subtle bg-ds-surface-elevated p-8 text-center">
                     <Empty
                         description={
                             <span className="text-ds-text-secondary">
-                                You are not currently part of a squad.
+                                {TEAM_PAGE_CONTENT.noTeamMessage}
                                 <br />
-                                Ask your admin to add you to one.
+                                {TEAM_PAGE_CONTENT.noTeamPrompt}
                             </span>
                         }
                     />
@@ -241,7 +241,7 @@ export default function TeamPage() {
                             Invite Members
                         </h2>
                         <p className="text-sm text-ds-text-secondary">
-                            Generate a shareable invite link for new squad members (up to 10 uses).
+                            {TEAM_PAGE_CONTENT.inviteLinkDescription}
                         </p>
                         <div className="flex flex-wrap items-center gap-3">
                             <Button
