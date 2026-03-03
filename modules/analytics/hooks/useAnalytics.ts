@@ -35,9 +35,17 @@ export function useUserAnalytics(): UseAnalyticsReturn {
         fetch();
     }, [fetch]);
 
-    useAutoRefresh("pointsLedger", fetch);
-    useAutoRefresh("linkEvents", fetch);
-    useAutoRefresh("referrals", fetch);
+    useAutoRefresh("pointsLedger", fetch, {
+        getFingerprint: () =>
+            `${analytics?.points.total ?? 0}:${analytics?.streaks.daily ?? 0}`,
+    });
+    useAutoRefresh("linkEvents", fetch, {
+        getFingerprint: () =>
+            `${analytics?.engagement.clicks ?? 0}:${analytics?.engagement.shares ?? 0}`,
+    });
+    useAutoRefresh("referrals", fetch, {
+        getFingerprint: () => `${analytics?.referrals.totalReferrals ?? 0}`,
+    });
 
     return { analytics, loading, error, refresh: fetch };
 }
@@ -80,8 +88,13 @@ export function useCampaignAnalytics(
         fetch();
     }, [fetch]);
 
-    useAutoRefresh("linkEvents", fetch);
-    useAutoRefresh("donations", fetch);
+    useAutoRefresh("linkEvents", fetch, {
+        getFingerprint: () =>
+            `${analytics?.participants ?? 0}:${analytics?.engagementTrend.length ?? 0}`,
+    });
+    useAutoRefresh("donations", fetch, {
+        getFingerprint: () => `${analytics?.fundraising?.totalRaised ?? 0}`,
+    });
 
     return { analytics, loading, error, refresh: fetch };
 }
@@ -119,8 +132,14 @@ export function useOverviewAnalytics(): UseOverviewAnalyticsReturn {
         fetch();
     }, [fetch]);
 
-    useAutoRefresh("users", fetch);
-    useAutoRefresh("campaigns", fetch);
+    useAutoRefresh("users", fetch, {
+        getFingerprint: () =>
+            `${overview?.totalUsers ?? 0}:${overview?.totalClicks ?? 0}`,
+    });
+    useAutoRefresh("campaigns", fetch, {
+        getFingerprint: () =>
+            `${overview?.activeCampaigns ?? 0}:${overview?.totalShares ?? 0}`,
+    });
 
     return { overview, loading, error, refresh: fetch };
 }

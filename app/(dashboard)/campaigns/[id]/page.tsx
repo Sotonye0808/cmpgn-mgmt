@@ -37,6 +37,15 @@ export default function CampaignDetailPage() {
       .catch(() => { /* silent */ });
   }, [user, id]);
 
+  // Fire-and-forget view tracking on first mount (deduped server-side via cookie)
+  useEffect(() => {
+    if (!id) return;
+    fetch(`/api/campaigns/${id}/track-view`, {
+      method: "POST",
+      keepalive: true,
+    }).catch(() => { /* best-effort */ });
+  }, [id]);
+
   const handleJoin = async () => {
     if (!user || joined) return;
     setJoining(true);
@@ -86,6 +95,7 @@ export default function CampaignDetailPage() {
   const handleShare = async () => {
     // Get/create the user’s tracking link for this campaign first
     let trackingUrl = window.location.href;
+    let trackingSlug: string | null = null;
     try {
       const linkRes = await fetch("/api/smart-links", {
         method: "POST",
@@ -95,10 +105,23 @@ export default function CampaignDetailPage() {
       if (linkRes.ok) {
         const linkJson = await linkRes.json();
         const slug = linkJson.data?.slug;
-        if (slug) trackingUrl = `${window.location.origin}/c/${slug}`;
+        if (slug) {
+          trackingSlug = slug;
+          trackingUrl = `${window.location.origin}/c/${slug}`;
+        }
       }
     } catch {
       /* fall through to plain URL */
+    }
+
+    // Fire-and-forget share tracking
+    if (trackingSlug) {
+      fetch("/api/smart-links/track", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ slug: trackingSlug, type: "SHARE" }),
+        keepalive: true,
+      }).catch(() => { /* best-effort */ });
     }
 
     if (typeof navigator !== "undefined" && navigator.share) {
