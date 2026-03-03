@@ -90,4 +90,11 @@ export const NAV_ITEMS: NavItem[] = [
         icon: "trust",
         allowedRoles: [ROLE.SUPER_ADMIN],
     },
+    {
+        key: "bug-reports",
+        label: "Bug Reports",
+        href: ROUTES.BUG_REPORTS,
+        icon: "bug",
+        allowedRoles: [ROLE.SUPER_ADMIN],
+    },
 ];

@@ -4,7 +4,7 @@
 
 generator client {
     provider = "prisma-client-js"
-    output = "./generated/client"
+    output   = "./generated/client"
 }
 
 datasource db {
@@ -109,6 +109,22 @@ enum NotificationType {
     SYSTEM
 }
 
+enum BugReportCategory {
+    UI_ISSUE
+    DATA_ISSUE
+    PERFORMANCE
+    FEATURE_REQUEST
+    ACCESS_AUTH
+    OTHER
+}
+
+enum BugReportStatus {
+    OPEN
+    IN_PROGRESS
+    RESOLVED
+    CLOSED
+}
+
 // ─── Models ──────────────────────────────────────────────────────────────────
 
 model User {
@@ -120,6 +136,7 @@ model User {
     role            UserRole         @default(USER)
     profilePicture  String?
     whatsappNumber  String?
+    campus          String?
     teamId          String?
     trustScore      Int              @default(100)
     isActive        Boolean          @default(true)
@@ -396,6 +413,7 @@ model ViewProof {
     smartLinkId   String
     platform      SocialPlatform
     screenshotUrl String
+    viewCount     Int?
     status        ViewProofStatus @default(PENDING)
     reviewedById  String?
     reviewedAt    DateTime?
@@ -484,5 +502,25 @@ model CampaignAuditEvent {
 
     @@index([campaignId])
     @@index([actorId])
+    @@index([createdAt])
+}
+
+model BugReport {
+    id          String            @id @default(cuid())
+    category    BugReportCategory
+    description String            @db.Text
+    email       String
+    userId      String?
+    userAgent   String?
+    pageUrl     String?
+    status      BugReportStatus   @default(OPEN)
+    resolvedAt  DateTime?
+    adminNotes  String?           @db.Text
+    createdAt   DateTime          @default(now())
+    updatedAt   DateTime          @updatedAt
+
+    @@index([status])
+    @@index([category])
+    @@index([userId])
     @@index([createdAt])
 }

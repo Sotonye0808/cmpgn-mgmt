@@ -260,15 +260,47 @@ export default function AnalyticsPage() {
                       },
                       {
                         label: "Total Donations",
+                        value: overview.totalDonations,
+                      },
+                      {
+                        label: "Total Raised",
                         value: new Intl.NumberFormat("en-NG", {
                           style: "currency",
                           currency: "NGN",
                           maximumFractionDigits: 0,
-                        }).format(overview.totalDonations),
+                        }).format(overview.totalDonationAmount),
                       },
                       {
                         label: "Total Points Awarded",
                         value: overview.totalPoints.toLocaleString(),
+                      },
+                      {
+                        label: "Total Clicks",
+                        value: overview.totalClicks.toLocaleString(),
+                      },
+                      {
+                        label: "Total Shares",
+                        value: overview.totalShares.toLocaleString(),
+                      },
+                      {
+                        label: "Smart Links Created",
+                        value: overview.totalSmartLinks.toLocaleString(),
+                      },
+                      {
+                        label: "Total Referrals",
+                        value: overview.totalReferrals.toLocaleString(),
+                      },
+                      {
+                        label: "Total Views",
+                        value: overview.totalViews.toLocaleString(),
+                      },
+                      {
+                        label: "Engagement Rate",
+                        value: `${overview.engagementRate}%`,
+                      },
+                      {
+                        label: "Top Campaigns",
+                        value: overview.topCampaigns.length,
                       },
                     ].map((item) => (
                       <div

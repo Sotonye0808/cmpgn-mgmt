@@ -90,6 +90,22 @@ declare global {
         ENDED = "ENDED",
     }
 
+    const enum BugReportCategory {
+        UI_ISSUE = "UI_ISSUE",
+        DATA_ISSUE = "DATA_ISSUE",
+        PERFORMANCE = "PERFORMANCE",
+        FEATURE_REQUEST = "FEATURE_REQUEST",
+        ACCESS_AUTH = "ACCESS_AUTH",
+        OTHER = "OTHER",
+    }
+
+    const enum BugReportStatus {
+        OPEN = "OPEN",
+        IN_PROGRESS = "IN_PROGRESS",
+        RESOLVED = "RESOLVED",
+        CLOSED = "CLOSED",
+    }
+
     // ─── Core Entities ───────────────────────────────────────────────────────────
 
     interface User {
@@ -101,6 +117,7 @@ declare global {
         role: UserRole;
         profilePicture?: string;
         whatsappNumber?: string;
+        campus?: string;
         teamId?: string;
         trustScore: number;
         isActive: boolean;
@@ -117,6 +134,7 @@ declare global {
         role: UserRole;
         profilePicture?: string;
         whatsappNumber?: string;
+        campus?: string;
     }
 
     interface CampaignMedia {
@@ -281,12 +299,16 @@ declare global {
         smartLinkId: string;
         platform: SocialPlatform;
         screenshotUrl: string;
+        viewCount?: number;
         status: ViewProofStatus;
         reviewedById?: string;
         reviewedAt?: string;
         notes?: string;
         createdAt: string;
         updatedAt: string;
+        /** Enriched fields from API includes */
+        userName?: string;
+        campaignTitle?: string;
     }
 
     // ─── Input Types ─────────────────────────────────────────────────────────────
@@ -354,6 +376,7 @@ declare global {
         smartLinkId: string;
         platform: SocialPlatform;
         screenshotUrl: string;
+        viewCount?: number;
     }
 
     interface UpdateWeaponsOfChoiceInput {
@@ -408,7 +431,7 @@ declare global {
 
     // ─── Points / Gamification ───────────────────────────────────────────────────
 
-    type PointsAction = "CLICK_RECEIVED" | "SHARE_MADE" | "CONVERSION_RECEIVED" | "DAILY_STREAK" | "WEEKLY_STREAK" | "REFERRAL_JOINED" | "TEAM_MILESTONE" | "GOAL_MET" | "REPORT_ACCURATE";
+    type PointsAction = "CLICK_RECEIVED" | "SHARE_MADE" | "CONVERSION_RECEIVED" | "DAILY_STREAK" | "WEEKLY_STREAK" | "REFERRAL_JOINED" | "TEAM_MILESTONE" | "GOAL_MET" | "REPORT_ACCURATE" | "PROOF_APPROVED";
 
     interface RankLevel {
         level: number;
@@ -504,7 +527,14 @@ declare global {
         totalUsers: number;
         activeCampaigns: number;
         totalDonations: number;
+        totalDonationAmount: number;
         totalPoints: number;
+        totalClicks: number;
+        totalShares: number;
+        totalViews: number;
+        totalSmartLinks: number;
+        totalReferrals: number;
+        engagementRate: number;
         topCampaigns: { id: string; title: string; participants: number }[];
     }
 
@@ -669,5 +699,33 @@ declare global {
         bankAccountId?: string;
         proofScreenshotUrl?: string;
         notes?: string;
+    }
+
+    // ─── Bug Reports ─────────────────────────────────────────────────────────────
+
+    interface BugReport {
+        id: string;
+        category: BugReportCategory;
+        description: string;
+        email: string;
+        userId?: string;
+        userAgent?: string;
+        pageUrl?: string;
+        status: BugReportStatus;
+        resolvedAt?: string;
+        adminNotes?: string;
+        createdAt: string;
+        updatedAt: string;
+    }
+
+    interface CreateBugReportInput {
+        category: BugReportCategory;
+        description: string;
+        email: string;
+    }
+
+    interface UpdateBugReportInput {
+        status?: BugReportStatus;
+        adminNotes?: string;
     }
 }

@@ -19,6 +19,11 @@ const updateProfileSchema = z.object({
         .optional()
         .or(z.literal(""))
         .transform((v) => (v === "" ? undefined : v)),
+    campus: z
+        .string()
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export async function GET() {
@@ -54,6 +59,7 @@ export async function PATCH(request: NextRequest) {
                 }),
                 // Allow explicit clear (undefined) or set new number
                 whatsappNumber: parsed.data.whatsappNumber,
+                campus: parsed.data.campus,
             },
         });
 

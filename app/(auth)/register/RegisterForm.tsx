@@ -1,6 +1,6 @@
 "use client";
 
-import { Form, Input, Alert } from "antd";
+import { Form, Input, Alert, Select } from "antd";
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
@@ -9,6 +9,7 @@ import { ROUTES } from "@/config/routes";
 import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import PhoneInput from "@/components/ui/PhoneInput";
+import { CAMPUS_OPTIONS } from "@/config/campuses";
 
 export default function RegisterForm() {
   const { login } = useAuth();
@@ -25,6 +26,7 @@ export default function RegisterForm() {
     firstName: string;
     lastName: string;
     whatsappNumber?: string;
+    campus?: string;
   }) => {
     setLoading(true);
     setError(null);
@@ -131,6 +133,25 @@ export default function RegisterForm() {
             },
           ]}>
           <PhoneInput placeholder="7012345678" />
+        </Form.Item>
+
+        <Form.Item
+          label={
+            <span className="text-ds-text-secondary text-sm">
+              {c.campusLabel}{" "}
+              <span className="text-ds-text-muted">(optional)</span>
+            </span>
+          }
+          name="campus">
+          <Select
+            placeholder={c.campusPlaceholder}
+            size="large"
+            className="rounded-ds-lg"
+            allowClear
+            showSearch
+            optionFilterProp="label"
+            options={[...CAMPUS_OPTIONS]}
+          />
         </Form.Item>
 
         <Form.Item

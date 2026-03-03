@@ -9,6 +9,7 @@ export const ROUTES = {
     PRIVACY: "/privacy",
     TERMS: "/terms",
     HOW_IT_WORKS: "/how-it-works",
+    REPORT_BUG: "/report-bug",
 
     // Dashboard
     DASHBOARD: "/dashboard",
@@ -48,6 +49,9 @@ export const ROUTES = {
     // Profile / Settings
     SETTINGS: "/settings",
 
+    // Bug Reports (admin)
+    BUG_REPORTS: "/bug-reports",
+
     // API
     API: {
         AUTH: {
@@ -76,6 +80,7 @@ export const ROUTES = {
             TIMELINE: "/api/engagement/timeline",
             PROOFS: "/api/engagement/proofs",
             PROOF_REVIEW: (id: string) => `/api/engagement/proofs/${id}/review`,
+            PROOF_BATCH_REVIEW: "/api/engagement/proofs/batch-review",
         },
         REFERRALS: {
             ME: "/api/referrals/me",
@@ -104,6 +109,7 @@ export const ROUTES = {
             DETAIL: (id: string) => `/api/donations/${id}`,
             VERIFY: (id: string) => `/api/donations/${id}/verify`,
             PROOF: (id: string) => `/api/donations/${id}/proof`,
+            BATCH_VERIFY: "/api/donations/batch-verify",
         },
         TRUST: {
             ME: "/api/trust/me",
@@ -140,6 +146,10 @@ export const ROUTES = {
         INVITE: {
             PREVIEW: (token: string) => `/api/invite/${token}`,
             JOIN: (token: string) => `/api/invite/${token}/join`,
+        },
+        BUG_REPORTS: {
+            BASE: "/api/bug-reports",
+            DETAIL: (id: string) => `/api/bug-reports/${id}`,
         },
     },
 } as const;

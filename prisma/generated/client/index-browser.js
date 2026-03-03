@@ -129,6 +129,7 @@ exports.Prisma.UserScalarFieldEnum = {
   role: 'role',
   profilePicture: 'profilePicture',
   whatsappNumber: 'whatsappNumber',
+  campus: 'campus',
   teamId: 'teamId',
   trustScore: 'trustScore',
   isActive: 'isActive',
@@ -287,6 +288,7 @@ exports.Prisma.ViewProofScalarFieldEnum = {
   smartLinkId: 'smartLinkId',
   platform: 'platform',
   screenshotUrl: 'screenshotUrl',
+  viewCount: 'viewCount',
   status: 'status',
   reviewedById: 'reviewedById',
   reviewedAt: 'reviewedAt',
@@ -337,6 +339,21 @@ exports.Prisma.CampaignAuditEventScalarFieldEnum = {
   after: 'after',
   note: 'note',
   createdAt: 'createdAt'
+};
+
+exports.Prisma.BugReportScalarFieldEnum = {
+  id: 'id',
+  category: 'category',
+  description: 'description',
+  email: 'email',
+  userId: 'userId',
+  userAgent: 'userAgent',
+  pageUrl: 'pageUrl',
+  status: 'status',
+  resolvedAt: 'resolvedAt',
+  adminNotes: 'adminNotes',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
 };
 
 exports.Prisma.SortOrder = {
@@ -464,6 +481,22 @@ exports.CampaignAuditEventType = exports.$Enums.CampaignAuditEventType = {
   ENDED: 'ENDED'
 };
 
+exports.BugReportCategory = exports.$Enums.BugReportCategory = {
+  UI_ISSUE: 'UI_ISSUE',
+  DATA_ISSUE: 'DATA_ISSUE',
+  PERFORMANCE: 'PERFORMANCE',
+  FEATURE_REQUEST: 'FEATURE_REQUEST',
+  ACCESS_AUTH: 'ACCESS_AUTH',
+  OTHER: 'OTHER'
+};
+
+exports.BugReportStatus = exports.$Enums.BugReportStatus = {
+  OPEN: 'OPEN',
+  IN_PROGRESS: 'IN_PROGRESS',
+  RESOLVED: 'RESOLVED',
+  CLOSED: 'CLOSED'
+};
+
 exports.Prisma.ModelName = {
   User: 'User',
   Campaign: 'Campaign',
@@ -480,7 +513,8 @@ exports.Prisma.ModelName = {
   Group: 'Group',
   Team: 'Team',
   TeamInviteLink: 'TeamInviteLink',
-  CampaignAuditEvent: 'CampaignAuditEvent'
+  CampaignAuditEvent: 'CampaignAuditEvent',
+  BugReport: 'BugReport'
 };
 
 /**

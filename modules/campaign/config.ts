@@ -79,3 +79,17 @@ export const CAMPAIGN_AUDIENCE_TAGS = [
     { label: "Rural", value: "RURAL" },
     { label: "Gamers", value: "GAMERS" },
 ] as const;
+
+/**
+ * Media-type-conditional field visibility rules.
+ * Each key is a CampaignMediaType value.  The boolean flags indicate whether
+ * a field should be shown in the form and in display components for that type.
+ */
+export const MEDIA_TYPE_FIELDS = {
+    IMAGE: { showContent: false, showMediaUrl: false, showUpload: true, showThumbnailUpload: false },
+    VIDEO: { showContent: false, showMediaUrl: false, showUpload: true, showThumbnailUpload: false },
+    TEXT:  { showContent: true,  showMediaUrl: false, showUpload: false, showThumbnailUpload: true },
+    LINK:  { showContent: false, showMediaUrl: true,  showUpload: false, showThumbnailUpload: true },
+} as const;
+
+export type MediaTypeFieldConfig = (typeof MEDIA_TYPE_FIELDS)[keyof typeof MEDIA_TYPE_FIELDS];

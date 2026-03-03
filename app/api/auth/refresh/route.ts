@@ -41,6 +41,8 @@ export async function POST(_req: NextRequest): Promise<NextResponse<ApiResponse<
             lastName: user.lastName,
             role: user.role as UserRole,
             profilePicture: user.profilePicture ?? undefined,
+            whatsappNumber: user.whatsappNumber ?? undefined,
+            campus: user.campus ?? undefined,
         };
 
         const rememberMe = payload.rem ?? false;

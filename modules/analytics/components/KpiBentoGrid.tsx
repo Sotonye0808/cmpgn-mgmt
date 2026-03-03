@@ -41,13 +41,21 @@ export default function KpiBentoGrid({
       case "campaigns":
         return overview?.activeCampaigns ?? null;
       case "totalDonations":
-        return overview?.totalDonations != null
+        return overview?.totalDonationAmount != null
           ? new Intl.NumberFormat("en-NG", {
               style: "currency",
               currency: "NGN",
               maximumFractionDigits: 0,
-            }).format(overview.totalDonations)
+            }).format(overview.totalDonationAmount)
           : null;
+      case "totalClicks":
+        return overview?.totalClicks ?? null;
+      case "totalShares":
+        return overview?.totalShares ?? null;
+      case "totalSmartLinks":
+        return overview?.totalSmartLinks ?? null;
+      case "totalReferrals":
+        return overview?.totalReferrals ?? null;
       default:
         return null;
     }

@@ -63,6 +63,7 @@ import {
     PictureOutlined,
     CrownOutlined,
     AimOutlined,
+    BugOutlined,
 } from "@ant-design/icons";
 
 export const ICONS = {
@@ -157,6 +158,7 @@ export const ICONS = {
     picture: PictureOutlined,
     crown: CrownOutlined,
     aim: AimOutlined,
+    bug: BugOutlined,
 } as const;
 
 export type IconKey = keyof typeof ICONS;

@@ -11,40 +11,13 @@
 
 export const BANK_ACCOUNTS: BankAccount[] = [
     {
-        id: "bank-1",
-        accountName: "Harvesters International Christian Centre",
-        accountNumber: "0012345678",
-        bankName: "Guaranty Trust Bank (GTBank)",
+        id: "bank-1713419819",
+        accountName: "Harvesters Int\'l Special Events Account",
+        accountNumber: "1713419819",
+        bankName: "Access Bank",
         currency: "NGN",
         isActive: true,
         sortOrder: 1,
-    },
-    {
-        id: "bank-2",
-        accountName: "Harvesters Missions & Outreach",
-        accountNumber: "0098765432",
-        bankName: "First Bank of Nigeria",
-        currency: "NGN",
-        isActive: true,
-        sortOrder: 2,
-    },
-    {
-        id: "bank-3",
-        accountName: "Harvesters International (USD)",
-        accountNumber: "1234567890",
-        bankName: "Zenith Bank",
-        currency: "USD",
-        isActive: true,
-        sortOrder: 3,
-    },
-    {
-        id: "bank-4",
-        accountName: "Harvesters UK Giving",
-        accountNumber: "87654321",
-        bankName: "Barclays Bank",
-        currency: "GBP",
-        isActive: true,
-        sortOrder: 4,
     },
 ] satisfies BankAccount[];
 
