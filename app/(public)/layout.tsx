@@ -1,9 +1,6 @@
-import { NAV_CONTENT } from "@/config/content";
-import Link from "next/link";
-import { ROUTES } from "@/config/routes";
 import PublicFooter from "@/components/layout/PublicFooter";
+import PublicHeader from "@/components/layout/PublicHeader";
 import CookieConsent from "@/components/ui/CookieConsent";
-import BrandLogo from "@/components/ui/BrandLogo";
 
 export default function PublicLayout({
   children,
@@ -17,34 +14,7 @@ export default function PublicLayout({
         aria-hidden
         className="pointer-events-none fixed inset-0 -z-10 ambient-glow-public"
       />
-      <header className="glass-nav sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <BrandLogo size="sm" />
-            <span className="font-bold text-ds-text-primary">
-              {NAV_CONTENT.brandName}
-            </span>
-          </Link>
-
-          <div className="flex items-center gap-3">
-            <Link
-              href={ROUTES.HOW_IT_WORKS}
-              className="public-nav-link text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
-              How It Works
-            </Link>
-            <Link
-              href={ROUTES.LOGIN}
-              className="public-nav-link text-ds-text-secondary hover:text-ds-brand-accent text-sm font-medium transition-colors">
-              Sign In
-            </Link>
-            <Link
-              href={ROUTES.REGISTER}
-              className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
-              Enlist Now
-            </Link>
-          </div>
-        </div>
-      </header>
+      <PublicHeader />
 
       <main className="flex-1">{children}</main>
 
