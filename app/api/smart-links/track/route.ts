@@ -10,7 +10,6 @@ import { z } from "zod";
 
 // Supported tracking event types
 const TRACK_EVENT_TYPES = ["CLICK", "SHARE"] as const;
-type TrackEventType = typeof TRACK_EVENT_TYPES[number];
 
 const schema = z.object({
     slug: z.string().min(1),

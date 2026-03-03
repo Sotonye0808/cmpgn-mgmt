@@ -47,38 +47,102 @@ export default function CampaignBanner({
   const isActive = campaign.status === ("ACTIVE" as string);
 
   const renderMedia = () => {
-    if (campaign.mediaType === "IMAGE" && campaign.mediaUrl) {
+    // ── IMAGE ──────────────────────────────────────────────────────────────────
+    if (campaign.mediaType === "IMAGE") {
+      const url = campaign.mediaUrl ?? campaign.thumbnailUrl;
+      if (url) {
+        return (
+          <div className="relative w-full h-72 lg:h-96">
+            <Image
+              src={url}
+              alt={campaign.title}
+              fill
+              className="object-cover"
+              priority
+            />
+          </div>
+        );
+      }
       return (
-        <div className="relative w-full h-72 lg:h-96">
-          <Image
-            src={campaign.mediaUrl}
-            alt={campaign.title}
-            fill
-            className="object-cover"
-            priority
-          />
+        <div className="w-full h-40 lg:h-56 bg-ds-surface-sunken flex flex-col items-center justify-center gap-3 text-ds-text-subtle">
+          <ICONS.image className="text-4xl opacity-50" />
+          <span className="text-sm">No image provided</span>
         </div>
       );
     }
-    if (campaign.mediaType === "VIDEO" && campaign.mediaUrl) {
+
+    // ── VIDEO ──────────────────────────────────────────────────────────────────
+    if (campaign.mediaType === "VIDEO") {
+      if (campaign.mediaUrl) {
+        return (
+          <div className="relative w-full h-72 lg:h-96 bg-black">
+            <video
+              src={campaign.mediaUrl}
+              controls
+              className="w-full h-full object-contain"
+              poster={campaign.thumbnailUrl ?? undefined}
+            />
+          </div>
+        );
+      }
+      if (campaign.thumbnailUrl) {
+        return (
+          <div className="relative w-full h-72 lg:h-96">
+            <Image
+              src={campaign.thumbnailUrl}
+              alt={campaign.title}
+              fill
+              className="object-cover opacity-70"
+            />
+            <div className="absolute inset-0 flex items-center justify-center">
+              <ICONS.play className="text-5xl text-white drop-shadow-lg" />
+            </div>
+          </div>
+        );
+      }
       return (
-        <div className="relative w-full h-72 lg:h-96 bg-black">
-          <video
-            src={campaign.mediaUrl}
-            controls
-            className="w-full h-full object-contain"
-            poster={campaign.thumbnailUrl}
-          />
+        <div className="w-full h-40 lg:h-56 bg-ds-surface-sunken flex flex-col items-center justify-center gap-3 text-ds-text-subtle">
+          <ICONS.play className="text-4xl opacity-50" />
+          <span className="text-sm">No video provided</span>
         </div>
       );
     }
+
+    // ── TEXT ───────────────────────────────────────────────────────────────────
+    // Decorative gradient hero — full content is rendered in the prose section below
+    if (campaign.mediaType === "TEXT") {
+      return (
+        <div className="w-full bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 px-6 py-8 lg:px-10 lg:py-12">
+          <div className="max-w-2xl mx-auto">
+            <span className="inline-flex items-center gap-1.5 bg-white/20 text-white text-xs font-semibold px-3 py-1 rounded-full mb-4">
+              <ICONS.message className="text-xs" />
+              Article
+            </span>
+            <h1 className="text-2xl lg:text-3xl font-bold text-white break-words leading-snug">
+              {campaign.title}
+            </h1>
+            {campaign.description && (
+              <p className="mt-2 text-white/80 text-sm line-clamp-2 break-words">
+                {campaign.description}
+              </p>
+            )}
+          </div>
+        </div>
+      );
+    }
+
+    // ── Fallback (no mediaType) ─────────────────────────────────────────────────
     return (
-      <div className="w-full h-72 lg:h-96 bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 flex items-center justify-center text-white p-12">
-        <div className="text-center">
-          <h1 className="text-3xl lg:text-4xl font-bold mb-4">
+      <div className="w-full bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5 px-6 py-8 lg:px-10 lg:py-12 flex items-center justify-center">
+        <div className="text-center max-w-lg">
+          <h1 className="text-2xl lg:text-3xl font-bold text-white break-words leading-snug mb-2">
             {campaign.title}
           </h1>
-          <p className="text-lg opacity-90">{campaign.description}</p>
+          {campaign.description && (
+            <p className="text-white/80 text-sm line-clamp-3 break-words">
+              {campaign.description}
+            </p>
+          )}
         </div>
       </div>
     );
