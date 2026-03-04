@@ -27,7 +27,7 @@ function SidebarContent({
 }) {
   const pathname = usePathname();
   const { filterByRole, role } = useRole();
-  const visibleItems = filterByRole(NAV_ITEMS);
+  const visibleItems = filterByRole(NAV_ITEMS).filter((item) => !item.deprecated);
 
   return (
     <div

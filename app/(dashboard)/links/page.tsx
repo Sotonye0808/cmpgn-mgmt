@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Row, Col, Modal, Select, message } from "antd";
+import { Row, Col, Modal, Select, App } from "antd";
 import SmartLinkCard from "@/modules/links/components/SmartLinkCard";
 import SmartLinkStats from "@/modules/links/components/SmartLinkStats";
 import Empty from "@/components/ui/Empty";
@@ -13,6 +13,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
 
 export default function LinksPage() {
+  const { message: msgApi } = App.useApp();
   const [links, setLinks] = useState<
     (SmartLink & { campaignTitle?: string })[]
   >([]);
@@ -61,7 +62,7 @@ export default function LinksPage() {
 
   const handleGenerate = async () => {
     if (!selectedCampaign) {
-      message.warning("Please select a campaign first.");
+      msgApi.warning("Please select a campaign first.");
       return;
     }
     setGenerating(true);
@@ -73,11 +74,11 @@ export default function LinksPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to generate link");
-      message.success("Smart link generated!");
+      msgApi.success("Smart link generated!");
       setModalOpen(false);
       await fetchLinks();
     } catch (e: unknown) {
-      message.error(
+      msgApi.error(
         e instanceof Error ? e.message : "Could not generate link.",
       );
     } finally {

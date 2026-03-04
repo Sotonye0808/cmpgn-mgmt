@@ -196,7 +196,7 @@ export const CAMPAIGN_CONTENT = {
         subCampaignsEmpty: "No sub-missions yet.",
     },
     detail: {
-        submitProofButton: "Submit Activity Proof",
+        submitProofButton: "Submit Status View",
     },
 } as const;
 
@@ -241,7 +241,16 @@ export const ENGAGEMENT_PAGE_CONTENT = {
 export const REFERRAL_PAGE_CONTENT = {
     title: "Referrals",
     subtitle: "Track who you've referred and how your network is growing.",
-    linkPanelTitle: "Your Recruitment Link",
+    linkPanelTitle: "Your Invite Link",
+    linkPanelDescription: "Share this link with anyone to invite them to join DMHicc. When they sign up, you earn referral points!",
+    statsTitle: "Referral Stats",
+    howItWorksTitle: "How Referrals Work",
+    howItWorksSteps: [
+        { title: "Share your link", description: "Copy your personal invite link and share it with friends." },
+        { title: "They sign up", description: "When someone registers using your link, they're attributed to you." },
+        { title: "Earn points", description: "You receive referral points for each successful signup and ongoing cascade points." },
+    ],
+    emptyState: "You haven't referred anyone yet. Share your invite link to get started!",
 } as const;
 
 export const POINTS_PAGE_CONTENT = {
@@ -314,9 +323,10 @@ export const SETTINGS_PAGE_CONTENT = {
 export const SOCIAL_PLATFORMS_CONFIG = [
     { key: "FACEBOOK", label: "Facebook", icon: "facebook" as const, color: "#1877F2" },
     { key: "INSTAGRAM", label: "Instagram", icon: "instagram" as const, color: "#E4405F" },
-    { key: "TWITTER_X", label: "Twitter / X", icon: "twitterX" as const, color: "#1DA1F2" },
+    // { key: "TWITTER_X", label: "Twitter / X", icon: "twitterX" as const, color: "#1DA1F2" },
     { key: "TIKTOK", label: "TikTok", icon: "tiktok" as const, color: "#000000" },
-    { key: "YOUTUBE", label: "YouTube", icon: "youtube" as const, color: "#FF0000" },
+    { key: "TELEGRAM", label: "Telegram", icon: "telegram" as const, color: "#0088CC" },
+    // { key: "YOUTUBE", label: "YouTube", icon: "youtube" as const, color: "#FF0000" },
     { key: "WHATSAPP", label: "WhatsApp", icon: "whatsapp" as const, color: "#25D366" },
     { key: "SNAPCHAT", label: "Snapchat", icon: "snapchat" as const, color: "#FFFC00" },
 ] as const;
@@ -342,22 +352,22 @@ export const NOT_FOUND_CONTENT = {
 } as const;
 
 export const VIEW_PROOF_CONTENT = {
-    title: "Activity Proof",
+    title: "Status Views",
     subtitle: "Upload screenshots showing you've shared your campaign link on each platform.",
-    uploadButton: "Submit Proof",
-    modalTitle: "Upload Activity Proof",
+    uploadButton: "Submit Status View",
+    modalTitle: "Upload Status View",
     platformLabel: "Platform Shared On",
     screenshotLabel: "Screenshot",
-    screenshotPlaceholder: "Paste screenshot URL or upload",
-    submitButton: "Submit Proof",
+    screenshotPlaceholder: "Upload a screenshot",
+    submitButton: "Submit Status View",
     status: {
         PENDING: "Under Review",
         APPROVED: "Verified",
         REJECTED: "Rejected",
     },
-    emptyState: "No activity proofs submitted yet.",
-    submitFromDetailButton: "Submit Activity Proof",
-    reviewTitle: "Review Activity Proofs",
+    emptyState: "No status views submitted yet.",
+    submitFromDetailButton: "Submit Status View",
+    reviewTitle: "Review Status Views",
     approveButton: "Approve",
     rejectButton: "Reject",
 } as const;
@@ -741,8 +751,8 @@ export const HOW_IT_WORKS_STEPS = [
     {
         key: "proof",
         step: "4",
-        title: "Submit Activity Proof",
-        description: "After sharing, upload a screenshot as evidence. Approved proofs earn Reliability points and verify your activity to team leads.",
+        title: "Submit Status View",
+        description: "After sharing, upload a screenshot as evidence. Approved status views earn Reliability points and verify your activity to team leads.",
     },
     {
         key: "impact",
@@ -832,18 +842,18 @@ export const FAQ_ITEMS = [
     },
     {
         key: "what-is-proof",
-        question: "What is an Activity Proof?",
-        answer: "An Activity Proof is a screenshot you upload showing that you've shared your campaign link on a social media platform, messaging app, or email. It's your evidence of real-world sharing.",
+        question: "What is a Status View?",
+        answer: "A Status View is a screenshot you upload showing that you've shared your campaign link on a social media platform, messaging app, or email. It's your evidence of real-world sharing.",
     },
     {
         key: "proof-pipeline",
-        question: "How does the proof review pipeline work?",
-        answer: "After you submit a proof, it enters a PENDING queue. A Team Lead or Admin reviews it against the campaign requirements. If approved, Reliability Points are instantly credited to your rank. If rejected, you receive reviewer notes and can resubmit an improved proof.",
+        question: "How does the status view review pipeline work?",
+        answer: "After you submit a status view, it enters a PENDING queue. A Team Lead or Admin reviews it against the campaign requirements. If approved, Reliability Points are instantly credited to your rank. If rejected, you receive reviewer notes and can resubmit an improved status view.",
     },
     {
         key: "proof-points",
-        question: "What points do I earn from proofs?",
-        answer: "Approved proofs earn Reliability Points — one of the four point categories that make up your rank score. The more consistently you submit verified proofs, the faster you advance through the ranks.",
+        question: "What points do I earn from status views?",
+        answer: "Approved status views earn Reliability Points — one of the four point categories that make up your rank score. The more consistently you submit verified status views, the faster you advance through the ranks.",
     },
     {
         key: "donation-flow",
@@ -892,6 +902,8 @@ export const BUG_REPORT_CONTENT = {
         emailLabel: "Email Address",
         emailPlaceholder: "your@email.com",
         emailHint: "So we can follow up if we need more details.",
+        screenshotLabel: "Screenshot",
+        screenshotHint: "Optional — upload a screenshot showing the issue.",
         submitLabel: "Submit Report",
         submittingLabel: "Submitting…",
     },

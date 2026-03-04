@@ -5,6 +5,7 @@ import { Select, Input, Button, Result } from "antd";
 import { ROUTES } from "@/config/routes";
 import { BUG_REPORT_CONTENT, BUG_REPORT_CATEGORIES } from "@/config/content";
 import { ICONS } from "@/config/icons";
+import MediaUpload from "@/components/ui/MediaUpload";
 import Link from "next/link";
 
 const { TextArea } = Input;
@@ -18,6 +19,7 @@ export default function BugReportForm() {
   const [category, setCategory] = useState<string | undefined>(undefined);
   const [description, setDescription] = useState("");
   const [email, setEmail] = useState("");
+  const [screenshotUrl, setScreenshotUrl] = useState<string | undefined>(undefined);
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -58,6 +60,7 @@ export default function BugReportForm() {
           category,
           description: description.trim(),
           email: email.trim(),
+          screenshotUrl,
           pageUrl:
             typeof window !== "undefined" ? window.location.href : undefined,
         }),
@@ -157,6 +160,20 @@ export default function BugReportForm() {
           disabled={!!currentUser?.email}
         />
         <p className="text-xs text-ds-text-subtle mt-1">{content.emailHint}</p>
+      </div>
+
+      {/* Screenshot (optional) */}
+      <div>
+        <label className="block text-sm font-medium text-ds-text-primary mb-2">
+          {content.screenshotLabel}
+        </label>
+        <MediaUpload
+          accept="image/*"
+          maxSizeMb={10}
+          showPreview
+          onUploadComplete={(media) => setScreenshotUrl(media.url)}
+        />
+        <p className="text-xs text-ds-text-subtle mt-1">{content.screenshotHint}</p>
       </div>
 
       {/* Error */}

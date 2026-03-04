@@ -349,6 +349,7 @@ exports.Prisma.BugReportScalarFieldEnum = {
   userId: 'userId',
   userAgent: 'userAgent',
   pageUrl: 'pageUrl',
+  screenshotUrl: 'screenshotUrl',
   status: 'status',
   resolvedAt: 'resolvedAt',
   adminNotes: 'adminNotes',

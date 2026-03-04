@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Button, Modal, Form, Input, Empty, message, Tag } from "antd";
+import { Button, Modal, Form, Input, Empty, App, Tag } from "antd";
 import { ICONS } from "@/config/icons";
 
 interface Props {
@@ -16,6 +16,7 @@ export default function GroupManagementPanel({
     onRefresh,
 }: Props) {
 
+    const { message: msgApi } = App.useApp();
     const [createOpen, setCreateOpen] = useState(false);
     const [loading, setLoading] = useState(false);
     const [form] = Form.useForm();
@@ -33,15 +34,15 @@ export default function GroupManagementPanel({
             });
             const json = await res.json();
             if (json.success) {
-                message.success("Group created");
+                msgApi.success("Group created");
                 setCreateOpen(false);
                 form.resetFields();
                 onRefresh();
             } else {
-                message.error(json.error ?? "Failed to create group");
+                msgApi.error(json.error ?? "Failed to create group");
             }
         } catch {
-            message.error("Network error");
+            msgApi.error("Network error");
         } finally {
             setLoading(false);
         }

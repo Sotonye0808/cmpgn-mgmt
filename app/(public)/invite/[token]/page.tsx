@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Button, Result, Spin, Tag, message } from "antd";
+import { Button, Result, Spin, Tag, App } from "antd";
 import { ICONS } from "@/config/icons";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/config/routes";
@@ -20,6 +20,7 @@ interface InvitePreview {
 }
 
 export default function InvitePage() {
+    const { message: msgApi } = App.useApp();
     const params = useParams<{ token: string }>();
     const router = useRouter();
     const { user, isLoading: authLoading } = useAuth();
@@ -60,12 +61,12 @@ export default function InvitePage() {
             const json = await res.json();
             if (json.success) {
                 setJoined(true);
-                message.success("Successfully joined the team!");
+                msgApi.success("Successfully joined the team!");
             } else {
-                message.error(json.error ?? "Failed to join");
+                msgApi.error(json.error ?? "Failed to join");
             }
         } catch {
-            message.error("Network error");
+            msgApi.error("Network error");
         } finally {
             setJoining(false);
         }

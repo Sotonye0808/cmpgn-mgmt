@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Pagination, Segmented, Empty, message } from "antd";
+import { Pagination, Segmented, Empty, App } from "antd";
 import { ICONS } from "@/config/icons";
 import Spinner from "@/components/ui/Spinner";
 import CampaignCard from "./CampaignCard";
@@ -29,6 +29,7 @@ export default function CampaignList({
 }: CampaignListProps) {
   const router = useRouter();
   const { user } = useAuth();
+  const { message: msgApi } = App.useApp();
   const [view, setView] = useState<ViewMode>(defaultView);
   const [modalOpen, setModalOpen] = useState(false);
   const [modalStartIndex, setModalStartIndex] = useState(0);
@@ -74,7 +75,7 @@ export default function CampaignList({
 
   const handleJoin = async (campaign: Campaign) => {
     if (!user) {
-      message.warning("Please log in to join a campaign.");
+      msgApi.warning("Please log in to join a campaign.");
       return;
     }
     if (joinedIds.has(campaign.id)) return;
@@ -109,13 +110,13 @@ export default function CampaignList({
         /* silent — clipboard failure shouldn't block join */
       }
 
-      message.success(
+      msgApi.success(
         copiedLink
           ? `Joined "${campaign.title}"! Tracking link copied.`
           : `Joined "${campaign.title}"!`,
       );
     } catch (e: unknown) {
-      message.error(
+      msgApi.error(
         e instanceof Error ? e.message : "Could not join campaign.",
       );
     } finally {
@@ -151,9 +152,9 @@ export default function CampaignList({
     }
     try {
       await navigator.clipboard.writeText(shareUrl);
-      message.success("Tracking link copied to clipboard!");
+      msgApi.success("Tracking link copied to clipboard!");
     } catch {
-      message.error("Could not copy link.");
+      msgApi.error("Could not copy link.");
     }
   };
 

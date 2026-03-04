@@ -9,6 +9,7 @@ const createSchema = z.object({
     description: z.string().min(10, "Description must be at least 10 characters").max(5000),
     email: z.string().email("Invalid email address"),
     pageUrl: z.string().optional(),
+    screenshotUrl: z.string().url("Must be a valid URL").optional(),
 });
 
 /**
@@ -35,6 +36,7 @@ export async function POST(request: NextRequest) {
             userId: user?.id,
             userAgent,
             pageUrl: parsed.data.pageUrl,
+            screenshotUrl: parsed.data.screenshotUrl,
         });
 
         return successResponse(report, 201);

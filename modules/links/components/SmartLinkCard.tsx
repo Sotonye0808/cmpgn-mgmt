@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Tooltip, message } from "antd";
+import { Tooltip, App } from "antd";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import { ICONS } from "@/config/icons";
@@ -23,6 +23,7 @@ export default function SmartLinkCard({
   onGenerate: _onGenerate,
   className,
 }: SmartLinkCardProps) {
+  const { message: msgApi } = App.useApp();
   const [copied, setCopied] = useState(false);
   const [shared, setShared] = useState(false);
 
@@ -38,10 +39,10 @@ export default function SmartLinkCard({
     try {
       await navigator.clipboard.writeText(fullUrl);
       setCopied(true);
-      message.success("Link copied to clipboard!");
+      msgApi.success("Link copied to clipboard!");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      message.error("Failed to copy");
+      msgApi.error("Failed to copy");
     }
   };
 
@@ -58,7 +59,7 @@ export default function SmartLinkCard({
     }
     await navigator.clipboard.writeText(fullUrl);
     setShared(true);
-    message.success("Link copied to clipboard!");
+    msgApi.success("Link copied to clipboard!");
     setTimeout(() => setShared(false), 2000);
   };
 

@@ -151,10 +151,14 @@ export async function createCampaign(
 
 export async function updateCampaign(
     id: string,
-    input: UpdateCampaignInput
+    input: UpdateCampaignInput,
+    actor?: { id: string; role: string }
 ): Promise<Campaign | null> {
     const existing = await prisma.campaign.findUnique({ where: { id } });
     if (!existing) return null;
+
+    const actorId = actor?.id ?? existing.createdById;
+    const actorRole = actor?.role ?? "SYSTEM";
 
     // Build data object, converting date strings to Date objects
     const data: Record<string, unknown> = { ...input };
@@ -170,7 +174,7 @@ export async function updateCampaign(
 
     // Detect status change vs field update
     if (input.status && input.status !== (existing.status as unknown as CampaignStatus)) {
-        await recordAudit(id, "system", "SYSTEM", "STATUS_CHANGED", {
+        await recordAudit(id, actorId, actorRole, "STATUS_CHANGED", {
             before: { status: existing.status as string },
             after: { status: input.status as string },
             note: `Status changed from ${existing.status} to ${input.status}`,
@@ -186,7 +190,7 @@ export async function updateCampaign(
                 before[k] = (existing as unknown as Record<string, unknown>)[k];
                 after[k] = (input as unknown as Record<string, unknown>)[k];
             }
-            await recordAudit(id, "system", "SYSTEM", "FIELDS_UPDATED", {
+            await recordAudit(id, actorId, actorRole, "FIELDS_UPDATED", {
                 before,
                 after,
                 note: `Fields updated: ${changedFields.join(", ")}`,

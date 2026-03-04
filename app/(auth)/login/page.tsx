@@ -131,7 +131,7 @@ function LoginForm() {
       <p className="text-center text-sm text-ds-text-subtle mt-6">
         {c.registerPrompt}{" "}
         <Link
-          href={ROUTES.REGISTER}
+          href={(() => { const r = searchParams.get("redirect"); return r ? `${ROUTES.REGISTER}?redirect=${encodeURIComponent(r)}` : ROUTES.REGISTER; })()}
           className="text-ds-brand-accent hover:underline font-medium">
           {c.registerLink}
         </Link>

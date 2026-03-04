@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Image, Popconfirm, Input, Tooltip, message } from "antd";
+import { Image, Popconfirm, Input, Tooltip, App } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { formatDate } from "@/lib/utils/format";
@@ -24,6 +24,7 @@ export default function ProofCard({
   userName,
   campaignTitle,
 }: Props) {
+  const { message: msgApi } = App.useApp();
   const [notes, setNotes] = useState("");
   const { review, loading } = useReviewProof(onReviewed);
 
@@ -105,8 +106,8 @@ export default function ProofCard({
                     status: "APPROVED",
                     notes: notes || undefined,
                   });
-                  if (ok) message.success("Proof approved");
-                  else message.error("Failed to approve proof");
+                  if (ok) msgApi.success("Proof approved");
+                  else msgApi.error("Failed to approve proof");
                 }}
                 okText="Yes"
                 cancelText="No">
@@ -127,8 +128,8 @@ export default function ProofCard({
                     status: "REJECTED",
                     notes: notes || undefined,
                   });
-                  if (ok) message.success("Proof rejected");
-                  else message.error("Failed to reject proof");
+                  if (ok) msgApi.success("Proof rejected");
+                  else msgApi.error("Failed to reject proof");
                 }}
                 okText="Yes"
                 cancelText="No">

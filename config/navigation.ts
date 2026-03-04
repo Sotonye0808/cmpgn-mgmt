@@ -17,6 +17,8 @@ export interface NavItem {
     href: string;
     icon: string;
     allowedRoles: RoleValue[];
+    /** When true, this item is hidden from navigation but the page still exists. */
+    deprecated?: boolean;
 }
 
 export const NAV_ITEMS: NavItem[] = [
@@ -57,7 +59,7 @@ export const NAV_ITEMS: NavItem[] = [
     },
     {
         key: "proofs",
-        label: "Activity Proof",
+        label: "Status Views",
         href: ROUTES.PROOFS,
         icon: "proofs",
         allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
@@ -67,7 +69,14 @@ export const NAV_ITEMS: NavItem[] = [
         label: "Analytics",
         href: ROUTES.ANALYTICS,
         icon: "analytics",
-        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "referrals",
+        label: "Referrals",
+        href: ROUTES.REFERRALS,
+        icon: "share",
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
     {
         key: "team",
@@ -75,6 +84,7 @@ export const NAV_ITEMS: NavItem[] = [
         href: ROUTES.TEAM,
         icon: "team",
         allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+        deprecated: true,
     },
     {
         key: "users",

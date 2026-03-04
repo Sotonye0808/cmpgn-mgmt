@@ -25,7 +25,12 @@ export async function attributeReferral(
 
     // Find the smart link by slug to get the inviter + campaign
     const link = await prisma.smartLink.findUnique({ where: { slug } });
-    if (!link) return null;
+
+    // If no smart link found, check if `slug` is actually a userId (platform invite)
+    if (!link) {
+        return attributePlatformReferral(slug, registeredUserId);
+    }
+
     if (link.userId === registeredUserId) return null; // can't refer yourself
 
     const referral = await prisma.$transaction(async (tx) => {
@@ -81,6 +86,73 @@ export async function attributeReferral(
         ...referral,
         createdAt: referral.createdAt.toISOString(),
     } as unknown as Referral;
+}
+
+// ─── Platform-level referral (ref is userId, not a smart-link slug) ───────────
+/**
+ * When a user shares `/register?ref={theirUserId}` (not tied to any campaign),
+ * we still record a Referral row with a synthetic slug "platform-{inviterId}"
+ * and the first active campaign (or no campaign). This keeps the stats consistent.
+ */
+async function attributePlatformReferral(
+    inviterIdCandidate: string,
+    registeredUserId: string,
+): Promise<Referral | null> {
+    const inviter = await prisma.user.findUnique({ where: { id: inviterIdCandidate } });
+    if (!inviter || inviter.id === registeredUserId) return null;
+
+    const syntheticSlug = `platform-${inviter.id}`;
+
+    // Idempotent check
+    const existing = await prisma.referral.findUnique({
+        where: { inviteeId_slug: { inviteeId: registeredUserId, slug: syntheticSlug } },
+    });
+    if (existing) {
+        return { ...existing, createdAt: existing.createdAt.toISOString() } as unknown as Referral;
+    }
+
+    // Find a campaign for attribution — pick the first active campaign the inviter participates in
+    const participation = await prisma.campaignParticipation.findFirst({
+        where: { userId: inviter.id },
+        orderBy: { joinedAt: "desc" },
+        select: { campaignId: true },
+    });
+    const campaignId = participation?.campaignId ?? "platform";
+
+    const now = new Date();
+    const newReferral = await prisma.$transaction(async (tx) => {
+        const ref = await tx.referral.create({
+            data: {
+                inviterId: inviter.id,
+                inviteeId: registeredUserId,
+                campaignId,
+                slug: syntheticSlug,
+                createdAt: now,
+            },
+        });
+
+        // Award points — same value as campaign referrals
+        await tx.pointsLedgerEntry.create({
+            data: {
+                userId: inviter.id,
+                campaignId,
+                type: "LEADERSHIP" as never,
+                value: REFERRAL_SIGNUP_POINTS,
+                description: "Platform invite signup bonus",
+                referenceId: ref.id,
+            },
+        });
+
+        return ref;
+    });
+
+    await Promise.all([
+        redis.invalidatePattern(`referrals:user:${inviter.id}`),
+        redis.invalidatePattern(`engagement:user:${inviter.id}`),
+        redis.del(`points:summary:${inviter.id}`),
+    ]);
+
+    return { ...newReferral, createdAt: newReferral.createdAt.toISOString() } as unknown as Referral;
 }
 
 // ─── Award referral cascade points ────────────────────────────────────────────

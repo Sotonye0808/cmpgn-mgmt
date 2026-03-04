@@ -413,7 +413,7 @@ model ViewProof {
     smartLinkId   String
     platform      SocialPlatform
     screenshotUrl String
-    viewCount     Int?
+    viewCount     Int             @default(0)
     status        ViewProofStatus @default(PENDING)
     reviewedById  String?
     reviewedAt    DateTime?
@@ -506,18 +506,19 @@ model CampaignAuditEvent {
 }
 
 model BugReport {
-    id          String            @id @default(cuid())
-    category    BugReportCategory
-    description String            @db.Text
-    email       String
-    userId      String?
-    userAgent   String?
-    pageUrl     String?
-    status      BugReportStatus   @default(OPEN)
-    resolvedAt  DateTime?
-    adminNotes  String?           @db.Text
-    createdAt   DateTime          @default(now())
-    updatedAt   DateTime          @updatedAt
+    id            String            @id @default(cuid())
+    category      BugReportCategory
+    description   String            @db.Text
+    email         String
+    userId        String?
+    userAgent     String?
+    pageUrl       String?
+    screenshotUrl String?
+    status        BugReportStatus   @default(OPEN)
+    resolvedAt    DateTime?
+    adminNotes    String?           @db.Text
+    createdAt     DateTime          @default(now())
+    updatedAt     DateTime          @updatedAt
 
     @@index([status])
     @@index([category])

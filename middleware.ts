@@ -47,7 +47,7 @@ export function middleware(request: NextRequest) {
     const PROTECTED_PAGES = [
         "/dashboard", "/campaigns", "/analytics", "/users",
         "/donations", "/leaderboard", "/settings", "/trust-review",
-        "/links", "/team",
+        "/links", "/team", "/proofs", "/referrals",
     ];
     if (PROTECTED_PAGES.some((p) => pathname === p || pathname.startsWith(p + "/"))) {
         const token = request.cookies.get(JWT_ACCESS_COOKIE)?.value;

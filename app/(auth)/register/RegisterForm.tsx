@@ -199,7 +199,7 @@ export default function RegisterForm() {
       <p className="text-center text-sm text-ds-text-subtle mt-6">
         {c.loginPrompt}{" "}
         <Link
-          href={ROUTES.LOGIN}
+          href={(() => { const r = searchParams.get("redirect"); return r ? `${ROUTES.LOGIN}?redirect=${encodeURIComponent(r)}` : ROUTES.LOGIN; })()}
           className="text-ds-brand-accent hover:underline font-medium">
           {c.loginLink}
         </Link>

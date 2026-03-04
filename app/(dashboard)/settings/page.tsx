@@ -14,7 +14,7 @@ import {
   Divider,
   Tag,
   Select,
-  message,
+  App,
 } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import { SETTINGS_PAGE_CONTENT } from "@/config/content";
@@ -33,6 +33,7 @@ const { Title, Text } = Typography;
 
 function ProfileSection() {
   const { user } = useAuth();
+  const { message: msgApi } = App.useApp();
   const [saving, setSaving] = useState(false);
   const [avatarUrl, setAvatarUrl] = useState<string | undefined>(
     user?.profilePicture,
@@ -61,10 +62,10 @@ function ProfileSection() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to save");
-      message.success("Profile updated!");
+      msgApi.success("Profile updated!");
     } catch (e: unknown) {
       if (e instanceof Error && e.message !== "failed") {
-        message.error(e.message);
+        msgApi.error(e.message);
       }
     } finally {
       setSaving(false);
@@ -183,6 +184,7 @@ function ProfileSection() {
 }
 
 function SecuritySection() {
+  const { message: msgApi } = App.useApp();
   const [saving, setSaving] = useState(false);
   const [form] = Form.useForm();
 
@@ -192,9 +194,9 @@ function SecuritySection() {
       setSaving(true);
       await new Promise((r) => setTimeout(r, 600));
       form.resetFields();
-      message.success("Password updated successfully!");
+      msgApi.success("Password updated successfully!");
     } catch {
-      message.error("Failed to update password.");
+      msgApi.error("Failed to update password.");
     } finally {
       setSaving(false);
     }

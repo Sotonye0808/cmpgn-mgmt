@@ -35,6 +35,9 @@ export const ROUTES = {
     // Team
     TEAM: "/team",
 
+    // Referrals
+    REFERRALS: "/referrals",
+
     // Invites
     INVITE: (token: string) => `/invite/${token}`,
 

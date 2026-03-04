@@ -23,7 +23,7 @@ const createProofSchema = z.object({
         "SNAPCHAT",
     ]),
     screenshotUrl: z.string().url(),
-    viewCount: z.number().int().min(0).optional(),
+    viewCount: z.number().int().min(0),
 });
 
 // POST — submit a new view proof
@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
                 smartLinkId: parsed.data.smartLinkId,
                 platform: parsed.data.platform as never,
                 screenshotUrl: parsed.data.screenshotUrl,
-                viewCount: parsed.data.viewCount ?? null,
+                viewCount: parsed.data.viewCount,
                 status: "PENDING" as never,
             },
         });
