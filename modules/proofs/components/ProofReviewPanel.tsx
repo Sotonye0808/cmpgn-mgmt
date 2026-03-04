@@ -66,6 +66,8 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
       message.success(
         `${result.updated} proof${result.updated !== 1 ? "s" : ""} ${status === "APPROVED" ? "approved" : "rejected"}${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`,
       );
+    } else {
+      message.error("Batch review failed. Please try again.");
     }
   };
 
@@ -118,10 +120,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
             onConfirm={() => handleBatchAction("APPROVED")}
             okText="Yes"
             cancelText="No">
-            <Button
-              variant="primary"
-              size="small"
-              loading={batchLoading}>
+            <Button variant="primary" size="small" loading={batchLoading}>
               Approve Selected
             </Button>
           </Popconfirm>

@@ -220,6 +220,18 @@ export async function joinCampaign(
             data: { participantCount: { increment: 1 } },
         });
 
+        // Update goalCurrent for PARTICIPANTS-type campaigns
+        const campaign = await tx.campaign.findUnique({
+            where: { id: campaignId },
+            select: { goalType: true },
+        });
+        if (campaign?.goalType === "PARTICIPANTS") {
+            await tx.campaign.update({
+                where: { id: campaignId },
+                data: { goalCurrent: { increment: 1 } },
+            });
+        }
+
         return part;
     });
 

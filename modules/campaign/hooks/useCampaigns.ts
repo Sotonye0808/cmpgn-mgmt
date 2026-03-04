@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ROUTES } from "@/config/routes";
 import type { PaginatedResponse } from "@/types/api";
 
@@ -14,9 +14,14 @@ export function useCampaigns({ filters = {}, page = 1, pageSize = 10 }: UseCampa
     const [data, setData] = useState<PaginatedResponse<Campaign> | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasInitialData = useRef(false);
 
     const fetch = useCallback(async () => {
-        setLoading(true);
+        // Only show loading skeleton on first load — subsequent refetches
+        // keep stale data visible until the new data arrives
+        if (!hasInitialData.current) {
+            setLoading(true);
+        }
         setError(null);
         try {
             const params = new URLSearchParams({
@@ -30,6 +35,7 @@ export function useCampaigns({ filters = {}, page = 1, pageSize = 10 }: UseCampa
             const json = await res.json();
             if (!res.ok) throw new Error(json.error ?? "Failed to fetch campaigns");
             setData(json);
+            hasInitialData.current = true;
         } catch (err) {
             setError(err instanceof Error ? err.message : "Error");
         } finally {

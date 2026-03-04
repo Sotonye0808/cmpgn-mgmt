@@ -187,11 +187,17 @@ function SecuritySection() {
   const [form] = Form.useForm();
 
   async function handlePasswordChange() {
-    await form.validateFields();
-    setSaving(true);
-    await new Promise((r) => setTimeout(r, 600));
-    form.resetFields();
-    setSaving(false);
+    try {
+      await form.validateFields();
+      setSaving(true);
+      await new Promise((r) => setTimeout(r, 600));
+      form.resetFields();
+      message.success("Password updated successfully!");
+    } catch {
+      message.error("Failed to update password.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   return (

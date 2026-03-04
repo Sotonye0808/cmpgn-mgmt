@@ -86,6 +86,21 @@ export default function TeamManagementPanel({
     }
   };
 
+  /** Confirm before removing a team member */
+  const confirmRemoveMember = (
+    teamId: string,
+    userId: string,
+    memberName: string,
+  ) => {
+    Modal.confirm({
+      title: "Remove Team Member",
+      content: `Remove ${memberName} from this team? They will lose access to team resources.`,
+      okText: "Remove",
+      okButtonProps: { danger: true },
+      onOk: () => handleRemoveMember(teamId, userId),
+    });
+  };
+
   const groupOptions = groups.map((g) => ({
     value: g.id,
     label: `${g.name} (${g.teamIds.length}/${g.maxTeams} teams)`,
@@ -173,7 +188,13 @@ export default function TeamManagementPanel({
           <TeamMemberStatsTable
             stats={detailStats}
             loading={detailLoading}
-            onRemove={(userId) => handleRemoveMember(detailTeamId, userId)}
+            onRemove={(userId) => {
+              const member = detailStats.find((s) => s.id === userId);
+              const name = member
+                ? `${member.firstName} ${member.lastName}`
+                : "this member";
+              confirmRemoveMember(detailTeamId, userId, name);
+            }}
           />
         )}
       </Modal>

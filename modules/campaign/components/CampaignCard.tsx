@@ -207,7 +207,7 @@ export default function CampaignCard({
             {/* Action row — stopPropagation so card click doesn't also fire */}
             {(onJoin || onView || onShare) && (
               <div
-                className="flex flex-wrap items-center justify-between gap-2 pt-2 mt-1 border-t border-ds-border-base"
+                className="flex flex-wrap items-center gap-2 pt-2 mt-1 border-t border-ds-border-base"
                 onClick={(e) => e.stopPropagation()}>
                 {onView && (
                   <button
@@ -219,20 +219,22 @@ export default function CampaignCard({
                   </button>
                 )}
                 <div className="flex items-center gap-1.5 ml-auto">
-                  {(campaign.mediaType === "IMAGE" || campaign.mediaType === "VIDEO") && campaign.mediaUrl && (
-                    <Tooltip title="Download media">
-                      <a
-                        href={campaign.mediaUrl}
-                        download
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        aria-label="Download campaign media"
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
-                        <ICONS.download className="text-xs" />
-                      </a>
-                    </Tooltip>
-                  )}
+                  {(campaign.mediaType === "IMAGE" ||
+                    campaign.mediaType === "VIDEO") &&
+                    campaign.mediaUrl && (
+                      <Tooltip title="Download media">
+                        <a
+                          href={campaign.mediaUrl}
+                          download
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          aria-label="Download campaign media"
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
+                          <ICONS.download className="text-xs" />
+                        </a>
+                      </Tooltip>
+                    )}
                   {onShare && (
                     <button
                       type="button"
@@ -247,7 +249,9 @@ export default function CampaignCard({
                       variant={isJoined ? "ghost" : "primary"}
                       size="small"
                       icon={isJoined ? <ICONS.check /> : <ICONS.rocket />}
-                      onClick={() => { if (!isJoined && !isJoining) onJoin(campaign); }}
+                      onClick={() => {
+                        if (!isJoined && !isJoining) onJoin(campaign);
+                      }}
                       disabled={isJoined || isJoining}
                       loading={isJoining}
                       className="!py-0 !h-7 !text-xs !leading-none shrink-0">

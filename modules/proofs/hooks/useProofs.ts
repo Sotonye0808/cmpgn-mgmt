@@ -91,7 +91,7 @@ export function useSubmitProof(onSuccess?: () => void): UseSubmitProofReturn {
 // ─── useReviewProof ───────────────────────────────────────────────────────────
 
 interface UseReviewProofReturn {
-    review: (proofId: string, input: ReviewProofInput) => Promise<void>;
+    review: (proofId: string, input: ReviewProofInput) => Promise<boolean>;
     loading: boolean;
     error: string | null;
 }
@@ -107,8 +107,10 @@ export function useReviewProof(onSuccess?: () => void): UseReviewProofReturn {
             try {
                 await reviewProof(proofId, input);
                 onSuccess?.();
+                return true;
             } catch (e) {
                 setError(e instanceof Error ? e.message : "Failed to review proof");
+                return false;
             } finally {
                 setLoading(false);
             }

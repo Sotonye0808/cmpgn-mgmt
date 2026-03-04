@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { ROUTES } from "@/config/routes";
 import { useAutoRefresh } from "@/hooks/useAutoRefresh";
 
@@ -15,15 +15,17 @@ export function useUserAnalytics(): UseAnalyticsReturn {
     const [analytics, setAnalytics] = useState<UserAnalytics | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasData = useRef(false);
 
     const fetch = useCallback(async () => {
-        setLoading(true);
+        if (!hasData.current) setLoading(true);
         setError(null);
         try {
             const res = await window.fetch(ROUTES.API.ANALYTICS.ME);
             if (!res.ok) throw new Error("Failed to load analytics");
             const json = await res.json();
             setAnalytics(json.data);
+            hasData.current = true;
         } catch (e) {
             setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
@@ -65,10 +67,11 @@ export function useCampaignAnalytics(
     const [analytics, setAnalytics] = useState<CampaignAnalytics | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasData = useRef(false);
 
     const fetch = useCallback(async () => {
         if (!campaignId) return;
-        setLoading(true);
+        if (!hasData.current) setLoading(true);
         setError(null);
         try {
             const res = await window.fetch(
@@ -77,6 +80,7 @@ export function useCampaignAnalytics(
             if (!res.ok) throw new Error("Failed to load campaign analytics");
             const json = await res.json();
             setAnalytics(json.data);
+            hasData.current = true;
         } catch (e) {
             setError(e instanceof Error ? e.message : "Unknown error");
         } finally {
@@ -112,15 +116,17 @@ export function useOverviewAnalytics(): UseOverviewAnalyticsReturn {
     const [overview, setOverview] = useState<OverviewAnalytics | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const hasData = useRef(false);
 
     const fetch = useCallback(async () => {
-        setLoading(true);
+        if (!hasData.current) setLoading(true);
         setError(null);
         try {
             const res = await window.fetch(ROUTES.API.ANALYTICS.OVERVIEW);
             if (!res.ok) throw new Error("Failed to load overview");
             const json = await res.json();
             setOverview(json.data);
+            hasData.current = true;
         } catch (e) {
             setError(e instanceof Error ? e.message : "Unknown error");
         } finally {

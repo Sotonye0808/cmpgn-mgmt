@@ -5,6 +5,7 @@ import { registerSchema } from "@/lib/schemas/authSchemas";
 import { prisma } from "@/lib/prisma";
 import { signAccessToken, signRefreshToken, setAuthCookies } from "@/lib/utils/jwt";
 import { successResponse, badRequestResponse, handleApiError } from "@/lib/utils/api";
+import { attributeReferral } from "@/modules/referral/services/referralService";
 import type { ApiResponse } from "@/types/api";
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<AuthUser>>> {
@@ -15,7 +16,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
             return badRequestResponse(result.error.errors[0].message);
         }
 
-        const { email, password, firstName, lastName, whatsappNumber, campus } = result.data;
+        const { email, password, firstName, lastName, whatsappNumber, campus, ref } = result.data;
 
         // Check if email already exists
         const existing = await prisma.user.findUnique({ where: { email } });
@@ -50,6 +51,15 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
 
             return newUser;
         });
+
+        // Attribute referral if the user signed up via a smart link (?ref=slug)
+        if (ref) {
+            try {
+                await attributeReferral(ref, user.id);
+            } catch {
+                // Referral attribution is best-effort — never block registration
+            }
+        }
 
         const authUser: AuthUser = {
             id: user.id,

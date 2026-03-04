@@ -1,6 +1,12 @@
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 
+/** Points awarded to a referrer when a new user signs up via their link */
+const REFERRAL_SIGNUP_POINTS = 5;
+
+/** Percentage (0–1) of a referree's earned points that cascade to their referrer */
+export const REFERRAL_CASCADE_PERCENT = 0.1;
+
 // ─── Attribute a referral (called post-register when ?ref={slug} is present) ──
 export async function attributeReferral(
     slug: string,
@@ -40,8 +46,33 @@ export async function attributeReferral(
             data: { conversionCount: { increment: 1 }, updatedAt: now },
         });
 
+        // Update goalCurrent for REFERRALS-type campaigns
+        const campaign = await tx.campaign.findUnique({
+            where: { id: link.campaignId },
+            select: { goalType: true },
+        });
+        if (campaign?.goalType === "REFERRALS") {
+            await tx.campaign.update({
+                where: { id: link.campaignId },
+                data: { goalCurrent: { increment: 1 } },
+            });
+        }
+
+        // Award LEADERSHIP points to the referrer for the signup itself
+        await tx.pointsLedgerEntry.create({
+            data: {
+                userId: link.userId,
+                campaignId: link.campaignId,
+                type: "LEADERSHIP" as never,
+                value: REFERRAL_SIGNUP_POINTS,
+                description: "Referral signup bonus",
+                referenceId: newReferral.id,
+            },
+        });
+
         await redis.invalidatePattern(`referrals:user:${link.userId}`);
         await redis.invalidatePattern(`engagement:user:${link.userId}`);
+        await redis.del(`points:summary:${link.userId}`);
 
         return newReferral;
     });
@@ -50,6 +81,46 @@ export async function attributeReferral(
         ...referral,
         createdAt: referral.createdAt.toISOString(),
     } as unknown as Referral;
+}
+
+// ─── Award referral cascade points ────────────────────────────────────────────
+/**
+ * When a referred user (invitee) earns points, a percentage cascades to the referrer.
+ * Call this AFTER the primary points entry has been written.
+ *
+ * @param inviteeId  The user who just earned points
+ * @param campaignId The campaign context (used to find the referral relationship)
+ * @param earnedPoints The points the invitee just earned
+ */
+export async function awardReferralCascade(
+    inviteeId: string,
+    campaignId: string,
+    earnedPoints: number,
+): Promise<void> {
+    if (earnedPoints <= 0) return;
+
+    const referral = await prisma.referral.findFirst({
+        where: { inviteeId, campaignId },
+    });
+    if (!referral) return;
+
+    const cascadeValue = Math.max(1, Math.round(earnedPoints * REFERRAL_CASCADE_PERCENT));
+
+    await prisma.pointsLedgerEntry.create({
+        data: {
+            userId: referral.inviterId,
+            campaignId,
+            type: "LEADERSHIP" as never,
+            value: cascadeValue,
+            description: `Referral cascade (${Math.round(REFERRAL_CASCADE_PERCENT * 100)}% of referree contribution)`,
+            referenceId: referral.id,
+        },
+    });
+
+    await Promise.all([
+        redis.del(`points:summary:${referral.inviterId}`),
+        redis.invalidatePattern(`engagement:user:${referral.inviterId}`),
+    ]);
 }
 
 // ─── Get referral stats for a user ────────────────────────────────────────────

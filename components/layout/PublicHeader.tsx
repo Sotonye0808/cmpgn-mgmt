@@ -6,6 +6,7 @@ import { usePathname } from "next/navigation";
 import { NAV_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import BrandLogo from "@/components/ui/BrandLogo";
+import { useAuth } from "@/hooks/useAuth";
 
 const NAV_LINKS = [
   { label: "How It Works", href: ROUTES.HOW_IT_WORKS },
@@ -17,26 +18,13 @@ interface Props {
   className?: string;
 }
 
-/**
- * Lightweight cookie-based auth check — avoids a network round-trip.
- * Returns true when the httpOnly access-token cookie exists (set by the
- * auth system). This is not a security gate — just a UI hint.
- */
-function useIsAuthenticated(): boolean {
-  const [authed, setAuthed] = useState(false);
-  useEffect(() => {
-    // The JWT middleware uses "access_token" as the cookie name.
-    setAuthed(document.cookie.split(";").some((c) => c.trim().startsWith("access_token=")));
-  }, []);
-  return authed;
-}
-
 export default function PublicHeader({ className }: Props) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   const buttonRef = useRef<HTMLButtonElement>(null);
   const pathname = usePathname();
-  const isAuthenticated = useIsAuthenticated();
+  const { user } = useAuth();
+  const isAuthenticated = !!user;
 
   // Close menu on route change
   useEffect(() => {

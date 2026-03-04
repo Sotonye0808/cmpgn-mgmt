@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Button, Space, message } from "antd";
+import { Modal, Button, Space, Popconfirm, message } from "antd";
 import { TRUST_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 
@@ -57,29 +57,44 @@ export default function TrustReviewModal({
           Choose an action for this user&#39;s flagged activity:
         </p>
         <Space direction="vertical" className="w-full">
-          <Button
-            block
-            type="primary"
-            loading={loading === "CLEAR"}
-            onClick={() => resolve("CLEAR")}
-            className="bg-ds-brand-success hover:bg-ds-brand-success-hover">
-            {TRUST_PAGE_CONTENT.resolveButton} — Clear all flags &amp; restore
-            score
-          </Button>
-          <Button
-            block
-            danger
-            loading={loading === "PENALIZE"}
-            onClick={() => resolve("PENALIZE")}>
-            {TRUST_PAGE_CONTENT.penalizeButton} — Apply additional score penalty
-          </Button>
-          <Button
-            block
-            loading={loading === "ESCALATE"}
-            onClick={() => resolve("ESCALATE")}>
-            {TRUST_PAGE_CONTENT.escalateButton} — Mark as reviewed &amp;
-            escalate
-          </Button>
+          <Popconfirm
+            title="Clear all flags?"
+            description="This will restore the user's trust score."
+            onConfirm={() => resolve("CLEAR")}
+            okText="Confirm"
+            cancelText="Cancel">
+            <Button
+              block
+              type="primary"
+              loading={loading === "CLEAR"}
+              className="bg-ds-brand-success hover:bg-ds-brand-success-hover">
+              {TRUST_PAGE_CONTENT.resolveButton} — Clear all flags &amp; restore
+              score
+            </Button>
+          </Popconfirm>
+          <Popconfirm
+            title="Penalize this user?"
+            description="This will apply an additional score penalty. This action cannot be undone."
+            onConfirm={() => resolve("PENALIZE")}
+            okText="Penalize"
+            okButtonProps={{ danger: true }}
+            cancelText="Cancel">
+            <Button block danger loading={loading === "PENALIZE"}>
+              {TRUST_PAGE_CONTENT.penalizeButton} — Apply additional score
+              penalty
+            </Button>
+          </Popconfirm>
+          <Popconfirm
+            title="Escalate this user?"
+            description="This will mark the user as reviewed and escalate for further action."
+            onConfirm={() => resolve("ESCALATE")}
+            okText="Escalate"
+            cancelText="Cancel">
+            <Button block loading={loading === "ESCALATE"}>
+              {TRUST_PAGE_CONTENT.escalateButton} — Mark as reviewed &amp;
+              escalate
+            </Button>
+          </Popconfirm>
         </Space>
       </Modal>
     </>

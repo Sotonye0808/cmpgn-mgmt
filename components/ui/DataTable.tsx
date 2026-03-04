@@ -1,7 +1,12 @@
 "use client";
 
 import { Table } from "antd";
-import type { ColumnGroupType, ColumnType, ColumnsType, TableProps } from "antd/es/table";
+import type {
+  ColumnGroupType,
+  ColumnType,
+  ColumnsType,
+  TableProps,
+} from "antd/es/table";
 import { cn } from "@/lib/utils/cn";
 
 interface DataTableProps<T extends object> extends TableProps<T> {
@@ -14,27 +19,41 @@ interface DataTableProps<T extends object> extends TableProps<T> {
    * Pass false to disable vertical clamping and let the table grow freely.
    */
   maxBodyHeight?: number | string | false;
+  /**
+   * When true, columns default to nowrap + ellipsis (opt out per-column with
+   * ellipsis: false). When false (default), cells use natural wrapping and
+   * overflow scrolls horizontally so no data is clipped.
+   */
+  compactCells?: boolean;
 }
 
 /**
- * Inject nowrap + ellipsis defaults into every column.
- * Merges with any onCell / onHeaderCell the caller already provided.
+ * Normalise columns — optionally inject nowrap + ellipsis defaults.
+ * When `compact` is false, cells use natural sizing and AntD handles overflow
+ * via scroll.x, so every cell's content is always reachable via horizontal scroll.
  * Recurses into ColumnGroup children.
  */
-function withNowrap<T extends object>(
+function normaliseColumns<T extends object>(
   cols: ColumnsType<T> | undefined,
+  compact: boolean,
 ): ColumnsType<T> | undefined {
   if (!cols) return undefined;
   return cols.map((col) => {
     if ("children" in col) {
       const g = col as ColumnGroupType<T>;
-      return { ...g, children: withNowrap(g.children as ColumnsType<T>) ?? [] };
+      return {
+        ...g,
+        children: normaliseColumns(g.children as ColumnsType<T>, compact) ?? [],
+      };
     }
     const c = col as ColumnType<T>;
     const prevOnCell = c.onCell;
     const prevOnHeaderCell = c.onHeaderCell;
-    // Caller's explicit ellipsis: false wins; otherwise default ON.
-    const useEllipsis = c.ellipsis ?? true;
+
+    // In compact mode, honour per-column ellipsis (default ON).
+    // In normal mode, never force ellipsis — let content define width.
+    const useEllipsis = compact ? (c.ellipsis ?? true) : c.ellipsis === true;
+
     return {
       ...c,
       ellipsis: useEllipsis,
@@ -64,8 +83,8 @@ function withNowrap<T extends object>(
  *  • Horizontal scroll is handled by AntD internally (scroll.x = "max-content").
  *    Do NOT add overflow-x-auto to parent elements — it conflicts with AntD's
  *    own scroll container and causes dual-scrollbar and layout bugs.
- *  • Cell content never wraps (injected via onCell whiteSpace: nowrap).
- *  • Ellipsis + tooltip is on by default; opt out per-column with ellipsis: false.
+ *  • By default, cells use natural wrapping — data is never clipped.
+ *    Set compactCells={true} for the old behaviour (nowrap + ellipsis).
  *  • Sticky header is built into AntD's scroll.y — no manual `sticky` prop needed.
  *  • Pagination defaults include page-size changer.
  */
@@ -73,6 +92,7 @@ export default function DataTable<T extends object>({
   wrapperClassName,
   className,
   maxBodyHeight = "calc(100vh - 280px)",
+  compactCells = false,
   columns,
   ...props
 }: DataTableProps<T>) {
@@ -81,15 +101,15 @@ export default function DataTable<T extends object>({
   return (
     <div
       className={cn(
-        // overflow-hidden is INTENTIONAL: it clips the corners to match the
-        // rounded border AND lets AntD's INTERNAL scroll container (.ant-table-body)
-        // handle horizontal + vertical overflow. Do NOT add overflow-x-auto here.
+        // overflow-hidden clips corners to match the rounded border AND lets
+        // AntD's INTERNAL scroll container (.ant-table-body) handle horizontal +
+        // vertical overflow. Do NOT add overflow-x-auto here.
         "w-full overflow-hidden rounded-ds-xl border border-ds-border-base bg-ds-surface-elevated",
         wrapperClassName,
       )}>
       <Table<T>
         {...props}
-        columns={withNowrap(columns)}
+        columns={normaliseColumns(columns, compactCells)}
         className={cn("ds-data-table w-full", className)}
         scroll={
           props.scroll ?? {
@@ -124,4 +144,3 @@ export default function DataTable<T extends object>({
     </div>
   );
 }
-

@@ -1,5 +1,0 @@
-# 1. Generate the Prisma client from your schema
-# npx prisma generate
-
-# 2. Load .env.prod, swap DATABASE_URL to the direct connection, deploy migrations
-# Get-Content .env.prod | Where-Object { $_ -match '^[^#\s].*=.*' } | ForEach-Object { $k,$v = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($k.Trim(), $v.Trim(), 'Process') }; $env:DATABASE_URL = $env:DIRECT_DATABASE_URL; npx prisma migrate deploy

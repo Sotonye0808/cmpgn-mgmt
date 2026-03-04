@@ -3,6 +3,7 @@ import { redis } from "@/lib/redis";
 import { serialize } from "@/lib/utils/serialize";
 import { generateSlug } from "@/lib/utils/slug";
 import { CACHE_TTL_CAMPAIGN_LIST as CACHE_TTL_SHORT } from "@/lib/constants";
+import { awardReferralCascade } from "@/modules/referral/services/referralService";
 
 // View model: SmartLink enriched with campaign title (lookup-only, not stored)
 export type SmartLinkView = SmartLink & { campaignTitle?: string };
@@ -27,6 +28,8 @@ interface IncrementClickInput {
     ipAddress?: string;
     userAgent?: string;
     cookieSeen?: boolean;
+    /** Authenticated user ID — enables cross-device dedup on top of fingerprint */
+    userId?: string;
 }
 
 /** djb2-style non-cryptographic hash — sufficient for click dedup fingerprinting */
@@ -160,7 +163,7 @@ export async function getLinksByCampaign(options: GetLinksOptions) {
 
 // ─── Increment click + log event ──────────────────────────────────────────────
 export async function incrementClick(input: IncrementClickInput): Promise<SmartLink> {
-    const { slug, ipAddress, userAgent, cookieSeen } = input;
+    const { slug, ipAddress, userAgent, cookieSeen, userId } = input;
 
     const link = await prisma.smartLink.findUnique({ where: { slug } });
     if (!link) throw new Error("Link not found");
@@ -177,13 +180,27 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
         await redis.set(seenKey, true, 86_400_000); // 24h in ms
     }
 
+    // User-based dedup — prevents same logged-in user from inflating unique
+    // clicks by visiting from multiple devices/browsers (24h window)
+    let userAlreadySeen = false;
+    if (userId) {
+        const userSeenKey = `seen:user:${link.id}:${userId}`;
+        userAlreadySeen = !!(await redis.get<boolean>(userSeenKey));
+        if (!userAlreadySeen) {
+            await redis.set(userSeenKey, true, 86_400_000);
+        }
+    }
+
+    // A click is only "unique" when BOTH fingerprint AND user checks pass
+    const isUniqueClick = !alreadySeen && !userAlreadySeen;
+
     // Update SmartLink counters + Campaign counter + award points atomically
     const updatedLink = await prisma.$transaction(async (tx) => {
         const updated = await tx.smartLink.update({
             where: { id: link.id },
             data: {
                 clickCount: { increment: 1 },
-                uniqueClickCount: alreadySeen ? undefined : { increment: 1 },
+                uniqueClickCount: isUniqueClick ? { increment: 1 } : undefined,
             },
         });
 
@@ -192,6 +209,18 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
             where: { id: link.campaignId },
             data: { clickCount: { increment: 1 } },
         });
+
+        // Update goalCurrent for CLICKS-type campaigns
+        const campaign = await tx.campaign.findUnique({
+            where: { id: link.campaignId },
+            select: { goalType: true },
+        });
+        if (campaign?.goalType === "CLICKS") {
+            await tx.campaign.update({
+                where: { id: link.campaignId },
+                data: { goalCurrent: { increment: 1 } },
+            });
+        }
 
         // Distribute click points
         await tx.pointsLedgerEntry.create({
@@ -205,6 +234,11 @@ export async function incrementClick(input: IncrementClickInput): Promise<SmartL
         });
 
         return updated;
+    });
+
+    // Referral cascade — award a % of the click point to the link owner's referrer
+    await awardReferralCascade(link.userId, link.campaignId, 1).catch(() => {
+        /* best-effort — never break click tracking */
     });
 
     // Invalidate caches
@@ -233,6 +267,18 @@ export async function incrementShare(slug: string): Promise<void> {
             data: { shareCount: { increment: 1 } },
         });
 
+        // Update goalCurrent for SHARES-type campaigns
+        const campaign = await tx.campaign.findUnique({
+            where: { id: link.campaignId },
+            select: { goalType: true },
+        });
+        if (campaign?.goalType === "SHARES") {
+            await tx.campaign.update({
+                where: { id: link.campaignId },
+                data: { goalCurrent: { increment: 1 } },
+            });
+        }
+
         await tx.linkEvent.create({
             data: {
                 linkId: link.id,
@@ -251,6 +297,11 @@ export async function incrementShare(slug: string): Promise<void> {
                 description: "Smart link shared",
             },
         });
+    });
+
+    // Referral cascade — award a % of the share points to the link owner's referrer
+    await awardReferralCascade(link.userId, link.campaignId, 2).catch(() => {
+        /* best-effort */
     });
 
     await Promise.all([

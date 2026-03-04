@@ -6,6 +6,7 @@ import {
     getLinkBySlug,
 } from "@/modules/links/services/linkService";
 import { handleApiError } from "@/lib/utils/api";
+import { getAuthenticatedUser } from "@/lib/middleware/auth";
 import { z } from "zod";
 
 // Supported tracking event types
@@ -50,8 +51,17 @@ export async function POST(request: NextRequest) {
             return NextResponse.json({ ok: false }, { status: 404 });
         }
 
-        // Increment click (handles dedup via Redis fingerprint + cookie flag)
-        await incrementClick({ slug, ipAddress, userAgent, cookieSeen });
+        // Extract authenticated userId for cross-device dedup (best-effort)
+        const authUser = await getAuthenticatedUser().catch(() => null);
+
+        // Increment click (handles dedup via Redis fingerprint + userId + cookie flag)
+        await incrementClick({
+            slug,
+            ipAddress,
+            userAgent,
+            cookieSeen,
+            userId: authUser?.id,
+        });
 
         // Log the event
         await logLinkEvent({
