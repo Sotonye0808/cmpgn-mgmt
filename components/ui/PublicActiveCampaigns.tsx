@@ -14,6 +14,7 @@ interface PublicActiveCampaignsProps {
     description: string;
     thumbnailUrl?: string;
     mediaUrl?: string;
+    mediaType?: string;
     participantCount?: number;
     goalTarget?: number;
     goalCurrent?: number;
@@ -66,19 +67,32 @@ export default function PublicActiveCampaigns({ campaigns }: PublicActiveCampaig
                   )
                 : null;
 
+            // Same priority as CampaignCard: IMAGE mediaUrl → VIDEO thumbnailUrl → any thumbnailUrl
+            const imgSrc =
+              campaign.mediaType === "IMAGE" && campaign.mediaUrl
+                ? campaign.mediaUrl
+                : campaign.thumbnailUrl ?? null;
+            const isVideo =
+              campaign.mediaType === "VIDEO" && !!campaign.thumbnailUrl;
+
             return (
               <div
                 key={campaign.id}
                 className="glass-surface rounded-ds-xl overflow-hidden hover:glow-border transition-all duration-200 flex flex-col">
                 {/* Thumbnail */}
                 <div className="relative w-full h-36 bg-gradient-to-br from-ds-brand-accent via-ds-chart-1 to-ds-chart-5">
-                  {(campaign.thumbnailUrl || campaign.mediaUrl) && (
+                  {imgSrc && (
                     <Image
-                      src={campaign.thumbnailUrl || campaign.mediaUrl || ""}
+                      src={imgSrc}
                       alt={campaign.title}
                       fill
                       className="object-cover"
                     />
+                  )}
+                  {isVideo && (
+                    <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <ICONS.play className="text-4xl text-white drop-shadow-lg" />
+                    </div>
                   )}
                   {campaign.isMegaCampaign && (
                     <span className="absolute top-3 left-3 px-2 py-0.5 bg-ds-brand-accent text-white text-[10px] font-bold rounded-full uppercase tracking-wider">
