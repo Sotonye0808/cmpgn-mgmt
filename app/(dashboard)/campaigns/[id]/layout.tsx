@@ -12,7 +12,7 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
 
     const campaign = await prisma.campaign.findUnique({
         where: { id },
-        select: { title: true, description: true, thumbnailUrl: true, status: true },
+        select: { title: true, description: true, mediaType: true, mediaUrl: true, thumbnailUrl: true, metaImage: true, status: true },
     });
 
     if (!campaign) {
@@ -26,7 +26,12 @@ export async function generateMetadata({ params }: { params: Promise<{ id: strin
     const description = campaign.description
         ? campaign.description.slice(0, 160)
         : `Join this campaign on ${SITE_CONFIG.name} and start deploying.`;
-    const image = campaign.thumbnailUrl ?? SITE_CONFIG.ogImage;
+    // Priority: explicit metaImage → IMAGE mediaUrl → thumbnailUrl → default OG
+    const image =
+        campaign.metaImage ??
+        (campaign.mediaType === "IMAGE" && campaign.mediaUrl ? campaign.mediaUrl : null) ??
+        campaign.thumbnailUrl ??
+        SITE_CONFIG.ogImage;
 
     return {
         title: campaign.title,
