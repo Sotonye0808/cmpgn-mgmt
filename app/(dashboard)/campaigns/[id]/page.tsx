@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { Spin, message, Descriptions, Tag } from "antd";
+import { Spin, App, Descriptions, Tag } from "antd";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
 import CampaignBanner from "@/modules/campaign/components/CampaignBanner";
 import Button from "@/components/ui/Button";
@@ -19,6 +19,7 @@ export default function CampaignDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const { user } = useAuth();
+  const { message: msgApi } = App.useApp();
   const { campaign, loading, error, refetch } = useCampaign(id);
   const [joined, setJoined] = useState(false);
   const [joining, setJoining] = useState(false);
@@ -84,13 +85,13 @@ export default function CampaignDetailPage() {
         /* silent */
       }
 
-      message.success(
+      msgApi.success(
         copiedLink
           ? "Joined! Your tracking link has been copied to clipboard."
           : "Successfully joined campaign!",
       );
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : "Failed to join");
+      msgApi.error(e instanceof Error ? e.message : "Failed to join");
     } finally {
       setJoining(false);
     }
@@ -140,7 +141,7 @@ export default function CampaignDetailPage() {
     }
     navigator.clipboard
       .writeText(trackingUrl)
-      .then(() => message.success("Tracking link copied!"));
+      .then(() => msgApi.success("Tracking link copied!"));
   };
 
   if (loading)

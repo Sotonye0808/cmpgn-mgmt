@@ -46,7 +46,7 @@ export default function CampaignAuditLog({
   const fetchAudit = useCallback(async () => {
     try {
       const res = await fetch(
-        `${ROUTES.API.CAMPAIGNS.AUDIT(campaignId)}?pageSize=50`
+        `${ROUTES.API.CAMPAIGNS.AUDIT(campaignId)}?pageSize=50`,
       );
       if (!res.ok) return;
       const json = await res.json();
@@ -84,7 +84,7 @@ export default function CampaignAuditLog({
         <Tag className="ml-auto">{events.length} events</Tag>
       </div>
 
-      <div className="space-y-6">
+      <div className="space-y-6 max-h-[32rem] overflow-y-auto pr-1">
         {Object.entries(grouped).map(([date, dayEvents]) => (
           <div key={date}>
             <div className="text-xs font-semibold text-ds-text-subtle uppercase tracking-wide mb-3">
@@ -143,7 +143,7 @@ export default function CampaignAuditLog({
                                     {String(
                                       (
                                         event.before as Record<string, unknown>
-                                      )?.[field] ?? "—"
+                                      )?.[field] ?? "—",
                                     )}
                                   </span>
                                 </Tooltip>
@@ -153,7 +153,7 @@ export default function CampaignAuditLog({
                                     {String(
                                       (
                                         event.after as Record<string, unknown>
-                                      )?.[field] ?? "—"
+                                      )?.[field] ?? "—",
                                     )}
                                   </span>
                                 </Tooltip>
@@ -169,13 +169,14 @@ export default function CampaignAuditLog({
                             <Tag>
                               {String(
                                 (event.before as Record<string, unknown>)
-                                  ?.status
+                                  ?.status,
                               )}
                             </Tag>
                             <span className="text-ds-text-subtle">→</span>
                             <Tag color="blue">
                               {String(
-                                (event.after as Record<string, unknown>)?.status
+                                (event.after as Record<string, unknown>)
+                                  ?.status,
                               )}
                             </Tag>
                           </div>

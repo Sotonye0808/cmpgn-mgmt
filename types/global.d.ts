@@ -299,7 +299,7 @@ declare global {
         smartLinkId: string;
         platform: SocialPlatform;
         screenshotUrl: string;
-        viewCount?: number;
+        viewCount: number;
         status: ViewProofStatus;
         reviewedById?: string;
         reviewedAt?: string;
@@ -376,7 +376,7 @@ declare global {
         smartLinkId: string;
         platform: SocialPlatform;
         screenshotUrl: string;
-        viewCount?: number;
+        viewCount: number;
     }
 
     interface UpdateWeaponsOfChoiceInput {
@@ -711,6 +711,7 @@ declare global {
         userId?: string;
         userAgent?: string;
         pageUrl?: string;
+        screenshotUrl?: string;
         status: BugReportStatus;
         resolvedAt?: string;
         adminNotes?: string;

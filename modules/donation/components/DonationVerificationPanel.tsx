@@ -9,7 +9,7 @@ import {
   Modal,
   Image,
   Descriptions,
-  message,
+  App,
   Space,
   Popconfirm,
 } from "antd";
@@ -38,6 +38,7 @@ const STATUS_FILTER_OPTIONS = [
 ];
 
 export default function DonationVerificationPanel() {
+  const { message: msgApi } = App.useApp();
   const [donations, setDonations] = useState<EnrichedDonation[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -65,7 +66,7 @@ export default function DonationVerificationPanel() {
       setDonations(json.data ?? []);
       setTotal(json.pagination?.total ?? 0);
     } catch {
-      message.error("Failed to load donations");
+      msgApi.error("Failed to load donations");
     } finally {
       setLoading(false);
     }
@@ -93,13 +94,13 @@ export default function DonationVerificationPanel() {
         const err = await res.json();
         throw new Error(err.error ?? "Verification failed");
       }
-      message.success(
+      msgApi.success(
         `Donation ${action === "VERIFIED" ? "verified" : "rejected"}`,
       );
       setSelectedDonation(null);
       fetchDonations();
     } catch (e) {
-      message.error(e instanceof Error ? e.message : "Unknown error");
+      msgApi.error(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setVerifying(false);
     }
@@ -122,13 +123,13 @@ export default function DonationVerificationPanel() {
       }
       const json = await res.json();
       const result = json.data as { updated: number; skipped: number };
-      message.success(
+      msgApi.success(
         `${result.updated} donation${result.updated !== 1 ? "s" : ""} ${action === "VERIFIED" ? "verified" : "rejected"}${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`,
       );
       setSelectedRowKeys([]);
       fetchDonations();
     } catch (e) {
-      message.error(e instanceof Error ? e.message : "Unknown error");
+      msgApi.error(e instanceof Error ? e.message : "Unknown error");
     } finally {
       setBatchVerifying(false);
     }

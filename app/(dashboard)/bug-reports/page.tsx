@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useCallback, useEffect } from "react";
-import { Select, Tag, Empty, Modal, Input, Popconfirm, message } from "antd";
+import { Select, Tag, Empty, Modal, Input, Popconfirm, App } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import { ROUTES } from "@/config/routes";
 import { BUG_REPORT_CATEGORIES, BUG_REPORT_STATUSES } from "@/config/content";
@@ -41,6 +41,7 @@ const STATUS_LABEL_MAP = new Map<string, string>(
 );
 
 export default function BugReportsPage() {
+  const { message: msgApi } = App.useApp();
   const { user, hasRole } = useAuth();
   const [reports, setReports] = useState<BugReportRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -106,11 +107,11 @@ export default function BugReportsPage() {
         }),
       });
       if (!res.ok) throw new Error("Update failed");
-      message.success("Bug report updated");
+      msgApi.success("Bug report updated");
       setDetailOpen(false);
       fetchReports(meta.page);
     } catch {
-      message.error("Failed to update bug report");
+      msgApi.error("Failed to update bug report");
     } finally {
       setUpdatingStatus(false);
     }

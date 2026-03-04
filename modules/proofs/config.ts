@@ -33,26 +33,26 @@ export const PROOF_PLATFORM_OPTIONS = SOCIAL_PLATFORMS_CONFIG.map((p) => ({
 export const PROOFS_PAGE_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[] = [
     {
         key: "my-proofs",
-        label: "My Proofs",
+        label: "My Status Views",
         allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
     {
         key: "team-proofs",
-        label: "Team / Campaign Proofs",
+        label: "Team / Campaign Status Views",
         allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
 ];
 
 export const PROOFS_PAGE_CONTENT = {
-    title: "Proof of Deployment",
-    subtitle: "Submit screenshots proving your ammunition was deployed. Earn Reliability points on approval.",
-    myProofsTitle: "My Deployment Proofs",
-    myProofsEmpty: "You haven't submitted any proofs yet.",
-    teamProofsTitle: "Team & Campaign Proofs",
-    teamProofsEmpty: "No proofs found for this campaign.",
-    submitBtn: "Submit Proof",
-    submitModalTitle: "Submit Deployment Proof",
-    submitSuccess: "Proof submitted successfully! It will be reviewed shortly.",
+    title: "Status Views",
+    subtitle: "Submit screenshots showing your campaign share status. Earn Reliability points on approval.",
+    myProofsTitle: "My Status Views",
+    myProofsEmpty: "You haven't submitted any status views yet.",
+    teamProofsTitle: "Team & Campaign Status Views",
+    teamProofsEmpty: "No status views found for this campaign.",
+    submitBtn: "Submit Status View",
+    submitModalTitle: "Submit Status View",
+    submitSuccess: "Status view submitted successfully! It will be reviewed shortly.",
     approveBtn: "Approve",
     rejectBtn: "Reject",
     reviewNotesPlaceholder: "Optional notes for the soldier...",

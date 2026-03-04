@@ -64,6 +64,7 @@ import {
     CrownOutlined,
     AimOutlined,
     BugOutlined,
+    SendOutlined,
 } from "@ant-design/icons";
 
 export const ICONS = {
@@ -150,6 +151,7 @@ export const ICONS = {
     twitterX: TwitterOutlined,
     youtube: YoutubeOutlined,
     whatsapp: WhatsAppOutlined,
+    telegram: SendOutlined,
     tiktok: VideoCameraOutlined, // AntD has no TikTok icon — using VideoCameraOutlined
     snapchat: CameraOutlined,    // AntD has no Snapchat icon — using CameraOutlined
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Select, Popconfirm, Input, message } from "antd";
+import { Select, Popconfirm, Input, App } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import ProofList, { ProofStatusFilter } from "./ProofList";
@@ -16,6 +16,7 @@ interface Props {
 }
 
 export default function ProofReviewPanel({ campaigns, userMap }: Props) {
+  const { message: msgApi } = App.useApp();
   const [filterCampaignId, setFilterCampaignId] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -63,11 +64,11 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
       notes: batchNotes || undefined,
     });
     if (result) {
-      message.success(
+      msgApi.success(
         `${result.updated} proof${result.updated !== 1 ? "s" : ""} ${status === "APPROVED" ? "approved" : "rejected"}${result.skipped > 0 ? ` (${result.skipped} skipped)` : ""}`,
       );
     } else {
-      message.error("Batch review failed. Please try again.");
+      msgApi.error("Batch review failed. Please try again.");
     }
   };
 

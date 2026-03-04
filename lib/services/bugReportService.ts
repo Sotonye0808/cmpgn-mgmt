@@ -13,6 +13,7 @@ interface CreateInput {
     userId?: string;
     userAgent?: string;
     pageUrl?: string;
+    screenshotUrl?: string;
 }
 
 export async function createBugReport(input: CreateInput): Promise<BugReport> {
@@ -24,6 +25,7 @@ export async function createBugReport(input: CreateInput): Promise<BugReport> {
             userId: input.userId,
             userAgent: input.userAgent,
             pageUrl: input.pageUrl,
+            screenshotUrl: input.screenshotUrl,
         },
     });
 

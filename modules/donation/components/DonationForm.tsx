@@ -7,7 +7,7 @@ import {
   Select,
   Input,
   Button,
-  message,
+  App,
   Card,
   Typography,
 } from "antd";
@@ -45,7 +45,7 @@ export default function DonationForm({
 }: Props) {
   const [form] = Form.useForm<FormValues>();
   const [submitting, setSubmitting] = useState(false);
-  const [msgApi, contextHolder] = message.useMessage();
+  const { message: msgApi } = App.useApp();
   const selectedCurrency = Form.useWatch("currency", form) ?? "NGN";
 
   const bankOptions = useMemo(() => {
@@ -84,7 +84,6 @@ export default function DonationForm({
 
   return (
     <>
-      {contextHolder}
       <div className="bg-ds-surface-elevated border border-ds-border-base rounded-ds-xl p-6">
         <h3 className="font-semibold text-ds-text-primary text-lg mb-4">
           {DONATION_PAGE_CONTENT.formTitle}

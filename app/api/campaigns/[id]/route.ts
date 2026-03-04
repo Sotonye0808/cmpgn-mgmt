@@ -42,7 +42,10 @@ export async function PUT(request: NextRequest, { params }: RouteParams) {
             return badRequestResponse(JSON.stringify(parsed.error.flatten().fieldErrors));
         }
 
-        const campaign = await updateCampaign(id, parsed.data as UpdateCampaignInput);
+        const campaign = await updateCampaign(id, parsed.data as UpdateCampaignInput, {
+            id: auth.user.id,
+            role: auth.user.role as string,
+        });
         if (!campaign) return notFoundResponse("Campaign not found");
         return successResponse(campaign);
     } catch (err) {
@@ -60,7 +63,10 @@ export async function DELETE(request: NextRequest, { params }: RouteParams) {
         if (!existing) return notFoundResponse("Campaign not found");
 
         // Soft-delete: archive the campaign
-        const campaign = await updateCampaign(id, { status: "ARCHIVED" as CampaignStatus });
+        const campaign = await updateCampaign(id, { status: "ARCHIVED" as CampaignStatus }, {
+            id: auth.user.id,
+            role: auth.user.role as string,
+        });
         return successResponse(campaign);
     } catch (err) {
         return handleApiError(err);

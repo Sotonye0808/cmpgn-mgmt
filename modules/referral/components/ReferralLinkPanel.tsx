@@ -1,14 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { Tooltip, message } from "antd";
+import { Tooltip, App } from "antd";
 import { ICONS } from "@/config/icons";
 import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 import Spinner from "@/components/ui/Spinner";
 
 interface ReferralLinkPanelProps {
-  slug: string;
+  /** Smart-link slug (campaign referral) or undefined for platform invite link */
+  slug?: string;
+  /** Override the full URL (used for platform invite links) */
+  url?: string;
   stats: ReferralStats | null;
   loading?: boolean;
   className?: string;
@@ -16,23 +19,24 @@ interface ReferralLinkPanelProps {
 
 export default function ReferralLinkPanel({
   slug,
+  url,
   stats,
   loading,
   className,
 }: ReferralLinkPanelProps) {
   const [copied, setCopied] = useState(false);
-  const [messageApi, contextHolder] = message.useMessage();
+  const { message: msgApi } = App.useApp();
 
-  const referralUrl = `${typeof window !== "undefined" ? window.location.origin : ""}/c/${slug}`;
+  const referralUrl = url ?? `${typeof window !== "undefined" ? window.location.origin : ""}/c/${slug}`;
 
   const handleCopy = async () => {
     try {
       await navigator.clipboard.writeText(referralUrl);
       setCopied(true);
-      messageApi.success("Referral link copied!");
+      msgApi.success("Referral link copied!");
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      messageApi.error("Failed to copy link");
+      msgApi.error("Failed to copy link");
     }
   };
 
@@ -46,7 +50,6 @@ export default function ReferralLinkPanel({
 
   return (
     <div className={cn("space-y-4", className)}>
-      {contextHolder}
 
       {/* Link display */}
       <div className="flex items-center gap-2 p-3 bg-ds-surface-base border border-ds-border-base rounded-ds-lg">

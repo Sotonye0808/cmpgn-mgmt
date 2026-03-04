@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Form, Select, Alert, InputNumber } from "antd";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
+import MediaUpload from "@/components/ui/MediaUpload";
 import { PROOF_PLATFORM_OPTIONS, PROOFS_PAGE_CONTENT } from "../config";
 import { useSubmitProof } from "../hooks/useProofs";
 import { useSmartLink } from "@/modules/links/hooks/useSmartLink";
@@ -20,7 +21,7 @@ interface FormValues {
   campaignId: string;
   platform: string;
   screenshotUrl: string;
-  viewCount?: number;
+  viewCount: number;
 }
 
 export default function SubmitProofModal({
@@ -136,41 +137,42 @@ export default function SubmitProofModal({
           />
         </Form.Item>
 
-        {/* Screenshot URL */}
+        {/* Screenshot Upload */}
         <Form.Item
           name="screenshotUrl"
-          label="Screenshot URL"
-          rules={[
-            { required: true, message: "Provide a screenshot URL" },
-            { type: "url", message: "Must be a valid URL" },
-          ]}
-          extra="Upload your screenshot to any image host and paste the direct link here.">
-          <input
-            className="w-full px-3 py-2 rounded-ds-md border border-ds-border bg-ds-surface text-ds-text-primary text-sm focus:outline-none focus:border-ds-brand-accent"
-            placeholder="https://i.imgur.com/example.png"
-            onChange={(e) =>
-              form.setFieldValue("screenshotUrl", e.target.value)
-            }
+          label="Screenshot"
+          rules={[{ required: true, message: "Upload a screenshot" }]}
+          extra="Upload a screenshot showing your campaign share status.">
+          <MediaUpload
+            accept="image/*"
+            maxSizeMb={10}
+            showPreview
+            onUploadComplete={(media) => {
+              form.setFieldValue("screenshotUrl", media.url);
+            }}
           />
         </Form.Item>
 
-        {/* View Count (optional) */}
+        {/* View Count */}
         <Form.Item
           name="viewCount"
           label="View / Reach Count"
-          extra="How many views or people reached does your screenshot show? (Optional)">
+          rules={[
+            {
+              required: true,
+              message:
+                "Please enter the view/reach count shown in your screenshot",
+            },
+          ]}
+          extra="How many views or people reached does your screenshot show?">
           <InputNumber
             min={0}
             placeholder="e.g. 1500"
             className="w-full"
             formatter={(value) =>
-              value
-                ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",")
-                : ""
+              value ? `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",") : ""
             }
-            parser={(value) =>
-              Number((value ?? "").replace(/,/g, "")) as 0
-            }
+            parser={(value) => Number((value ?? "").replace(/,/g, "")) as 0}
           />
         </Form.Item>
 

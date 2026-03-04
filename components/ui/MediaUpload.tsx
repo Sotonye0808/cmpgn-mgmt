@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Upload, message, Image } from "antd";
+import { Upload, App, Image } from "antd";
 import { ICONS } from "@/config/icons";
 import { cn } from "@/lib/utils/cn";
 
@@ -35,12 +35,13 @@ export default function MediaUpload({
   className,
   showPreview = true,
 }: Props) {
+  const { message: msgApi } = App.useApp();
   const [uploading, setUploading] = useState(false);
   const [previewUrl, setPreviewUrl] = useState<string | undefined>(value);
 
   const handleUpload = async (file: File): Promise<boolean> => {
     if (file.size > maxSizeMb * 1024 * 1024) {
-      message.error(`File too large. Max ${maxSizeMb}MB`);
+      msgApi.error(`File too large. Max ${maxSizeMb}MB`);
       return false;
     }
 
@@ -60,12 +61,12 @@ export default function MediaUpload({
         setPreviewUrl(media.url);
         onChange?.(media.url);
         onUploadComplete?.(media);
-        message.success("Upload successful");
+        msgApi.success("Upload successful");
       } else {
-        message.error(json.error ?? "Upload failed");
+        msgApi.error(json.error ?? "Upload failed");
       }
     } catch {
-      message.error("Network error during upload");
+      msgApi.error("Network error during upload");
     } finally {
       setUploading(false);
     }

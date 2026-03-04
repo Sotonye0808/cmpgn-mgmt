@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Divider, message, Empty, Table, Button, Input } from "antd";
+import { Divider, App, Empty, Table, Button, Input } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import { useAuth } from "@/hooks/useAuth";
 import { useRole } from "@/hooks/useRole";
@@ -16,6 +16,13 @@ import MyTeamCard from "@/modules/teams/components/MyTeamCard";
 import { TEAM_PAGE_SECTIONS } from "@/modules/teams/config";
 import Spinner from "@/components/ui/Spinner";
 import { ICONS } from "@/config/icons";
+import { NAV_ITEMS } from "@/config/navigation";
+import { ROUTES } from "@/config/routes";
+import Link from "next/link";
+import PageHeader from "@/components/ui/PageHeader";
+
+/** Check if the team feature is deprecated via navigation config */
+const isTeamDeprecated = NAV_ITEMS.find((i) => i.key === "team")?.deprecated === true;
 
 // --------------------------------------------------------------------------
 // Sub-tables for team / group leaderboard filters
@@ -71,6 +78,35 @@ const GROUP_COLS: ColumnsType<GroupLeaderboardEntry> = [
 ];
 
 export default function TeamPage() {
+  // Deprecated guard — show coming-soon notice when feature is disabled
+  if (isTeamDeprecated) {
+    return (
+      <div className="p-6 max-w-2xl mx-auto mt-12">
+        <PageHeader title="Teams & Groups" subtitle="This feature is temporarily unavailable." />
+        <Empty
+          image={<ICONS.team style={{ fontSize: 64 }} className="text-ds-text-muted" />}
+          description={
+            <div className="space-y-2">
+              <p className="text-ds-text-secondary">
+                Teams and groups are being restructured and will return in a future update.
+              </p>
+              <Link href={ROUTES.REFERRALS}>
+                <Button type="primary" className="mt-4">
+                  Go to Referrals
+                </Button>
+              </Link>
+            </div>
+          }
+        />
+      </div>
+    );
+  }
+
+  return <TeamPageContent />;
+}
+
+function TeamPageContent() {
+  const { message: msgApi } = App.useApp();
   const { user } = useAuth();
   const { isAdmin } = useRole();
   const {
@@ -174,14 +210,14 @@ export default function TeamPage() {
         );
         const json = await res.json();
         if (json.success) {
-          message.success("Member removed");
+          msgApi.success("Member removed");
           refetch();
-        } else message.error(json.error ?? "Failed to remove member");
+        } else msgApi.error(json.error ?? "Failed to remove member");
       } catch {
-        message.error("Network error");
+        msgApi.error("Network error");
       }
     },
-    [myTeam, refetch],
+    [myTeam, refetch, msgApi],
   );
 
   const handleGenerateInvite = useCallback(async () => {
@@ -200,22 +236,22 @@ export default function TeamPage() {
           `${window.location.origin}/register?inviteToken=${json.data.token}`,
         );
       } else {
-        message.error(json.error ?? "Could not generate invite link");
+        msgApi.error(json.error ?? "Could not generate invite link");
       }
     } catch {
-      message.error("Network error");
+      msgApi.error("Network error");
     } finally {
       setInviteLoading(false);
     }
-  }, [myTeam]);
+  }, [myTeam, msgApi]);
 
   const handleCopyInvite = useCallback(() => {
     if (!inviteUrl) return;
     navigator.clipboard.writeText(inviteUrl).then(
-      () => message.success("Invite link copied!"),
-      () => message.error("Copy failed — please copy manually"),
+      () => msgApi.success("Invite link copied!"),
+      () => msgApi.error("Copy failed — please copy manually"),
     );
-  }, [inviteUrl]);
+  }, [inviteUrl, msgApi]);
 
   const visibleSections = TEAM_PAGE_SECTIONS.filter((s) =>
     s.allowedRoles.includes(user?.role as unknown as string),

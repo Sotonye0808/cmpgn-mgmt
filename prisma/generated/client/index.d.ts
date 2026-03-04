@@ -16818,7 +16818,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount: number | null
+    viewCount: number
     status: $Enums.ViewProofStatus
     reviewedById: string | null
     reviewedAt: Date | null
@@ -16950,7 +16950,7 @@ export namespace Prisma {
       smartLinkId: string
       platform: $Enums.SocialPlatform
       screenshotUrl: string
-      viewCount: number | null
+      viewCount: number
       status: $Enums.ViewProofStatus
       reviewedById: string | null
       reviewedAt: Date | null
@@ -22419,6 +22419,7 @@ export namespace Prisma {
     userId: string | null
     userAgent: string | null
     pageUrl: string | null
+    screenshotUrl: string | null
     status: $Enums.BugReportStatus | null
     resolvedAt: Date | null
     adminNotes: string | null
@@ -22434,6 +22435,7 @@ export namespace Prisma {
     userId: string | null
     userAgent: string | null
     pageUrl: string | null
+    screenshotUrl: string | null
     status: $Enums.BugReportStatus | null
     resolvedAt: Date | null
     adminNotes: string | null
@@ -22449,6 +22451,7 @@ export namespace Prisma {
     userId: number
     userAgent: number
     pageUrl: number
+    screenshotUrl: number
     status: number
     resolvedAt: number
     adminNotes: number
@@ -22466,6 +22469,7 @@ export namespace Prisma {
     userId?: true
     userAgent?: true
     pageUrl?: true
+    screenshotUrl?: true
     status?: true
     resolvedAt?: true
     adminNotes?: true
@@ -22481,6 +22485,7 @@ export namespace Prisma {
     userId?: true
     userAgent?: true
     pageUrl?: true
+    screenshotUrl?: true
     status?: true
     resolvedAt?: true
     adminNotes?: true
@@ -22496,6 +22501,7 @@ export namespace Prisma {
     userId?: true
     userAgent?: true
     pageUrl?: true
+    screenshotUrl?: true
     status?: true
     resolvedAt?: true
     adminNotes?: true
@@ -22584,6 +22590,7 @@ export namespace Prisma {
     userId: string | null
     userAgent: string | null
     pageUrl: string | null
+    screenshotUrl: string | null
     status: $Enums.BugReportStatus
     resolvedAt: Date | null
     adminNotes: string | null
@@ -22616,6 +22623,7 @@ export namespace Prisma {
     userId?: boolean
     userAgent?: boolean
     pageUrl?: boolean
+    screenshotUrl?: boolean
     status?: boolean
     resolvedAt?: boolean
     adminNotes?: boolean
@@ -22631,6 +22639,7 @@ export namespace Prisma {
     userId?: boolean
     userAgent?: boolean
     pageUrl?: boolean
+    screenshotUrl?: boolean
     status?: boolean
     resolvedAt?: boolean
     adminNotes?: boolean
@@ -22646,6 +22655,7 @@ export namespace Prisma {
     userId?: boolean
     userAgent?: boolean
     pageUrl?: boolean
+    screenshotUrl?: boolean
     status?: boolean
     resolvedAt?: boolean
     adminNotes?: boolean
@@ -22661,6 +22671,7 @@ export namespace Prisma {
     userId?: boolean
     userAgent?: boolean
     pageUrl?: boolean
+    screenshotUrl?: boolean
     status?: boolean
     resolvedAt?: boolean
     adminNotes?: boolean
@@ -22668,7 +22679,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type BugReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "category" | "description" | "email" | "userId" | "userAgent" | "pageUrl" | "status" | "resolvedAt" | "adminNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["bugReport"]>
+  export type BugReportOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "category" | "description" | "email" | "userId" | "userAgent" | "pageUrl" | "screenshotUrl" | "status" | "resolvedAt" | "adminNotes" | "createdAt" | "updatedAt", ExtArgs["result"]["bugReport"]>
 
   export type $BugReportPayload<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     name: "BugReport"
@@ -22681,6 +22692,7 @@ export namespace Prisma {
       userId: string | null
       userAgent: string | null
       pageUrl: string | null
+      screenshotUrl: string | null
       status: $Enums.BugReportStatus
       resolvedAt: Date | null
       adminNotes: string | null
@@ -23116,6 +23128,7 @@ export namespace Prisma {
     readonly userId: FieldRef<"BugReport", 'String'>
     readonly userAgent: FieldRef<"BugReport", 'String'>
     readonly pageUrl: FieldRef<"BugReport", 'String'>
+    readonly screenshotUrl: FieldRef<"BugReport", 'String'>
     readonly status: FieldRef<"BugReport", 'BugReportStatus'>
     readonly resolvedAt: FieldRef<"BugReport", 'DateTime'>
     readonly adminNotes: FieldRef<"BugReport", 'String'>
@@ -23778,6 +23791,7 @@ export namespace Prisma {
     userId: 'userId',
     userAgent: 'userAgent',
     pageUrl: 'pageUrl',
+    screenshotUrl: 'screenshotUrl',
     status: 'status',
     resolvedAt: 'resolvedAt',
     adminNotes: 'adminNotes',
@@ -25230,7 +25244,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
-    viewCount?: IntNullableFilter<"ViewProof"> | number | null
+    viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -25249,7 +25263,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
-    viewCount?: SortOrderInput | SortOrder
+    viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
@@ -25271,7 +25285,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
-    viewCount?: IntNullableFilter<"ViewProof"> | number | null
+    viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -25290,7 +25304,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
-    viewCount?: SortOrderInput | SortOrder
+    viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
     reviewedAt?: SortOrderInput | SortOrder
@@ -25314,7 +25328,7 @@ export namespace Prisma {
     smartLinkId?: StringWithAggregatesFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformWithAggregatesFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringWithAggregatesFilter<"ViewProof"> | string
-    viewCount?: IntNullableWithAggregatesFilter<"ViewProof"> | number | null
+    viewCount?: IntWithAggregatesFilter<"ViewProof"> | number
     status?: EnumViewProofStatusWithAggregatesFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableWithAggregatesFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableWithAggregatesFilter<"ViewProof"> | Date | string | null
@@ -25632,6 +25646,7 @@ export namespace Prisma {
     userId?: StringNullableFilter<"BugReport"> | string | null
     userAgent?: StringNullableFilter<"BugReport"> | string | null
     pageUrl?: StringNullableFilter<"BugReport"> | string | null
+    screenshotUrl?: StringNullableFilter<"BugReport"> | string | null
     status?: EnumBugReportStatusFilter<"BugReport"> | $Enums.BugReportStatus
     resolvedAt?: DateTimeNullableFilter<"BugReport"> | Date | string | null
     adminNotes?: StringNullableFilter<"BugReport"> | string | null
@@ -25647,6 +25662,7 @@ export namespace Prisma {
     userId?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     pageUrl?: SortOrderInput | SortOrder
+    screenshotUrl?: SortOrderInput | SortOrder
     status?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     adminNotes?: SortOrderInput | SortOrder
@@ -25665,6 +25681,7 @@ export namespace Prisma {
     userId?: StringNullableFilter<"BugReport"> | string | null
     userAgent?: StringNullableFilter<"BugReport"> | string | null
     pageUrl?: StringNullableFilter<"BugReport"> | string | null
+    screenshotUrl?: StringNullableFilter<"BugReport"> | string | null
     status?: EnumBugReportStatusFilter<"BugReport"> | $Enums.BugReportStatus
     resolvedAt?: DateTimeNullableFilter<"BugReport"> | Date | string | null
     adminNotes?: StringNullableFilter<"BugReport"> | string | null
@@ -25680,6 +25697,7 @@ export namespace Prisma {
     userId?: SortOrderInput | SortOrder
     userAgent?: SortOrderInput | SortOrder
     pageUrl?: SortOrderInput | SortOrder
+    screenshotUrl?: SortOrderInput | SortOrder
     status?: SortOrder
     resolvedAt?: SortOrderInput | SortOrder
     adminNotes?: SortOrderInput | SortOrder
@@ -25701,6 +25719,7 @@ export namespace Prisma {
     userId?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
     userAgent?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
     pageUrl?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
+    screenshotUrl?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
     status?: EnumBugReportStatusWithAggregatesFilter<"BugReport"> | $Enums.BugReportStatus
     resolvedAt?: DateTimeNullableWithAggregatesFilter<"BugReport"> | Date | string | null
     adminNotes?: StringNullableWithAggregatesFilter<"BugReport"> | string | null
@@ -26920,7 +26939,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -26938,7 +26957,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -26952,7 +26971,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -26970,7 +26989,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -26986,7 +27005,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -27000,7 +27019,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27015,7 +27034,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -27347,6 +27366,7 @@ export namespace Prisma {
     userId?: string | null
     userAgent?: string | null
     pageUrl?: string | null
+    screenshotUrl?: string | null
     status?: $Enums.BugReportStatus
     resolvedAt?: Date | string | null
     adminNotes?: string | null
@@ -27362,6 +27382,7 @@ export namespace Prisma {
     userId?: string | null
     userAgent?: string | null
     pageUrl?: string | null
+    screenshotUrl?: string | null
     status?: $Enums.BugReportStatus
     resolvedAt?: Date | string | null
     adminNotes?: string | null
@@ -27377,6 +27398,7 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    screenshotUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27392,6 +27414,7 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    screenshotUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27407,6 +27430,7 @@ export namespace Prisma {
     userId?: string | null
     userAgent?: string | null
     pageUrl?: string | null
+    screenshotUrl?: string | null
     status?: $Enums.BugReportStatus
     resolvedAt?: Date | string | null
     adminNotes?: string | null
@@ -27422,6 +27446,7 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    screenshotUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -27437,6 +27462,7 @@ export namespace Prisma {
     userId?: NullableStringFieldUpdateOperationsInput | string | null
     userAgent?: NullableStringFieldUpdateOperationsInput | string | null
     pageUrl?: NullableStringFieldUpdateOperationsInput | string | null
+    screenshotUrl?: NullableStringFieldUpdateOperationsInput | string | null
     status?: EnumBugReportStatusFieldUpdateOperationsInput | $Enums.BugReportStatus
     resolvedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     adminNotes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -28977,6 +29003,7 @@ export namespace Prisma {
     userId?: SortOrder
     userAgent?: SortOrder
     pageUrl?: SortOrder
+    screenshotUrl?: SortOrder
     status?: SortOrder
     resolvedAt?: SortOrder
     adminNotes?: SortOrder
@@ -28992,6 +29019,7 @@ export namespace Prisma {
     userId?: SortOrder
     userAgent?: SortOrder
     pageUrl?: SortOrder
+    screenshotUrl?: SortOrder
     status?: SortOrder
     resolvedAt?: SortOrder
     adminNotes?: SortOrder
@@ -29007,6 +29035,7 @@ export namespace Prisma {
     userId?: SortOrder
     userAgent?: SortOrder
     pageUrl?: SortOrder
+    screenshotUrl?: SortOrder
     status?: SortOrder
     resolvedAt?: SortOrder
     adminNotes?: SortOrder
@@ -31708,7 +31737,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -31724,7 +31753,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -31748,7 +31777,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -31765,7 +31794,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -32236,7 +32265,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
-    viewCount?: IntNullableFilter<"ViewProof"> | number | null
+    viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
     reviewedAt?: DateTimeNullableFilter<"ViewProof"> | Date | string | null
@@ -32777,7 +32806,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -32793,7 +32822,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -37311,7 +37340,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -37327,7 +37356,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
     notes?: string | null
@@ -37782,7 +37811,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37798,7 +37827,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37813,7 +37842,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -37827,7 +37856,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37844,7 +37873,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37859,7 +37888,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38041,7 +38070,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
-    viewCount?: number | null
+    viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
     reviewedAt?: Date | string | null
@@ -38383,7 +38412,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     notes?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38399,7 +38428,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -38414,7 +38443,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
-    viewCount?: NullableIntFieldUpdateOperationsInput | number | null
+    viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
