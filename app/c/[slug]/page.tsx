@@ -71,5 +71,19 @@ export default async function SmartLinkPage({ params }: PageProps) {
         redirect("/");
     }
 
-    return <SmartLinkRedirect slug={slug} destination={link.originalUrl} />;
+    // Always resolve destination live from the campaign's current ctaUrl so
+    // edits to the campaign CTA are reflected immediately for all existing links.
+    // Falls back to the stored originalUrl if the campaign has no ctaUrl or is gone.
+    let destination = link.originalUrl;
+    if (link.campaignId) {
+        const campaign = await prisma.campaign.findUnique({
+            where: { id: link.campaignId },
+            select: { ctaUrl: true },
+        });
+        if (campaign?.ctaUrl) {
+            destination = campaign.ctaUrl;
+        }
+    }
+
+    return <SmartLinkRedirect slug={slug} destination={destination} />;
 }
