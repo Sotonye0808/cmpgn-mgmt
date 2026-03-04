@@ -31,10 +31,21 @@ export default function RegisterForm() {
     setLoading(true);
     setError(null);
     try {
+      // Forward ?ref= slug for referral attribution
+      // Also check sessionStorage (set by SmartLinkRedirect) as fallback
+      const ref =
+        searchParams.get("ref") ||
+        (() => {
+          try {
+            return sessionStorage.getItem("ref_slug") ?? undefined;
+          } catch {
+            return undefined;
+          }
+        })();
       const res = await fetch(ROUTES.API.AUTH.REGISTER, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(values),
+        body: JSON.stringify({ ...values, ref }),
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Registration failed");

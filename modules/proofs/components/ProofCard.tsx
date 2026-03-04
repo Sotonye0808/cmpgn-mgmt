@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Image, Popconfirm, Input, Tooltip } from "antd";
+import { Image, Popconfirm, Input, Tooltip, message } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import { formatDate } from "@/lib/utils/format";
@@ -100,12 +100,14 @@ export default function ProofCard({
             <Tooltip title="Approve this proof">
               <Popconfirm
                 title="Approve this proof?"
-                onConfirm={() =>
-                  review(proof.id, {
+                onConfirm={async () => {
+                  const ok = await review(proof.id, {
                     status: "APPROVED",
                     notes: notes || undefined,
-                  })
-                }
+                  });
+                  if (ok) message.success("Proof approved");
+                  else message.error("Failed to approve proof");
+                }}
                 okText="Yes"
                 cancelText="No">
                 <Button
@@ -120,12 +122,14 @@ export default function ProofCard({
             <Tooltip title="Reject this proof">
               <Popconfirm
                 title="Reject this proof?"
-                onConfirm={() =>
-                  review(proof.id, {
+                onConfirm={async () => {
+                  const ok = await review(proof.id, {
                     status: "REJECTED",
                     notes: notes || undefined,
-                  })
-                }
+                  });
+                  if (ok) message.success("Proof rejected");
+                  else message.error("Failed to reject proof");
+                }}
                 okText="Yes"
                 cancelText="No">
                 <Button

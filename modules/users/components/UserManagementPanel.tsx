@@ -1,7 +1,16 @@
 "use client";
 
-import { useState, useEffect, useCallback } from "react";
-import { Tag, Select, Button, Input, message, Skeleton, Empty } from "antd";
+import { useState, useEffect, useCallback, useRef } from "react";
+import {
+  Tag,
+  Select,
+  Button,
+  Input,
+  message,
+  Skeleton,
+  Empty,
+  Modal,
+} from "antd";
 import type { ColumnsType } from "antd/es/table";
 import DataTable from "@/components/ui/DataTable";
 import { USERS_PAGE_CONTENT } from "@/config/content";
@@ -30,6 +39,7 @@ export default function UserManagementPanel() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string | undefined>();
   const [msgApi, contextHolder] = message.useMessage();
+  const hasData = useRef(false);
 
   const isSuperAdmin =
     (currentUser?.role as unknown as string) === "SUPER_ADMIN";
@@ -43,7 +53,7 @@ export default function UserManagementPanel() {
   };
 
   const fetchUsers = useCallback(async () => {
-    setLoading(true);
+    if (!hasData.current) setLoading(true);
     try {
       const params = new URLSearchParams();
       if (search) params.set("search", search);
@@ -52,6 +62,7 @@ export default function UserManagementPanel() {
       if (!res.ok) throw new Error("Failed to load users");
       const json = await res.json();
       setUsers(json.data ?? []);
+      hasData.current = true;
     } finally {
       setLoading(false);
     }
@@ -74,6 +85,22 @@ export default function UserManagementPanel() {
     } catch (e) {
       msgApi.error(e instanceof Error ? e.message : "Error");
     }
+  };
+
+  /** Wrap role change in a confirmation modal for sensitive operations */
+  const confirmRoleChange = (
+    userId: string,
+    newRole: string,
+    userName: string,
+  ) => {
+    Modal.confirm({
+      title: "Confirm Role Change",
+      content: `Change ${userName}'s role to ${newRole}? This will affect their access permissions.`,
+      okText: "Confirm",
+      cancelText: "Cancel",
+      okButtonProps: { danger: PROTECTED_ROLES.includes(newRole) },
+      onOk: () => changeRole(userId, newRole),
+    });
   };
 
   const columns: ColumnsType<UserListItem> = [
@@ -116,8 +143,17 @@ export default function UserManagementPanel() {
               size="small"
               value={rec.role}
               style={{ width: 130 }}
-              options={getAssignableRoles().map((r) => ({ value: r, label: r }))}
-              onChange={(val) => changeRole(rec.id, val)}
+              options={getAssignableRoles().map((r) => ({
+                value: r,
+                label: r,
+              }))}
+              onChange={(val) =>
+                confirmRoleChange(
+                  rec.id,
+                  val,
+                  `${rec.firstName} ${rec.lastName}`,
+                )
+              }
             />
           ) : (
             <Tag color={ROLE_COLORS[rec.role] ?? "default"}>{rec.role}</Tag>

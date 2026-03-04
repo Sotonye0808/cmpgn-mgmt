@@ -75,7 +75,7 @@ export default function CampaignModal({
       onCancel={onClose}
       width={680}
       footer={
-        <div className="flex items-center justify-between">
+        <div className="flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-2">
             <Button
               variant="ghost"
@@ -94,7 +94,7 @@ export default function CampaignModal({
               Next
             </Button>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             {onShare && (
               <Button
                 variant="secondary"
@@ -108,7 +108,10 @@ export default function CampaignModal({
               variant="ghost"
               size="small"
               icon={<ICONS.right />}
-              onClick={() => { onClose(); router.push(ROUTES.CAMPAIGN_DETAIL(campaign.id)); }}>
+              onClick={() => {
+                onClose();
+                router.push(ROUTES.CAMPAIGN_DETAIL(campaign.id));
+              }}>
               View Page
             </Button>
             {onJoin && campaign.status === ("ACTIVE" as string) && (

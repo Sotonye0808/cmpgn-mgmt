@@ -1,0 +1,17 @@
+- When tracking visits and all from campaign links, in addition to checking device ID, it's worth considering also doing a quick check for user ID so users don't use the same account on multiple devices to statpad basically
+- Let's actually build the referral system, enhancing the invite feature to function for more than just adding someone to your team or group. ensure referrers get points from the referral itself as well as the contributions/points of their referrees (some percentage, basically as an incentive for them to continue referring and encourage activity from their referrees)
+- the dataTable, please make it responsive and don't clip data within it or give the cells or columns fixed width with hidden overflow. The data and columns should be scrollable when they overflow the table width so everything within the table is visible
+- There's still responsiveness consideration for divs across various components and layouts. For instance on the campaign page, the section having add campaign button tends to overflow instead of wrap when screen width is reached, additionally campaign card still has the join button not visible on smaller screens when it's expected to wrap. Even the campaign modal, on smaller screens the join button is not visible (not even sure it's on the modal and it should be there) and probably other places that should have it that don't have it
+- for campaign list when in status view, the thumbnail (uploaded for links and text media type, then for image and videos it's their upload by default) should be visible in that circle. 
+- Change detection and effect should happen better. Basically when a change is made to the DB successfully, the UI should reflect that ASAP, even if data isn't fetched again from the DB. Then remember the concept I mentioned where if the data retrieved is the same as the data that was already there, the UI basically shouldn't really change to loading skeleton
+- Once again, ensure campaign and user data and stats are actually properly gathered, stored, retrieved and displayed (with all necessary calculations done if needed)
+- Also, very important. We need fedback when operations are done. There's no feedback if the update or adding of a campaign is successful (with automatic closing of the form modal if needed) or unsuccessful, or if a required field isn't field or something. When a user signs in or signs up successfully, you know, other events that should have feedback for improved UI/UX. Come on, you're better than not having to be told to include that. It could be normal antd message or something that pops up and goes after some seconds with meaningful concise messages. Also, sensitive operations like change of user status and the likes should have confirmation modals
+
+
+
+So audit and let's plan then implement, then also share with me what I'd need to do to push the prisma schema changes to the prod DB (hopefully this is done without erasing/corrupting the data we already have there). It's important to maintain our config/object driven approach in all these changes to make easy for propagation, future modification and all.
+# 1. Generate the Prisma client from your schema
+# npx prisma generate
+
+# 2. Load .env.prod, swap DATABASE_URL to the direct connection, deploy migrations
+# Get-Content .env.prod | Where-Object { $_ -match '^[^#\s].*=.*' } | ForEach-Object { $k,$v = $_ -split '=',2; [System.Environment]::SetEnvironmentVariable($k.Trim(), $v.Trim(), 'Process') }; $env:DATABASE_URL = $env:DIRECT_DATABASE_URL; npx prisma migrate deploy

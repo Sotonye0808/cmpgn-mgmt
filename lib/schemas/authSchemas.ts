@@ -21,6 +21,13 @@ export const registerSchema = z.object({
         .optional()
         .or(z.literal(""))
         .transform((v) => (v === "" ? undefined : v)),
+    /** Smart link slug from ?ref= query param — enables referral attribution */
+    ref: z
+        .string()
+        .min(1)
+        .optional()
+        .or(z.literal(""))
+        .transform((v) => (v === "" ? undefined : v)),
 });
 
 export const loginSchema = z.object({

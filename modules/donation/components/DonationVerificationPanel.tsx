@@ -139,8 +139,7 @@ export default function DonationVerificationPanel() {
     selectedRowKeys,
     onChange: (keys) => setSelectedRowKeys(keys),
     getCheckboxProps: (record) => ({
-      disabled:
-        record.status !== "RECEIVED" && record.status !== "PENDING",
+      disabled: record.status !== "RECEIVED" && record.status !== "PENDING",
     }),
   };
 
@@ -257,7 +256,8 @@ export default function DonationVerificationPanel() {
       {selectedRowKeys.length > 0 && (
         <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-ds-surface-glass border border-ds-border">
           <span className="text-sm text-ds-text-primary font-medium">
-            {selectedRowKeys.length} donation{selectedRowKeys.length !== 1 ? "s" : ""} selected
+            {selectedRowKeys.length} donation
+            {selectedRowKeys.length !== 1 ? "s" : ""} selected
           </span>
           <div className="flex-1" />
           <Popconfirm
@@ -315,13 +315,16 @@ export default function DonationVerificationPanel() {
           (selectedDonation.status === "RECEIVED" ||
             selectedDonation.status === "PENDING") ? (
             <Space>
-              <Button
-                danger
-                loading={verifying}
-                icon={<ICONS.close />}
-                onClick={() => handleVerify("REJECTED")}>
-                Reject
-              </Button>
+              <Popconfirm
+                title="Reject this donation?"
+                description="This action cannot be undone."
+                onConfirm={() => handleVerify("REJECTED")}
+                okText="Reject"
+                okButtonProps={{ danger: true }}>
+                <Button danger loading={verifying} icon={<ICONS.close />}>
+                  Reject
+                </Button>
+              </Popconfirm>
               <Button
                 type="primary"
                 loading={verifying}
