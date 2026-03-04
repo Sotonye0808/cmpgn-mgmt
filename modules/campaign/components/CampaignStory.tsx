@@ -2,7 +2,6 @@
 
 import { Avatar } from "antd";
 import { ICONS } from "@/config/icons";
-import Image from "next/image";
 import { formatRelative } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
 
@@ -42,36 +41,29 @@ export default function CampaignStory({
 
   const config = SIZE_CONFIG[size];
 
-  const getAvatarContent = () => {
-    // thumbnailUrl is always safe to use as an image (explicitly uploaded).
-    // Only fall back to mediaUrl when mediaType is IMAGE — for LINK/TEXT,
-    // mediaUrl is a web URL, not an image, and would break Next.js Image.
-    const imageUrl =
-      campaign.thumbnailUrl ||
-      (campaign.mediaType === "IMAGE" ? campaign.mediaUrl : null);
-    if (imageUrl) {
-      return (
-        <div className="relative w-full h-full">
-          <Image
-            src={imageUrl}
-            alt={campaign.title}
-            fill
-            className="object-cover"
-          />
-          {campaign.mediaType === "VIDEO" && (
-            <div className="absolute inset-0 flex items-center justify-center bg-black/20">
-              <ICONS.play className="text-2xl text-white drop-shadow-lg" />
-            </div>
-          )}
-        </div>
-      );
+  /**
+   * Derive a still-image URL to feed into <Avatar src>.
+   * Priority: explicit thumbnailUrl → IMAGE mediaUrl → Cloudinary video thumbnail.
+   * LINK/TEXT mediaUrls are web URLs (not images) and are skipped.
+   */
+  const getAvatarSrc = (): string | undefined => {
+    if (campaign.thumbnailUrl) return campaign.thumbnailUrl;
+    if (campaign.mediaType === "IMAGE" && campaign.mediaUrl)
+      return campaign.mediaUrl;
+    if (
+      campaign.mediaType === "VIDEO" &&
+      campaign.mediaUrl?.includes("res.cloudinary.com")
+    ) {
+      // Rewrite Cloudinary video URL → JPEG thumbnail at frame 0, cropped to a square
+      return campaign.mediaUrl
+        .replace("/video/upload/", "/video/upload/so_0,w_200,h_200,c_fill/")
+        .replace(/\.(mp4|webm|mov|avi)(\?.*)?$/i, ".jpg");
     }
-    return (
-      <div className="w-full h-full bg-gradient-to-br from-ds-brand-accent via-purple-500 to-pink-500 flex items-center justify-center text-white font-bold text-xl">
-        {campaign.title.charAt(0)}
-      </div>
-    );
+    return undefined;
   };
+
+  const avatarSrc = getAvatarSrc();
+  const isVideo = campaign.mediaType === "VIDEO";
 
   const ringGradient = isExpired
     ? undefined
@@ -113,9 +105,28 @@ export default function CampaignStory({
           <div className="relative bg-ds-surface-elevated rounded-full p-1">
             <Avatar
               size={config.avatarSize}
+              src={avatarSrc}
+              style={
+                !avatarSrc
+                  ? {
+                      background:
+                        "linear-gradient(135deg, var(--ds-brand-accent), #a855f7, #ec4899)",
+                    }
+                  : undefined
+              }
               className="border-2 border-ds-surface-elevated">
-              {getAvatarContent()}
+              {!avatarSrc && (
+                <span className="font-bold text-white text-xl">
+                  {campaign.title.charAt(0)}
+                </span>
+              )}
             </Avatar>
+            {/* Play icon overlay for video campaigns */}
+            {isVideo && avatarSrc && (
+              <div className="absolute inset-1 rounded-full flex items-center justify-center bg-black/25 pointer-events-none">
+                <ICONS.play className="text-lg text-white drop-shadow-lg" />
+              </div>
+            )}
           </div>
 
           {/* "LIVE" chip — overlays the bottom-center of the circle like a notification badge */}
