@@ -97,6 +97,18 @@ export default async function LandingPage() {
         .length
     : 0;
 
+  // Resolve featured campaign image — same priority as CampaignCard:
+  // IMAGE mediaUrl → VIDEO thumbnailUrl → any thumbnailUrl → null
+  const featuredImgSrc = featuredCampaign
+    ? featuredCampaign.mediaType === "IMAGE" && featuredCampaign.mediaUrl
+      ? featuredCampaign.mediaUrl
+      : featuredCampaign.thumbnailUrl ?? null
+    : null;
+  const featuredIsVideo =
+    !!featuredCampaign &&
+    featuredCampaign.mediaType === "VIDEO" &&
+    !!featuredCampaign.thumbnailUrl;
+
   return (
     <div className="min-h-screen">
       {/* Hero */}
@@ -144,14 +156,20 @@ export default async function LandingPage() {
                   </p>
                   <div className="glass-surface rounded-ds-xl p-6 hover:glow-border transition-all">
                     <div className="flex flex-col gap-6">
-                      {featuredCampaign.thumbnailUrl && (
-                        <Image
-                          src={featuredCampaign.thumbnailUrl}
-                          alt={featuredCampaign.title}
-                          className="w-full h-40 object-cover rounded-ds-lg"
-                          width={500}
-                          height={160}
-                        />
+                      {featuredImgSrc && (
+                        <div className="relative w-full h-40 rounded-ds-lg overflow-hidden">
+                          <Image
+                            src={featuredImgSrc}
+                            alt={featuredCampaign.title}
+                            fill
+                            className="object-cover"
+                          />
+                          {featuredIsVideo && (
+                            <div className="absolute inset-0 flex items-center justify-center bg-black/30 rounded-ds-lg">
+                              <ICONS.play className="text-5xl text-white drop-shadow-lg" />
+                            </div>
+                          )}
+                        </div>
                       )}
                       <div>
                         <div className="flex items-center gap-3 mb-3">
@@ -303,6 +321,7 @@ export default async function LandingPage() {
           description: c.description,
           thumbnailUrl: c.thumbnailUrl,
           mediaUrl: c.mediaUrl,
+          mediaType: c.mediaType,
           participantCount: c.participantCount,
           goalTarget: c.goalTarget,
           goalCurrent: c.goalCurrent,
