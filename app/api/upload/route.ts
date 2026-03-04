@@ -5,7 +5,7 @@ import {
     badRequestResponse,
     handleApiError,
 } from "@/lib/utils/api";
-import { uploadAsset, type AssetCategory } from "@/lib/cloudinary";
+import { uploadAsset, deleteAsset, type AssetCategory } from "@/lib/cloudinary";
 
 const ALLOWED_TYPES = [
     "image/jpeg",
@@ -81,6 +81,28 @@ export async function POST(request: NextRequest) {
             },
             201
         );
+    } catch (err) {
+        return handleApiError(err);
+    }
+}
+/**
+ * DELETE /api/upload
+ * Body: { publicId: string; resourceType?: "image" | "video" }
+ * Deletes a Cloudinary asset. Used for cleanup when campaign forms are cancelled
+ * or when uploads are replaced during an edit.
+ */
+export async function DELETE(request: NextRequest) {
+    try {
+        const auth = await requireAuth();
+        if (auth.error) return auth.error;
+
+        const body = await request.json() as { publicId?: string; resourceType?: string };
+        const { publicId, resourceType = "image" } = body;
+
+        if (!publicId) return badRequestResponse("publicId is required");
+
+        await deleteAsset(publicId, resourceType as "image" | "video");
+        return successResponse({ deleted: true, publicId });
     } catch (err) {
         return handleApiError(err);
     }

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { message } from "antd";
+import { useState, useRef } from "react";
+import { App } from "antd";
 import { useRouter } from "next/navigation";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
@@ -10,11 +10,18 @@ import CampaignForm from "@/modules/campaign/components/CampaignForm";
 import { CAMPAIGN_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 import { useAuth } from "@/hooks/useAuth";
+import {
+  type TrackedAsset,
+  deleteCloudinaryAssets,
+} from "@/lib/utils/cloudinaryCleanup";
 
 export default function NewCampaignPage() {
   const router = useRouter();
   const { user } = useAuth();
   const [loading, setLoading] = useState(false);
+  const { message: msgApi } = App.useApp();
+  /** Assets uploaded during this form session — cleaned up on cancel. */
+  const uploadTracker = useRef<TrackedAsset[]>([]);
 
   // Role guard (admin/super_admin only)
   if (user && user.role !== "ADMIN" && user.role !== "SUPER_ADMIN") {
@@ -32,15 +39,24 @@ export default function NewCampaignPage() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to create campaign");
-      message.success("Campaign created!");
+      // Assets are saved — clear tracker so they are NOT deleted on unmount
+      uploadTracker.current = [];
+      msgApi.success("Campaign created!");
       router.push(ROUTES.CAMPAIGN_DETAIL(json.data.id));
     } catch (e: unknown) {
-      message.error(
+      msgApi.error(
         e instanceof Error ? e.message : "Failed to create campaign",
       );
     } finally {
       setLoading(false);
     }
+  };
+
+  /** Cancel: clean up any assets uploaded-but-not-saved this session. */
+  const handleCancel = async () => {
+    await deleteCloudinaryAssets(uploadTracker.current);
+    uploadTracker.current = [];
+    router.back();
   };
 
   return (
@@ -50,7 +66,7 @@ export default function NewCampaignPage() {
           variant="ghost"
           size="small"
           icon={<ICONS.left />}
-          onClick={() => router.back()}>
+          onClick={handleCancel}>
           Back
         </Button>
         <div>
@@ -68,7 +84,8 @@ export default function NewCampaignPage() {
           mode="create"
           onSubmit={handleSubmit}
           loading={loading}
-          onCancel={() => router.back()}
+          onCancel={handleCancel}
+          onMediaUploaded={(info) => uploadTracker.current.push(info)}
         />
       </Card>
     </div>

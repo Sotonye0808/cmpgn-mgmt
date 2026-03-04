@@ -43,12 +43,17 @@ export default function CampaignStory({
   const config = SIZE_CONFIG[size];
 
   const getAvatarContent = () => {
-    const mediaUrl = campaign.thumbnailUrl || campaign.mediaUrl;
-    if (mediaUrl) {
+    // thumbnailUrl is always safe to use as an image (explicitly uploaded).
+    // Only fall back to mediaUrl when mediaType is IMAGE — for LINK/TEXT,
+    // mediaUrl is a web URL, not an image, and would break Next.js Image.
+    const imageUrl =
+      campaign.thumbnailUrl ||
+      (campaign.mediaType === "IMAGE" ? campaign.mediaUrl : null);
+    if (imageUrl) {
       return (
         <div className="relative w-full h-full">
           <Image
-            src={mediaUrl}
+            src={imageUrl}
             alt={campaign.title}
             fill
             className="object-cover"
