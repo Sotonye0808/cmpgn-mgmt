@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Button, Modal, Form, Input, Select, message, Empty } from "antd";
+import { Button, Modal, Form, Input, Select, Empty, App } from "antd";
 import { ICONS } from "@/config/icons";
 import TeamCard from "./TeamCard";
 import TeamMemberStatsTable from "./TeamMemberStatsTable";
@@ -24,6 +24,7 @@ export default function TeamManagementPanel({
   const [detailLoading, setDetailLoading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [form] = Form.useForm();
+  const { modal, message: msgApi } = App.useApp();
 
   // Fetch member stats when a team is selected
   useEffect(() => {
@@ -35,7 +36,7 @@ export default function TeamManagementPanel({
       .then((json) => {
         if (json.data) setDetailStats(json.data as TeamMemberStat[]);
       })
-      .catch(() => message.error("Failed to load team stats"))
+      .catch(() => msgApi.error("Failed to load team stats"))
       .finally(() => setDetailLoading(false));
   }, [detailTeamId]);
 
@@ -52,15 +53,15 @@ export default function TeamManagementPanel({
       });
       const json = await res.json();
       if (json.success) {
-        message.success("Team created");
+        msgApi.success("Team created");
         setCreateModalOpen(false);
         form.resetFields();
         onRefresh();
       } else {
-        message.error(json.error ?? "Failed to create team");
+        msgApi.error(json.error ?? "Failed to create team");
       }
     } catch {
-      message.error("Network error");
+      msgApi.error("Network error");
     } finally {
       setLoading(false);
     }
@@ -74,15 +75,15 @@ export default function TeamManagementPanel({
       );
       const json = await res.json();
       if (json.success) {
-        message.success("Member removed");
+        msgApi.success("Member removed");
         // Refresh detail
         setDetailTeamId(null);
         onRefresh();
       } else {
-        message.error(json.error ?? "Failed to remove member");
+        msgApi.error(json.error ?? "Failed to remove member");
       }
     } catch {
-      message.error("Network error");
+      msgApi.error("Network error");
     }
   };
 
@@ -92,7 +93,7 @@ export default function TeamManagementPanel({
     userId: string,
     memberName: string,
   ) => {
-    Modal.confirm({
+    modal.confirm({
       title: "Remove Team Member",
       content: `Remove ${memberName} from this team? They will lose access to team resources.`,
       okText: "Remove",

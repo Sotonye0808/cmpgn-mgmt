@@ -1,16 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback, useRef } from "react";
-import {
-  Tag,
-  Select,
-  Button,
-  Input,
-  message,
-  Skeleton,
-  Empty,
-  Modal,
-} from "antd";
+import { Tag, Select, Button, Input, Skeleton, Empty, App } from "antd";
 import type { ColumnsType } from "antd/es/table";
 import DataTable from "@/components/ui/DataTable";
 import { USERS_PAGE_CONTENT } from "@/config/content";
@@ -38,7 +29,7 @@ export default function UserManagementPanel() {
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string | undefined>();
-  const [msgApi, contextHolder] = message.useMessage();
+  const { modal, message: msgApi } = App.useApp();
   const hasData = useRef(false);
 
   const isSuperAdmin =
@@ -93,7 +84,7 @@ export default function UserManagementPanel() {
     newRole: string,
     userName: string,
   ) => {
-    Modal.confirm({
+    modal.confirm({
       title: "Confirm Role Change",
       content: `Change ${userName}'s role to ${newRole}? This will affect their access permissions.`,
       okText: "Confirm",
@@ -165,7 +156,6 @@ export default function UserManagementPanel() {
 
   return (
     <>
-      {contextHolder}
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-3">
           <Input.Search

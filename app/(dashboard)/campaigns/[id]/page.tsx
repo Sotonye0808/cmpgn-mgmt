@@ -34,7 +34,9 @@ export default function CampaignDetailPage() {
           if ((json.data.campaignIds as string[]).includes(id)) setJoined(true);
         }
       })
-      .catch(() => { /* silent */ });
+      .catch(() => {
+        /* silent */
+      });
   }, [user, id]);
 
   // Fire-and-forget view tracking on first mount (deduped server-side via cookie)
@@ -43,7 +45,9 @@ export default function CampaignDetailPage() {
     fetch(`/api/campaigns/${id}/track-view`, {
       method: "POST",
       keepalive: true,
-    }).catch(() => { /* best-effort */ });
+    }).catch(() => {
+      /* best-effort */
+    });
   }, [id]);
 
   const handleJoin = async () => {
@@ -121,7 +125,9 @@ export default function CampaignDetailPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ slug: trackingSlug, type: "SHARE" }),
         keepalive: true,
-      }).catch(() => { /* best-effort */ });
+      }).catch(() => {
+        /* best-effort */
+      });
     }
 
     if (typeof navigator !== "undefined" && navigator.share) {
@@ -166,7 +172,7 @@ export default function CampaignDetailPage() {
         campaign={campaign}
         showActions
         onShare={handleShare}
-        onJoin={!isAdmin ? handleJoin : undefined}
+        onJoin={handleJoin}
         isJoined={joined}
         joiningLoading={joining}
       />

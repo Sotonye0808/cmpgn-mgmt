@@ -1,6 +1,7 @@
 "use client";
 
-import { Row, Col } from "antd";
+import { useState, useEffect, useCallback } from "react";
+import { Row, Col, App } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import Card from "@/components/ui/Card";
 import { ICONS } from "@/config/icons";
@@ -47,12 +48,72 @@ const KPI_STATS = [
 export default function DashboardPage() {
   const { user } = useAuth();
   const router = useRouter();
+  const { message: msgApi } = App.useApp();
+  const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
+  const [joiningId, setJoiningId] = useState<string | null>(null);
 
   const { campaigns: activeCampaigns, loading } = useCampaigns({
     filters: { status: "ACTIVE" as CampaignStatus },
     page: 1,
     pageSize: 3,
   });
+
+  // Sync joined state after campaigns load
+  useEffect(() => {
+    if (!user) return;
+    fetch(ROUTES.API.CAMPAIGNS.JOINED)
+      .then((r) => r.json())
+      .then((json) => {
+        if (Array.isArray(json.data?.campaignIds)) {
+          setJoinedIds(new Set(json.data.campaignIds as string[]));
+        }
+      })
+      .catch(() => {
+        /* silent */
+      });
+  }, [user]);
+
+  const handleJoin = useCallback(
+    async (campaign: Campaign) => {
+      if (!user || joinedIds.has(campaign.id) || joiningId) return;
+      setJoiningId(campaign.id);
+      try {
+        const res = await fetch(`/api/campaigns/${campaign.id}/participants`, {
+          method: "POST",
+        });
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error ?? "Failed to join");
+        setJoinedIds((prev) => new Set([...prev, campaign.id]));
+        // Generate tracking link
+        try {
+          const linkRes = await fetch("/api/smart-links", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ campaignId: campaign.id }),
+          });
+          if (linkRes.ok) {
+            const linkJson = await linkRes.json();
+            const slug = linkJson.data?.slug;
+            if (slug) {
+              await navigator.clipboard.writeText(
+                `${window.location.origin}/c/${slug}`,
+              );
+              msgApi.success("Joined! Your tracking link has been copied.");
+              return;
+            }
+          }
+        } catch {
+          /* clipboard is best-effort */
+        }
+        msgApi.success("Successfully joined campaign!");
+      } catch (e) {
+        msgApi.error(e instanceof Error ? e.message : "Failed to join");
+      } finally {
+        setJoiningId(null);
+      }
+    },
+    [user, joinedIds, joiningId, msgApi],
+  );
 
   // Aggregate quick stats from active campaigns
   const totalClicks = activeCampaigns.reduce((s, c) => s + c.clickCount, 0);
@@ -130,6 +191,9 @@ export default function DashboardPage() {
                 <CampaignCard
                   campaign={campaign}
                   onView={(c) => router.push(ROUTES.CAMPAIGN_DETAIL(c.id))}
+                  onJoin={handleJoin}
+                  isJoined={joinedIds.has(campaign.id)}
+                  isJoining={joiningId === campaign.id}
                 />
               </Col>
             ))}

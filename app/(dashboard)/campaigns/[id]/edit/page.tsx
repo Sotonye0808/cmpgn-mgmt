@@ -1,7 +1,7 @@
 "use client";
 
-import { use, useState } from "react";
-import { Spin, Alert, message } from "antd";
+import { use, useState, useRef, useCallback } from "react";
+import { Spin, Alert, App } from "antd";
 import { useRouter } from "next/navigation";
 import { useCampaign } from "@/modules/campaign/hooks/useCampaign";
 import CampaignForm from "@/modules/campaign/components/CampaignForm";
@@ -10,6 +10,11 @@ import { ROUTES } from "@/config/routes";
 import { ICONS } from "@/config/icons";
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
+import {
+  type TrackedAsset,
+  deleteCloudinaryAssets,
+  computeObsoleteAssets,
+} from "@/lib/utils/cloudinaryCleanup";
 
 interface PageProps {
   params: Promise<{ id: string }>;
@@ -20,6 +25,9 @@ export default function CampaignEditPage({ params }: PageProps) {
   const { campaign, loading, error } = useCampaign(id);
   const router = useRouter();
   const [saving, setSaving] = useState(false);
+  const { message: msgApi } = App.useApp();
+  /** New uploads during this edit session — cleaned up if user cancels. */
+  const uploadTracker = useRef<TrackedAsset[]>([]);
 
   const handleSave = async (values: Record<string, unknown>) => {
     setSaving(true);
@@ -31,14 +39,27 @@ export default function CampaignEditPage({ params }: PageProps) {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Failed to save changes");
-      message.success("Campaign updated!");
+      // Delete old assets whose URLs were replaced during this edit
+      if (campaign) {
+        const obsolete = computeObsoleteAssets(campaign, values);
+        await deleteCloudinaryAssets(obsolete);
+      }
+      uploadTracker.current = [];
+      msgApi.success("Campaign updated!");
       router.push(ROUTES.CAMPAIGN_DETAIL(id));
     } catch (e: unknown) {
-      message.error(e instanceof Error ? e.message : "Failed to save changes");
+      msgApi.error(e instanceof Error ? e.message : "Failed to save changes");
     } finally {
       setSaving(false);
     }
   };
+
+  /** Cancel: clean up any assets uploaded-but-not-saved this session. */
+  const handleCancel = useCallback(async () => {
+    await deleteCloudinaryAssets(uploadTracker.current);
+    uploadTracker.current = [];
+    router.back();
+  }, [router]);
 
   if (loading) {
     return (
@@ -66,7 +87,7 @@ export default function CampaignEditPage({ params }: PageProps) {
           variant="ghost"
           size="small"
           icon={<ICONS.left />}
-          onClick={() => router.back()}>
+          onClick={handleCancel}>
           Back
         </Button>
         <div>
@@ -86,7 +107,8 @@ export default function CampaignEditPage({ params }: PageProps) {
           initialValues={campaign}
           onSubmit={handleSave}
           loading={saving}
-          onCancel={() => router.back()}
+          onCancel={handleCancel}
+          onMediaUploaded={(info) => uploadTracker.current.push(info)}
         />
       </Card>
     </div>

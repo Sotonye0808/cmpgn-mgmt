@@ -10,6 +10,8 @@ interface UploadedMedia {
   thumbnailUrl: string;
   type: "IMAGE" | "VIDEO";
   fileName: string;
+  /** Cloudinary public_id — use for cleanup via DELETE /api/upload */
+  publicId: string;
 }
 
 interface Props {

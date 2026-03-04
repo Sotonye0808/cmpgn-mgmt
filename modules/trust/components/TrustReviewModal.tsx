@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Modal, Button, Space, Popconfirm, message } from "antd";
+import { Modal, Button, Space, Popconfirm, App } from "antd";
 import { TRUST_PAGE_CONTENT } from "@/config/content";
 import { ROUTES } from "@/config/routes";
 
@@ -23,7 +23,7 @@ export default function TrustReviewModal({
   onResolved,
 }: Props) {
   const [loading, setLoading] = useState<Resolution | null>(null);
-  const [msgApi, contextHolder] = message.useMessage();
+  const { message: msgApi } = App.useApp();
 
   const resolve = async (resolution: Resolution) => {
     setLoading(resolution);
@@ -46,7 +46,6 @@ export default function TrustReviewModal({
 
   return (
     <>
-      {contextHolder}
       <Modal
         open={open}
         onCancel={onClose}

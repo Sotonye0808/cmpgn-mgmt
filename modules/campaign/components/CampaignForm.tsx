@@ -21,6 +21,15 @@ interface CampaignFormProps {
   onSubmit: (values: Record<string, unknown>) => Promise<void>;
   onCancel?: () => void;
   loading?: boolean;
+  /**
+   * Fired whenever a new asset is uploaded so the parent page can track
+   * it for cleanup if the form is cancelled or an existing asset is replaced.
+   */
+  onMediaUploaded?: (info: {
+    publicId: string;
+    url: string;
+    resourceType: "image" | "video";
+  }) => void;
 }
 
 type MediaTypeKey = keyof typeof MEDIA_TYPE_FIELDS;
@@ -31,15 +40,19 @@ export default function CampaignForm({
   onSubmit,
   onCancel,
   loading,
+  onMediaUploaded,
 }: CampaignFormProps) {
   const [form] = Form.useForm();
   const isEdit = mode === "edit";
-  const watchedMediaType = Form.useWatch("mediaType", form) as string | undefined;
+  const watchedMediaType = Form.useWatch("mediaType", form) as
+    | string
+    | undefined;
 
   // Resolve field visibility from the MEDIA_TYPE_FIELDS config
-  const fieldConfig = watchedMediaType && watchedMediaType in MEDIA_TYPE_FIELDS
-    ? MEDIA_TYPE_FIELDS[watchedMediaType as MediaTypeKey]
-    : null;
+  const fieldConfig =
+    watchedMediaType && watchedMediaType in MEDIA_TYPE_FIELDS
+      ? MEDIA_TYPE_FIELDS[watchedMediaType as MediaTypeKey]
+      : null;
 
   useEffect(() => {
     if (!initialValues) return;
@@ -162,7 +175,9 @@ export default function CampaignForm({
           name="mediaUrl"
           extra={CAMPAIGN_CONTENT.form.uploadHint}>
           <MediaUpload
-            accept={watchedMediaType === "VIDEO" ? "video/mp4,video/webm" : "image/*"}
+            accept={
+              watchedMediaType === "VIDEO" ? "video/mp4,video/webm" : "image/*"
+            }
             maxSizeMb={watchedMediaType === "VIDEO" ? 50 : 10}
             showPreview
             onUploadComplete={(media) => {
@@ -171,6 +186,11 @@ export default function CampaignForm({
               if (media.thumbnailUrl) {
                 form.setFieldValue("thumbnailUrl", media.thumbnailUrl);
               }
+              onMediaUploaded?.({
+                publicId: media.publicId,
+                url: media.url,
+                resourceType: media.type === "VIDEO" ? "video" : "image",
+              });
             }}
           />
         </Form.Item>
@@ -188,6 +208,11 @@ export default function CampaignForm({
             showPreview
             onUploadComplete={(media) => {
               form.setFieldValue("thumbnailUrl", media.url);
+              onMediaUploaded?.({
+                publicId: media.publicId,
+                url: media.url,
+                resourceType: "image",
+              });
             }}
           />
         </Form.Item>
