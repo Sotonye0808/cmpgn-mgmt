@@ -24,7 +24,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const campaign = link.campaignId
         ? await prisma.campaign.findUnique({
               where: { id: link.campaignId },
-              select: { title: true, description: true, thumbnailUrl: true },
+              select: { title: true, description: true, mediaType: true, mediaUrl: true, thumbnailUrl: true, metaImage: true },
           })
         : null;
 
@@ -34,7 +34,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const description = campaign?.description
         ? campaign.description.slice(0, 160)
         : `You've been invited to deploy this campaign with ${SITE_CONFIG.name}.`;
-    const image = campaign?.thumbnailUrl ?? SITE_CONFIG.ogImage;
+    // Priority: explicit metaImage → IMAGE mediaUrl → thumbnailUrl → default OG
+    const image =
+        campaign?.metaImage ??
+        (campaign?.mediaType === "IMAGE" && campaign?.mediaUrl ? campaign.mediaUrl : null) ??
+        campaign?.thumbnailUrl ??
+        SITE_CONFIG.ogImage;
 
     return {
         // Smart link slugs should NOT appear in search engine results
