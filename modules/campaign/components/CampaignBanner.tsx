@@ -1,6 +1,7 @@
 "use client";
 
-import { Avatar, Tooltip, Progress, Tag } from "antd";
+import { useState } from "react";
+import { Avatar, Tooltip, Progress, Tag, App } from "antd";
 import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
 import { ICONS } from "@/config/icons";
@@ -36,6 +37,33 @@ export default function CampaignBanner({
   joiningLoading,
   className,
 }: CampaignBannerProps) {
+  const { message: msgApi } = App.useApp();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async () => {
+    if (!campaign.mediaUrl) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(campaign.mediaUrl);
+      if (!res.ok) throw new Error("Failed to fetch media");
+      const blob = await res.blob();
+      const ext = blob.type.split("/")[1]?.split(";")[0] ?? "bin";
+      const filename = `${campaign.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.${ext}`;
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      msgApi.error("Download failed — try right-clicking the media to save it.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const goalPercent =
     campaign.goalTarget && campaign.goalCurrent !== undefined
       ? Math.min(
@@ -304,16 +332,14 @@ export default function CampaignBanner({
             <div className="flex flex-wrap items-center gap-2 ml-auto">
               {(campaign.mediaType === "IMAGE" || campaign.mediaType === "VIDEO") && campaign.mediaUrl && (
                 <Tooltip title="Download media">
-                  <a
-                    href={campaign.mediaUrl}
-                    download
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    aria-label="Download campaign media"
-                    className="inline-flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-ds-lg border border-ds-border-base text-ds-text-secondary hover:text-ds-brand-accent hover:border-ds-brand-accent transition-all">
-                    <ICONS.download className="text-base" />
-                    <span>Download</span>
-                  </a>
+                  <Button
+                    variant="ghost"
+                    size="small"
+                    icon={<ICONS.download />}
+                    loading={downloading}
+                    onClick={handleDownload}>
+                    Download
+                  </Button>
                 </Tooltip>
               )}
               <Button

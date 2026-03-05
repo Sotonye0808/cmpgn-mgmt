@@ -65,6 +65,7 @@ import {
     AimOutlined,
     BugOutlined,
     SendOutlined,
+    DesktopOutlined,
 } from "@ant-design/icons";
 
 export const ICONS = {
@@ -144,6 +145,7 @@ export const ICONS = {
     // Theme
     sun: SunOutlined,
     moon: MoonOutlined,
+    monitor: DesktopOutlined,
 
     // Social Platforms (Weapons of Choice)
     facebook: FacebookOutlined,

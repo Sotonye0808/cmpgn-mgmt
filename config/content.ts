@@ -308,6 +308,9 @@ export const ANALYTICS_PAGE_CONTENT = {
     campaignAnalyticsPlaceholder: "Select a campaign above to view detailed analytics.",
     campaignAnalyticsEngagementLabel: "Engagement Trend",
     campaignAnalyticsTopSoldiersLabel: "Top Members — This Campaign",
+    userStatsTitle: "User Stats & Contributions",
+    userStatsSubtitle: "View any member's engagement, referrals, donation history, and activity.",
+    userStatsSearchPlaceholder: "Search by name or email",
 } as const;
 
 export const SETTINGS_PAGE_CONTENT = {
