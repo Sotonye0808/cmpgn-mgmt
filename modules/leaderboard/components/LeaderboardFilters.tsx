@@ -15,8 +15,6 @@ interface LeaderboardFiltersProps {
 const FILTER_OPTIONS: Array<{ label: string; value: LeaderboardFilter }> = [
   { label: "Individual", value: "individual" },
   { label: "Global", value: "global" },
-  { label: "Team", value: "team" },
-  { label: "Group", value: "group" },
 ];
 
 export default function LeaderboardFilters({

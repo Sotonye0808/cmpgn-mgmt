@@ -149,6 +149,8 @@ export default function DonationVerificationPanel() {
       title: "Reference",
       dataIndex: "reference",
       key: "reference",
+      width: 160,
+      ellipsis: true,
       render: (ref: string) => (
         <span className="font-ds-mono text-xs text-ds-text-subtle">{ref}</span>
       ),
@@ -156,6 +158,8 @@ export default function DonationVerificationPanel() {
     {
       title: "Donor",
       key: "donor",
+      width: 160,
+      ellipsis: true,
       render: (_: unknown, rec: EnrichedDonation) => (
         <Link
           href={ROUTES.USER_DETAIL(rec.userId)}
@@ -168,11 +172,13 @@ export default function DonationVerificationPanel() {
       title: "Campaign",
       dataIndex: "campaignTitle",
       key: "campaignTitle",
+      width: 200,
       ellipsis: true,
     },
     {
       title: "Amount",
       key: "amount",
+      width: 130,
       render: (_, rec) => (
         <span className="font-semibold text-ds-text-primary font-ds-mono">
           {new Intl.NumberFormat("en-NG", {
@@ -188,6 +194,7 @@ export default function DonationVerificationPanel() {
       title: "Status",
       dataIndex: "status",
       key: "status",
+      width: 120,
       render: (status: string) => {
         const cfg = DONATION_STATUS_CONFIG[status];
         return (
@@ -198,6 +205,7 @@ export default function DonationVerificationPanel() {
     {
       title: "Proof",
       key: "proof",
+      width: 90,
       render: (_, rec) =>
         rec.proofScreenshotUrl ? (
           <Tag color="blue" className="cursor-pointer">
@@ -211,6 +219,7 @@ export default function DonationVerificationPanel() {
       title: "Date",
       dataIndex: "createdAt",
       key: "createdAt",
+      width: 130,
       render: (d: string) => formatDate(d),
       sorter: (a, b) =>
         new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
@@ -218,6 +227,8 @@ export default function DonationVerificationPanel() {
     {
       title: "Actions",
       key: "actions",
+      width: 90,
+      fixed: "right" as const,
       render: (_, rec) => (
         <Button
           type="link"
@@ -297,6 +308,7 @@ export default function DonationVerificationPanel() {
         rowKey="id"
         loading={loading}
         rowSelection={rowSelection}
+        scroll={{ x: "max-content" }}
         pagination={{
           current: page,
           total,

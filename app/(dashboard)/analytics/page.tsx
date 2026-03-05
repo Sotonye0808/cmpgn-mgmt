@@ -24,6 +24,7 @@ import ProofReviewPanel from "@/modules/proofs/components/ProofReviewPanel";
 import TeamAnalyticsSection from "@/modules/analytics/components/TeamAnalyticsSection";
 import DonationAnalyticsSection from "@/modules/analytics/components/DonationAnalyticsSection";
 import UserStatsSection from "@/modules/analytics/components/UserStatsSection";
+import CampaignStatusSection from "@/modules/analytics/components/CampaignStatusSection";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
@@ -321,6 +322,9 @@ export default function AnalyticsPage() {
 
             case "proofs-overview":
               return <ProofReviewPanel campaigns={campaigns ?? []} />;
+
+            case "campaign-status-views":
+              return <CampaignStatusSection />;
 
             case "team-analytics":
               return <TeamAnalyticsSection />;
