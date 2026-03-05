@@ -71,29 +71,28 @@ function buildThemeConfig(isDark: boolean) {
 
 export function AntdProvider({ children }: { children: React.ReactNode }) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = React.useState(false);
-
-  // useLayoutEffect fires synchronously before paint on the client, so the
-  // second render (with correct theme) happens before the user sees anything.
-  useIsomorphicLayoutEffect(() => {
-    setMounted(true);
-  }, []);
 
   /**
-   * isDark resolution order:
-   * 1. After mount: use resolvedTheme from next-themes (the authoritative source).
-   *    Fall back to "dark" if resolvedTheme is undefined during a transition.
-   * 2. Before mount (first client render): read the DOM class that next-themes'
-   *    blocking script has already injected — avoids the flash.
-   * 3. SSR: returns true (dark) to match defaultTheme="dark" in ThemeProvider.
+   * isDark is initialised directly from the DOM class that next-themes'
+   * blocking <script> has already injected before React hydrates.
+   * This means the very first client render gets the right value with zero
+   * delay — no "mounted" boolean, no intermediate render with a wrong theme.
+   *
+   * When resolvedTheme from next-themes later resolves to a concrete string
+   * (it can briefly be undefined during hydration), the layout effect updates
+   * isDark synchronously before the browser paints, so there is no flash.
+   *
+   * Guard: if resolvedTheme is still undefined we leave isDark unchanged
+   * (keeping the correct DOM-read value) instead of assuming dark.
    */
-  const isDark = mounted
-    ? (resolvedTheme ?? "dark") === "dark"
-    : readDomIsDark();
+  const [isDark, setIsDark] = React.useState<boolean>(readDomIsDark);
 
-  // useMemo depends only on isDark — a simple boolean derived purely from
-  // React state (after mount) or a synchronous DOM read (before mount).
-  // No getCSSVar calls = no DOM-read timing hazards during theme transitions.
+  useIsomorphicLayoutEffect(() => {
+    if (resolvedTheme !== undefined) {
+      setIsDark(resolvedTheme === "dark");
+    }
+  }, [resolvedTheme]);
+
   const themeConfig = React.useMemo(() => buildThemeConfig(isDark), [isDark]);
 
   return (

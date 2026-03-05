@@ -25,15 +25,18 @@ export default function AppFooter({ variant = "public" }: AppFooterProps) {
   const content = isDashboard
     ? DASHBOARD_FOOTER_CONTENT
     : PUBLIC_FOOTER_CONTENT;
-  const homeHref = isDashboard ? "/dashboard" : "/";
+  const homeHref = "/"; // isDashboard ? "/dashboard" : "/";
 
   return (
     <footer className="glass-footer py-10 px-4 md:px-6">
       <div className="max-w-7xl mx-auto">
-        {/* Top grid: brand column + link columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+        {/* Top grid: brand column + link columns.
+             Mobile:  brand full-width, link cols in 2-per-row grid.
+             sm(640): brand full-width, link cols in 3-per-row grid.
+             md(768+): single 4-col grid (md:contents removes the wrapper). */}
+        <div className="grid grid-cols-1 md:grid-cols-4 md:gap-8 gap-y-8 mb-8">
           {/* Brand column — links to home */}
-          <div className="md:col-span-1">
+          <div>
             <Link
               href={homeHref}
               className="inline-flex items-center gap-2 mb-3 group"
@@ -48,7 +51,8 @@ export default function AppFooter({ variant = "public" }: AppFooterProps) {
             </p>
           </div>
 
-          {/* Link columns */}
+          {/* Link columns — 2-col on mobile, 3-col on sm, flows into parent grid on md+ */}
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-6 md:contents">
           {content.columns.map((col) => (
             <div key={col.key}>
               <h3 className="text-xs font-semibold text-ds-text-secondary uppercase tracking-wider mb-3">
@@ -67,6 +71,7 @@ export default function AppFooter({ variant = "public" }: AppFooterProps) {
               </ul>
             </div>
           ))}
+          </div>
         </div>
 
         {/* Bottom bar — 3-slot layout on sm+ so the centered dev credit never

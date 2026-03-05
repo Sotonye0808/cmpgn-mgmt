@@ -1,6 +1,7 @@
 "use client";
 
-import { Tooltip, Progress, Card as AntCard } from "antd";
+import { useState } from "react";
+import { Tooltip, Progress, Card as AntCard, App } from "antd";
 import Card from "@/components/ui/Card";
 import Button from "@/components/ui/Button";
 import StatusBadge from "@/components/ui/StatusBadge";
@@ -32,6 +33,34 @@ export default function CampaignCard({
   isJoining,
   className,
 }: CampaignCardProps) {
+  const { message: msgApi } = App.useApp();
+  const [downloading, setDownloading] = useState(false);
+
+  const handleDownload = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!campaign.mediaUrl) return;
+    setDownloading(true);
+    try {
+      const res = await fetch(campaign.mediaUrl);
+      if (!res.ok) throw new Error("fetch failed");
+      const blob = await res.blob();
+      const ext = blob.type.split("/")[1]?.split(";")[0] ?? "bin";
+      const filename = `${campaign.title.replace(/[^a-z0-9]/gi, "_").toLowerCase()}.${ext}`;
+      const objectUrl = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = objectUrl;
+      a.download = filename;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(objectUrl);
+    } catch {
+      msgApi.error("Download failed — try right-clicking the media to save it.");
+    } finally {
+      setDownloading(false);
+    }
+  };
+
   const isExpired = campaign.endDate && new Date(campaign.endDate) < new Date();
   const goalPercent =
     campaign.goalTarget && campaign.goalCurrent !== undefined
@@ -223,16 +252,14 @@ export default function CampaignCard({
                     campaign.mediaType === "VIDEO") &&
                     campaign.mediaUrl && (
                       <Tooltip title="Download media">
-                        <a
-                          href={campaign.mediaUrl}
-                          download
-                          target="_blank"
-                          rel="noopener noreferrer"
+                        <button
+                          type="button"
+                          disabled={downloading}
                           aria-label="Download campaign media"
-                          onClick={(e) => e.stopPropagation()}
-                          className="flex items-center text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded">
-                          <ICONS.download className="text-xs" />
-                        </a>
+                          onClick={handleDownload}
+                          className="flex items-center text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors px-1.5 py-1 rounded disabled:opacity-50">
+                          <ICONS.download className={`text-xs${downloading ? " animate-spin" : ""}`} />
+                        </button>
                       </Tooltip>
                     )}
                   {onShare && (

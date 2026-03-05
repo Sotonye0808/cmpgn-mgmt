@@ -143,9 +143,18 @@ export default function DonationAnalyticsSection() {
       {/* Top donors */}
       {analytics.topDonors.length > 0 && (
         <div>
-          <h3 className="text-sm font-semibold text-ds-text-subtle uppercase tracking-wide mb-3">
-            Top Donors
-          </h3>
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="text-sm font-semibold text-ds-text-subtle uppercase tracking-wide">
+              Top Donors
+            </h3>
+            {analytics.topDonors.length > 5 && (
+              <Link
+                href={ROUTES.DONATIONS}
+                className="text-xs text-ds-brand-accent hover:text-ds-brand-accent-hover transition-colors">
+                View all ({analytics.topDonors.length})
+              </Link>
+            )}
+          </div>
           <div className="space-y-2">
             {analytics.topDonors.slice(0, 5).map((donor, idx) => (
               <div
