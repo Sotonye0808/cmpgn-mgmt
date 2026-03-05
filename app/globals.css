@@ -384,18 +384,18 @@
     background: var(--_dc-ring);
   }
 
-  /* ─── Public nav link color fix ───────────────────────────────────────────── */
-  /* AntD 5 injects `a { color: var(--ant-color-link) }` via CSS-in-JS which  */
-  /* re-injects on theme toggle and can win over Tailwind text-* classes at   */
-  /* equal injection order. These utility classes own the property explicitly. */
+  /* ─── Public nav link explicit colours ───────────────────────────────────── */
+  /* The global `a { color: inherit }` base reset handles AntD bleed-through  */
+  /* at the root level. These classes exist for components that need a named   */
+  /* semantic colour rather than inherited context colour.                     */
   .public-nav-link {
-    color: var(--ds-text-secondary) !important;
+    color: var(--ds-text-secondary);
   }
   .public-nav-link:hover {
-    color: var(--ds-brand-accent) !important;
+    color: var(--ds-brand-accent);
   }
   .public-nav-cta {
-    color: #fff !important;
+    color: #fff;
   }
 }
 
@@ -404,6 +404,17 @@
 ───────────────────────────────────────────────────────── */
 * {
   box-sizing: border-box;
+}
+
+/* Neutralise AntD v5 CSS-in-JS global anchor injection.
+   AntD injects `:where(.css-[hash]) a { color: #3b82f6 }` at runtime.
+   :where() carries zero specificity, so any explicit `a` rule wins.
+   Setting color/text-decoration to inherit lets every link adopt its
+   surrounding context; explicit classes (text-ds-text-link, etc.) still
+   override as expected since they carry higher specificity. */
+a {
+  color: inherit;
+  text-decoration: inherit;
 }
 
 html {
