@@ -53,6 +53,11 @@ function buildThemeConfig(isDark: boolean) {
       colorTextSecondary: isDark ? "#c5c5d8" : "#374151",
       colorTextTertiary: isDark ? "#8888a0" : "#6b7280",
       colorTextDisabled: isDark ? "#555568" : "#9ca3af",
+      // Links — must be set explicitly; without colorLink AntD falls back
+      // to colorInfo (#3b82f6 blue).  Map to --ds-text-link (brand violet).
+      colorLink: isDark ? "#a78bfa" : "#7c3aed",
+      colorLinkHover: isDark ? "#c4b5fd" : "#6d28d9",
+      colorLinkActive: isDark ? "#7c3aed" : "#5b21b6",
       // Shape
       borderRadius: 8,
       borderRadiusLG: 12,
