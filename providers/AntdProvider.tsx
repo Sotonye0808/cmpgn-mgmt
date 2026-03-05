@@ -42,7 +42,9 @@ function buildThemeConfig(isDark: boolean) {
       colorBgContainer: isDark ? "#0f1117" : "#ffffff",
       // colorBgElevated drives portal content: Dropdown, Select, DatePicker, Modal
       colorBgElevated: isDark ? "#181b25" : "#ffffff",
-      colorBgSpotlight: isDark ? "#0f1117" : "#ffffff",
+      // Tooltip background — always dark for contrast regardless of page theme.
+      // When light mode sets this to a light surface, tooltip text (white) becomes invisible.
+      colorBgSpotlight: isDark ? "#0f1117" : "#1c1b24",
       // Borders
       colorBorder: isDark ? "rgba(255,255,255,0.08)" : "#e5e7eb",
       colorBorderSecondary: isDark ? "rgba(255,255,255,0.04)" : "#f3f4f6",

@@ -107,4 +107,11 @@ export const NAV_ITEMS: NavItem[] = [
         icon: "bug",
         allowedRoles: [ROLE.SUPER_ADMIN],
     },
+    {
+        key: "report-bug",
+        label: "Report a Bug",
+        href: ROUTES.REPORT_BUG,
+        icon: "bug",
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
 ];

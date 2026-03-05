@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { App, Avatar, Input, Select, Skeleton, Tag } from "antd";
+import { App, Avatar, Input, Pagination, Select, Skeleton, Tag } from "antd";
 import Link from "next/link";
 import GlassCard from "@/components/ui/GlassCard";
 import { ICONS } from "@/config/icons";
@@ -52,6 +52,8 @@ const ROLE_OPTIONS = [
 
 // ─── Component ────────────────────────────────────────────────────────────────
 
+const PAGE_SIZE = 8;
+
 export default function UserStatsSection() {
   const { message: msgApi } = App.useApp();
 
@@ -60,6 +62,7 @@ export default function UserStatsSection() {
   const [search, setSearch] = useState("");
   const [roleFilter, setRoleFilter] = useState<string>("");
   const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
 
   // Debounce search input so we don't fire on every keystroke
   useEffect(() => {
@@ -69,6 +72,7 @@ export default function UserStatsSection() {
 
   const fetchUsers = useCallback(async () => {
     setLoading(true);
+    setCurrentPage(1); // Reset to page 1 whenever search/filter changes
     try {
       const params = new URLSearchParams();
       if (debouncedSearch) params.set("search", debouncedSearch);
@@ -128,7 +132,7 @@ export default function UserStatsSection() {
         </button>
       </div>
 
-      {/* User list */}
+      {/* User list — paginated slice */}
       {loading ? (
         <div className="space-y-3">
           {[...Array(6)].map((_, i) => (
@@ -139,14 +143,33 @@ export default function UserStatsSection() {
         <p className="text-ds-text-subtle text-sm">No users match your search.</p>
       ) : (
         <div className="space-y-3">
-          {users.map((u) => (
-            <UserRow key={u.id} user={u} />
-          ))}
+          {users
+            .slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE)
+            .map((u) => (
+              <UserRow key={u.id} user={u} />
+            ))}
         </div>
       )}
 
-      {/* Total count */}
-      {!loading && users.length > 0 && (
+      {/* Pagination */}
+      {!loading && users.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between mt-4 flex-wrap gap-3">
+          <p className="text-xs text-ds-text-subtle">
+            Showing{" "}
+            {Math.min((currentPage - 1) * PAGE_SIZE + 1, users.length)}–{Math.min(currentPage * PAGE_SIZE, users.length)}{" "}
+            of {users.length} member{users.length !== 1 ? "s" : ""}
+          </p>
+          <Pagination
+            current={currentPage}
+            pageSize={PAGE_SIZE}
+            total={users.length}
+            onChange={setCurrentPage}
+            size="small"
+            showSizeChanger={false}
+          />
+        </div>
+      )}
+      {!loading && users.length > 0 && users.length <= PAGE_SIZE && (
         <p className="text-xs text-ds-text-subtle mt-4 text-right">
           Showing {users.length} member{users.length !== 1 ? "s" : ""}
         </p>

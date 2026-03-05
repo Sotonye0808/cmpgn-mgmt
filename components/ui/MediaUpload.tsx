@@ -23,6 +23,8 @@ interface Props {
   placeholder?: string;
   className?: string;
   showPreview?: boolean;
+  /** Passed as ?category= to /api/upload — controls the Cloudinary folder */
+  category?: string;
 }
 
 export default function MediaUpload({
@@ -34,6 +36,7 @@ export default function MediaUpload({
   placeholder = "Click or drag to upload",
   className,
   showPreview = true,
+  category,
 }: Props) {
   const { message: msgApi } = App.useApp();
   const [uploading, setUploading] = useState(false);
@@ -50,7 +53,8 @@ export default function MediaUpload({
       const formData = new FormData();
       formData.append("file", file);
 
-      const res = await window.fetch("/api/upload", {
+      const uploadUrl = `/api/upload${category ? `?category=${encodeURIComponent(category)}` : ""}`;
+      const res = await window.fetch(uploadUrl, {
         method: "POST",
         body: formData,
       });
