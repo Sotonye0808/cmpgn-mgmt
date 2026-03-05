@@ -68,7 +68,7 @@ export default function TeamAnalyticsSection() {
         </h2>
       </div>
 
-      <div className="space-y-4">
+      <div className="space-y-4 max-h-[440px] overflow-y-auto scrollbar-thin scrollbar-track-transparent scrollbar-thumb-ds-border-base pr-1">
         {teams.map((team, idx) => (
           <div
             key={team.teamId}

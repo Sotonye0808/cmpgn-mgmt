@@ -126,6 +126,11 @@ export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[]
         allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
     {
+        key: "campaign-status-views",
+        label: "Campaign Status Views",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
         key: "team-analytics",
         label: "Team Analytics",
         allowedRoles: [ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],

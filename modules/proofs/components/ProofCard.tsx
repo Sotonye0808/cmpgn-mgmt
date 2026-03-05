@@ -70,11 +70,12 @@ export default function ProofCard({
       </div>
 
       {/* Screenshot */}
-      <div className="rounded-ds-md overflow-hidden w-fit mx-auto border border-ds-border bg-ds-surface">
+      <div className="rounded-ds-md overflow-hidden w-full border border-ds-border bg-ds-surface flex items-center justify-center min-h-[120px]">
         <Image
           src={proof.screenshotUrl}
           alt={`Proof on ${platformLabel}`}
-          className="w-full object-contain"
+          width="100%"
+          style={{ maxHeight: 260, objectFit: "contain", display: "block" }}
           fallback="https://placehold.co/400x300?text=Screenshot"
           preview={{ mask: "View Screenshot" }}
         />
