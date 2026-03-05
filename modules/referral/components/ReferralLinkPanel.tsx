@@ -40,6 +40,23 @@ export default function ReferralLinkPanel({
     }
   };
 
+  const handleShare = async () => {
+    if (typeof navigator !== "undefined" && navigator.share) {
+      try {
+        await navigator.share({
+          title: "Join me on this campaign",
+          text: "Use my referral link to join this campaign:",
+          url: referralUrl,
+        });
+      } catch {
+        // User dismissed the native share sheet — no action needed
+      }
+    } else {
+      // Fallback: copy to clipboard for browsers without Web Share API
+      await handleCopy();
+    }
+  };
+
   if (loading) {
     return (
       <div className={cn("flex items-center justify-center py-6", className)}>
@@ -57,6 +74,7 @@ export default function ReferralLinkPanel({
         <span className="flex-1 text-sm font-ds-mono text-ds-text-secondary truncate">
           {referralUrl}
         </span>
+        {/* Copy */}
         <Tooltip title={copied ? "Copied!" : "Copy link"}>
           <button
             onClick={handleCopy}
@@ -66,6 +84,14 @@ export default function ReferralLinkPanel({
             ) : (
               <ICONS.copy />
             )}
+          </button>
+        </Tooltip>
+        {/* Share */}
+        <Tooltip title="Share link">
+          <button
+            onClick={handleShare}
+            className="p-1.5 rounded-ds-md hover:bg-ds-surface-elevated transition-colors text-ds-text-subtle hover:text-ds-brand-accent">
+            <ICONS.share />
           </button>
         </Tooltip>
       </div>

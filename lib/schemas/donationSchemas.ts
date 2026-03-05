@@ -6,7 +6,7 @@ export const createDonationSchema = z.object({
     currency: z.enum(["NGN", "USD", "GBP"]).default("NGN"),
     message: z.string().max(200).optional(),
     bankAccountId: z.string().optional(),
-    proofScreenshotUrl: z.string().url("Must be a valid URL").optional(),
+    proofScreenshotUrl: z.string().url("Proof screenshot URL is invalid").min(1, "Proof of payment is required"),
     notes: z.string().max(500).optional(),
 });
 

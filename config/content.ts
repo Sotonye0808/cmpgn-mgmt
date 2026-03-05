@@ -387,6 +387,10 @@ export const USERS_PAGE_CONTENT = {
 } as const;
 
 export const DASHBOARD_FOOTER_CONTENT = {
+    brand: {
+        name: "DMHicc",
+        tagline: "Digital Mobilization Army — Recruiting Online Souls",
+    },
     developer: {
         label: "Built by",
         name: "S.D.",
@@ -397,6 +401,37 @@ export const DASHBOARD_FOOTER_CONTENT = {
         version: "1.0.0-mvp",
         tagline: "Digital Mobilization Army — Recruiting Online Souls",
     },
+    columns: [
+        {
+            key: "platform",
+            heading: "Platform",
+            links: [
+                { key: "campaigns", label: "Campaigns", href: "/campaigns" },
+                { key: "leaderboard", label: "Leaderboard", href: "/leaderboard" },
+                { key: "analytics", label: "Analytics", href: "/analytics" },
+                { key: "donations", label: "Donations", href: "/donations" },
+            ],
+        },
+        {
+            key: "account",
+            heading: "Account",
+            links: [
+                { key: "settings", label: "Settings", href: "/settings" },
+                { key: "referrals", label: "Referrals", href: "/referrals" },
+                { key: "report-bug", label: "Report a Bug", href: "/report-bug" },
+            ],
+        },
+        {
+            key: "company",
+            heading: "Company",
+            links: [
+                { key: "about", label: "About", href: "/about" },
+                { key: "contact", label: "Contact", href: "/contact" },
+                { key: "privacy", label: "Privacy Policy", href: "/privacy" },
+                { key: "terms", label: "Terms", href: "/terms" },
+            ],
+        },
+    ],
     quickLinks: [
         { key: "lobby", label: "Lobby", href: "/" },
         { key: "campaigns", label: "Campaigns", href: "/campaigns" },
@@ -409,7 +444,11 @@ export const DASHBOARD_FOOTER_CONTENT = {
         { key: "terms", label: "Terms", href: "/terms" },
         { key: "report-bug", label: "Report Bug", href: "/report-bug" },
     ],
-    legal: { entity: "DMHicc" },
+    legal: {
+        copyright: { entity: "Harvesters International Christian Centre. DMHicc Platform." },
+        rights: "All rights reserved.",
+        entity: "DMHicc",
+    },
 } as const;
 
 export const PUBLIC_FOOTER_CONTENT = {

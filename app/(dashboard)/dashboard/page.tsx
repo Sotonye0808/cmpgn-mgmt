@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
-import { Row, Col, App } from "antd";
+import { Row, Col, App, Modal } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import Card from "@/components/ui/Card";
 import { ICONS } from "@/config/icons";
@@ -13,35 +13,40 @@ import { DASHBOARD_CONTENT } from "@/config/content";
 import PageHeader from "@/components/ui/PageHeader";
 import { formatNumber } from "@/lib/utils/format";
 import { cn } from "@/lib/utils/cn";
+import { RANK_LEVELS } from "@/config/ranks";
 
 const KPI_STATS = [
   {
-    key: "campaigns",
-    label: "Active Campaigns",
-    icon: "rocket",
+    key: "points",
+    label: "My Points",
+    icon: "star",
     color: "text-ds-brand-accent",
     bgColor: "bg-ds-brand-accent/10",
+    isText: false,
+  },
+  {
+    key: "rank",
+    label: "My Rank",
+    icon: "trophy",
+    color: "text-ds-chart-4",
+    bgColor: "bg-ds-chart-4/10",
+    isText: true, // value is a string, not a number
+  },
+  {
+    key: "campaigns",
+    label: "Campaigns Joined",
+    icon: "rocket",
+    color: "text-ds-status-success",
+    bgColor: "bg-ds-status-success/10",
+    isText: false,
   },
   {
     key: "clicks",
-    label: "Total Clicks",
+    label: "My Link Clicks",
     icon: "links",
-    color: "text-ds-status-success",
-    bgColor: "bg-ds-status-success/10",
-  },
-  {
-    key: "shares",
-    label: "Total Shares",
-    icon: "share",
     color: "text-ds-chart-3",
     bgColor: "bg-ds-chart-3/10",
-  },
-  {
-    key: "members",
-    label: "Participants",
-    icon: "users",
-    color: "text-ds-chart-4",
-    bgColor: "bg-ds-chart-4/10",
+    isText: false,
   },
 ];
 
@@ -51,6 +56,13 @@ export default function DashboardPage() {
   const { message: msgApi } = App.useApp();
   const [joinedIds, setJoinedIds] = useState<Set<string>>(new Set());
   const [joiningId, setJoiningId] = useState<string | null>(null);
+  const [showRankInfo, setShowRankInfo] = useState(false);
+
+  // Personal stats
+  const [totalPoints, setTotalPoints] = useState(0);
+  const [rankName, setRankName] = useState("—");
+  const [totalLinkClicks, setTotalLinkClicks] = useState(0);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const { campaigns: activeCampaigns, loading } = useCampaigns({
     filters: { status: "ACTIVE" as CampaignStatus },
@@ -58,9 +70,10 @@ export default function DashboardPage() {
     pageSize: 3,
   });
 
-  // Sync joined state after campaigns load
+  // Sync joined campaigns + personal stats
   useEffect(() => {
     if (!user) return;
+    // Joined campaign IDs
     fetch(ROUTES.API.CAMPAIGNS.JOINED)
       .then((r) => r.json())
       .then((json) => {
@@ -68,9 +81,21 @@ export default function DashboardPage() {
           setJoinedIds(new Set(json.data.campaignIds as string[]));
         }
       })
-      .catch(() => {
-        /* silent */
-      });
+      .catch(() => { /* silent */ });
+    // Personal points + rank + link clicks
+    setStatsLoading(true);
+    Promise.all([
+      fetch(ROUTES.API.POINTS.ME).then((r) => r.json()),
+      fetch(ROUTES.API.SMART_LINKS.BASE).then((r) => r.json()),
+    ])
+      .then(([pointsJson, linksJson]) => {
+        setTotalPoints(pointsJson.data?.summary?.total ?? 0);
+        setRankName(pointsJson.data?.progress?.currentRank?.name ?? "Recruit");
+        const links: SmartLink[] = Array.isArray(linksJson.data) ? linksJson.data : [];
+        setTotalLinkClicks(links.reduce((sum, l) => sum + (l.clickCount ?? 0), 0));
+      })
+      .catch(() => { /* silent */ })
+      .finally(() => setStatsLoading(false));
   }, [user]);
 
   const handleJoin = useCallback(
@@ -115,19 +140,10 @@ export default function DashboardPage() {
     [user, joinedIds, joiningId, msgApi],
   );
 
-  // Aggregate quick stats from active campaigns
-  const totalClicks = activeCampaigns.reduce((s, c) => s + c.clickCount, 0);
-  const totalShares = activeCampaigns.reduce((s, c) => s + c.shareCount, 0);
-  const totalParticipants = activeCampaigns.reduce(
-    (s, c) => s + (c.participantCount ?? 0),
-    0,
-  );
-
   const kpiValues: Record<string, number> = {
-    campaigns: activeCampaigns.length,
-    clicks: totalClicks,
-    shares: totalShares,
-    members: totalParticipants,
+    points: totalPoints,
+    campaigns: joinedIds.size,
+    clicks: totalLinkClicks,
   };
 
   return (
@@ -157,7 +173,11 @@ export default function DashboardPage() {
                         "text-2xl font-bold font-ds-mono",
                         stat.color,
                       )}>
-                      {loading ? "—" : formatNumber(kpiValues[stat.key])}
+                      {statsLoading
+                        ? "—"
+                        : stat.isText
+                          ? rankName
+                          : formatNumber(kpiValues[stat.key])}
                     </p>
                   </div>
                   <div className={cn("p-2 rounded-ds-lg", stat.bgColor)}>
@@ -169,6 +189,76 @@ export default function DashboardPage() {
           );
         })}
       </Row>
+
+      {/* Rank FAQ trigger */}
+      <div className="flex justify-end">
+        <button
+          type="button"
+          onClick={() => setShowRankInfo(true)}
+          className="inline-flex items-center gap-1.5 text-xs text-ds-text-subtle hover:text-ds-brand-accent transition-colors">
+          <ICONS.info className="text-sm" />
+          How do ranks work?
+        </button>
+      </div>
+
+      {/* Rank Ladder Modal */}
+      <Modal
+        open={showRankInfo}
+        onCancel={() => setShowRankInfo(false)}
+        footer={null}
+        title={
+          <div className="flex items-center gap-2">
+            <ICONS.trophy className="text-ds-brand-accent" />
+            <span>Rank Ladder</span>
+          </div>
+        }
+        width={560}>
+        <p className="text-sm text-ds-text-subtle mb-5">
+          Earn points by sharing campaigns and driving real engagement. Each point milestone unlocks the next rank and its perks.
+        </p>
+        <div className="space-y-3">
+          {RANK_LEVELS.map((rank) => {
+            const isCurrent = rank.name === rankName;
+            return (
+              <div
+                key={rank.level}
+                className={cn(
+                  "flex gap-3 p-3 rounded-ds-lg border transition-all",
+                  isCurrent
+                    ? "border-ds-brand-accent bg-ds-brand-accent-subtle"
+                    : "border-ds-border-subtle bg-ds-surface-elevated",
+                )}>
+                <div className="text-2xl shrink-0 w-10 text-center">{rank.badge}</div>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className="font-semibold text-sm"
+                      style={{ color: rank.color }}>
+                      {rank.name}
+                    </span>
+                    {isCurrent && (
+                      <span className="text-[10px] font-bold uppercase tracking-wide px-1.5 py-0.5 rounded-ds-full bg-ds-brand-accent text-white">
+                        You are here
+                      </span>
+                    )}
+                    <span className="text-xs text-ds-text-disabled ml-auto shrink-0">
+                      {rank.minScore.toLocaleString()}+ pts
+                    </span>
+                  </div>
+                  <ul className="mt-1.5 space-y-0.5">
+                    {rank.perks.map((perk) => (
+                      <li key={perk} className="text-xs text-ds-text-subtle flex items-start gap-1.5">
+                        <span className="text-ds-brand-accent mt-0.5">•</span>
+                        {perk}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </Modal>
 
       {/* Active Campaigns Preview */}
       <div>

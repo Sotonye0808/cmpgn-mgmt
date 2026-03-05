@@ -697,7 +697,8 @@ declare global {
 
     interface CreateDonationInputExtended extends CreateDonationInput {
         bankAccountId?: string;
-        proofScreenshotUrl?: string;
+        /** Required — Cloudinary URL of the payment screenshot */
+        proofScreenshotUrl: string;
         notes?: string;
     }
 

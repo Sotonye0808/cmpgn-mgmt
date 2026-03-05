@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect, useRef } from "react";
 import {
   Form,
   InputNumber,
@@ -48,6 +48,37 @@ export default function DonationForm({
   const { message: msgApi } = App.useApp();
   const selectedCurrency = Form.useWatch("currency", form) ?? "NGN";
 
+  // Track the Cloudinary publicId of the current proof upload so we can clean
+  // up orphaned assets when the user replaces the screenshot or leaves the form.
+  const proofPublicIdRef = useRef<string | null>(null);
+
+  /**
+   * Delete a Cloudinary asset — best-effort, never throws.
+   * Called when the user replaces a proof upload or unmounts without submitting.
+   */
+  const deleteProofAsset = async (publicId: string) => {
+    try {
+      await fetch("/api/upload", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ publicId, resourceType: "image" }),
+      });
+    } catch {
+      /* best-effort — do not block UX */
+    }
+  };
+
+  // On unmount: if the form was never submitted but a proof was already
+  // uploaded, remove the orphaned Cloudinary asset.
+  const submittedRef = useRef(false);
+  useEffect(() => {
+    return () => {
+      if (!submittedRef.current && proofPublicIdRef.current) {
+        deleteProofAsset(proofPublicIdRef.current);
+      }
+    };
+  }, []);
+
   const bankOptions = useMemo(() => {
     return getBankAccountsByCurrency(selectedCurrency).map((a) => ({
       value: a.id,
@@ -72,6 +103,8 @@ export default function DonationForm({
         const err = await res.json();
         throw new Error(err.error ?? "Donation failed");
       }
+      submittedRef.current = true; // proof is now owned by the server record
+      proofPublicIdRef.current = null;
       msgApi.success("Donation recorded! Thank you.");
       form.resetFields();
       onSuccess?.();
@@ -175,21 +208,29 @@ export default function DonationForm({
             </Card>
           )}
 
-          {/* Proof of Payment Upload */}
-          {selectedBankId && (
-            <Form.Item
-              name="proofScreenshotUrl"
-              label="Proof of Payment"
-              tooltip="Upload a screenshot of your transfer receipt">
-              <MediaUpload
-                accept="image/*"
-                maxSizeMb={5}
-                onChange={(url) =>
-                  form.setFieldValue("proofScreenshotUrl", url)
+          {/* Proof of Payment Upload — always required */}
+          <Form.Item
+            name="proofScreenshotUrl"
+            label="Proof of Payment"
+            tooltip="Upload a screenshot of your bank transfer receipt or payment confirmation"
+            rules={[
+              { required: true, message: "Please upload your proof of payment screenshot" },
+            ]}>
+            <MediaUpload
+              accept="image/*"
+              maxSizeMb={5}
+              category="proof-donation"
+              placeholder="Upload transfer receipt / payment screenshot"
+              onChange={(url) => form.setFieldValue("proofScreenshotUrl", url)}
+              onUploadComplete={(media) => {
+                // If a previous proof was uploaded in this session, delete it from Cloudinary
+                if (proofPublicIdRef.current && proofPublicIdRef.current !== media.publicId) {
+                  deleteProofAsset(proofPublicIdRef.current);
                 }
-              />
-            </Form.Item>
-          )}
+                proofPublicIdRef.current = media.publicId;
+              }}
+            />
+          </Form.Item>
 
           <Form.Item name="message" label={DONATION_PAGE_CONTENT.messageLabel}>
             <Input.TextArea
