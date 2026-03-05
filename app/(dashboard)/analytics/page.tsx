@@ -23,6 +23,7 @@ import PeriodSelector, { type Period } from "@/components/ui/PeriodSelector";
 import ProofReviewPanel from "@/modules/proofs/components/ProofReviewPanel";
 import TeamAnalyticsSection from "@/modules/analytics/components/TeamAnalyticsSection";
 import DonationAnalyticsSection from "@/modules/analytics/components/DonationAnalyticsSection";
+import UserStatsSection from "@/modules/analytics/components/UserStatsSection";
 
 export default function AnalyticsPage() {
   const { user } = useAuth();
@@ -300,7 +301,7 @@ export default function AnalyticsPage() {
                       },
                       {
                         label: "Top Campaigns",
-                        value: overview.topCampaigns.length,
+                        value: (overview.topCampaigns ?? []).length,
                       },
                     ].map((item) => (
                       <div
@@ -326,6 +327,9 @@ export default function AnalyticsPage() {
 
             case "donation-analytics":
               return <DonationAnalyticsSection />;
+
+            case "user-stats":
+              return <UserStatsSection />;
 
             default:
               return null;

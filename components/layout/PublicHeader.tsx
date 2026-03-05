@@ -82,7 +82,7 @@ export default function PublicHeader({ className }: Props) {
           {isAuthenticated ? (
             <Link
               href={ROUTES.DASHBOARD}
-              className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
+              className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-ds-text-secondary rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
               Dashboard
             </Link>
           ) : (
@@ -94,7 +94,7 @@ export default function PublicHeader({ className }: Props) {
               </Link>
               <Link
                 href={ROUTES.REGISTER}
-                className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-white rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
+                className="public-nav-cta px-4 py-2 bg-ds-brand-accent text-ds-text-secondary rounded-ds-lg text-sm font-medium hover:bg-ds-brand-accent-hover hover:glow-border transition-all">
                 Enlist Now
               </Link>
             </>

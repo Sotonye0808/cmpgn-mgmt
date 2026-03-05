@@ -140,4 +140,9 @@ export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[]
         label: "Deployment Proofs",
         allowedRoles: [ROLE.SUPER_ADMIN],
     },
+    {
+        key: "user-stats",
+        label: "User Stats & Contributions",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
 ];

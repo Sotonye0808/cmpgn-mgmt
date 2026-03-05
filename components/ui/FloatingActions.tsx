@@ -6,7 +6,7 @@ import { Tooltip } from "antd";
 import { ICONS } from "@/config/icons";
 
 export default function FloatingActions() {
-  const { setTheme, resolvedTheme } = useTheme();
+  const { setTheme, resolvedTheme, theme } = useTheme();
   const [mounted, setMounted] = useState(false);
   const [showScrollTop, setShowScrollTop] = useState(false);
 
@@ -25,11 +25,22 @@ export default function FloatingActions() {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const toggleTheme = () => {
-    setTheme(resolvedTheme === "dark" ? "light" : "dark");
+  // Cycle: system → dark → light → system
+  const cycleTheme = () => {
+    if (theme === "system") setTheme("dark");
+    else if (theme === "dark") setTheme("light");
+    else setTheme("system");
   };
 
-  const isDark = resolvedTheme === "dark";
+  const ThemeIcon =
+    theme === "system" ? ICONS.monitor : resolvedTheme === "dark" ? ICONS.sun : ICONS.moon;
+
+  const themeTooltip =
+    theme === "system"
+      ? "System theme (auto) — click for Dark"
+      : theme === "dark"
+      ? "Dark mode — click for Light"
+      : "Light mode — click for System (auto)";
 
   return (
     <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-2 items-center">
@@ -52,16 +63,12 @@ export default function FloatingActions() {
 
       {/* Theme toggle — always visible once mounted */}
       {mounted && (
-        <Tooltip title={isDark ? "Light mode" : "Dark mode"} placement="left">
+        <Tooltip title={themeTooltip} placement="left">
           <button
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
+            onClick={cycleTheme}
+            aria-label="Cycle theme"
             className="w-10 h-10 rounded-ds-xl border border-ds-border-base bg-ds-surface-elevated/80 backdrop-blur-sm text-ds-text-secondary hover:text-ds-brand-accent hover:border-ds-brand-accent/50 hover:bg-ds-surface-elevated transition-all shadow-lg flex items-center justify-center">
-            {isDark ? (
-              <ICONS.sun className="text-sm" />
-            ) : (
-              <ICONS.moon className="text-sm" />
-            )}
+            <ThemeIcon className="text-sm" />
           </button>
         </Tooltip>
       )}

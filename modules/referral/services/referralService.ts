@@ -75,9 +75,24 @@ export async function attributeReferral(
             },
         });
 
+        // Log a CONVERSION LinkEvent so analytics.engagement.conversions reflects this
+        await tx.linkEvent.create({
+            data: {
+                linkId: link.id,
+                eventType: "CONVERSION" as never,
+                userId: registeredUserId,
+            },
+        });
+
         await redis.invalidatePattern(`referrals:user:${link.userId}`);
         await redis.invalidatePattern(`engagement:user:${link.userId}`);
         await redis.del(`points:summary:${link.userId}`);
+        // Invalidate analytics caches so conversion stats update immediately
+        await redis.del(`analytics:user:${link.userId}`);
+        if (link.campaignId) {
+            await redis.del(`analytics:campaign:${link.campaignId}`);
+        }
+        await redis.del("analytics:overview");
 
         return newReferral;
     });
@@ -150,6 +165,9 @@ async function attributePlatformReferral(
         redis.invalidatePattern(`referrals:user:${inviter.id}`),
         redis.invalidatePattern(`engagement:user:${inviter.id}`),
         redis.del(`points:summary:${inviter.id}`),
+        // Invalidate analytics so referral count updates immediately on the analytics page
+        redis.del(`analytics:user:${inviter.id}`),
+        redis.del("analytics:overview"),
     ]);
 
     return { ...newReferral, createdAt: newReferral.createdAt.toISOString() } as unknown as Referral;
