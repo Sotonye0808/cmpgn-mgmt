@@ -60,19 +60,22 @@ export default function DashboardLayout({
         </div>
       </div>
 
-      {/* Scroll-to-top FAB — appears after 300px of downward scroll */}
+      {/* Scroll-to-top FAB — appears after 300px of downward scroll.
+           Styled to match the FloatingActions glass buttons for consistency. */}
       {showScrollTop && (
         <button
           type="button"
           onClick={scrollToTop}
           aria-label="Back to top"
           className={cn(
-            "fixed bottom-20 right-4 md:bottom-8 md:right-6 z-50",
-            "w-10 h-10 flex items-center justify-center rounded-ds-full",
-            "bg-ds-brand-accent text-white shadow-ds-lg",
-            "hover:bg-ds-brand-accent-hover transition-all duration-200",
+            "fixed bottom-20 right-4 md:bottom-6 md:right-6 z-50",
+            "w-10 h-10 flex items-center justify-center rounded-ds-xl",
+            "border border-ds-border-base bg-ds-surface-elevated/80 backdrop-blur-sm",
+            "text-ds-text-secondary shadow-lg",
+            "hover:text-ds-brand-accent hover:border-ds-brand-accent/50 hover:bg-ds-surface-elevated",
+            "transition-all duration-200",
           )}>
-          <ICONS.arrowUp className="text-base" />
+          <ICONS.arrowUp className="text-sm" />
         </button>
       )}
     </div>

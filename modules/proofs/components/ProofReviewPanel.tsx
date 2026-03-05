@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Select, Popconfirm, Input, App } from "antd";
+import { Select, Popconfirm, Input, App, Pagination } from "antd";
 import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import ProofList, { ProofStatusFilter } from "./ProofList";
@@ -21,6 +21,8 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [batchNotes, setBatchNotes] = useState("");
+  const [currentPage, setCurrentPage] = useState(1);
+  const PAGE_SIZE = 6;
 
   const { proofs, loading, refresh } = useProofs(
     filterCampaignId || undefined,
@@ -42,12 +44,22 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
     ...campaigns.map((c) => ({ value: c.id, label: c.title })),
   ];
 
-  const filtered = useMemo(
-    () =>
-      filterStatus
-        ? proofs.filter((p) => (p.status as string) === filterStatus)
-        : proofs,
-    [proofs, filterStatus],
+  const filtered = useMemo(() => {
+    const list = filterStatus
+      ? proofs.filter((p) => (p.status as string) === filterStatus)
+      : proofs;
+    return list;
+  }, [proofs, filterStatus]);
+
+  // Reset to page 1 whenever the filter changes
+  const handleFilterChange = (setter: (v: string) => void) => (val: string) => {
+    setter(val);
+    setCurrentPage(1);
+  };
+
+  const paginatedProofs = filtered.slice(
+    (currentPage - 1) * PAGE_SIZE,
+    currentPage * PAGE_SIZE,
   );
 
   const pendingCount = proofs.filter(
@@ -88,7 +100,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
         <div className="flex flex-wrap gap-2">
           <Select
             value={filterCampaignId}
-            onChange={setFilterCampaignId}
+            onChange={handleFilterChange(setFilterCampaignId)}
             options={campaignOptions}
             placeholder={PROOFS_PAGE_CONTENT.campaignFilterLabel}
             className="w-56"
@@ -99,7 +111,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
                 .includes(input.toLowerCase())
             }
           />
-          <ProofStatusFilter value={filterStatus} onChange={setFilterStatus} />
+          <ProofStatusFilter value={filterStatus} onChange={handleFilterChange(setFilterStatus)} />
         </div>
       </div>
 
@@ -142,7 +154,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
       )}
 
       <ProofList
-        proofs={filtered}
+        proofs={paginatedProofs}
         loading={loading}
         canReview
         onReviewed={refresh}
@@ -152,6 +164,25 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
         selectedIds={selectedIds}
         onSelectionChange={setSelectedIds}
       />
+
+      {/* Pagination — only shown when there are more proofs than one page */}
+      {filtered.length > PAGE_SIZE && (
+        <div className="flex items-center justify-between mt-4 pt-4 border-t border-ds-border-subtle">
+          <p className="text-xs text-ds-text-subtle">
+            Showing {(currentPage - 1) * PAGE_SIZE + 1}–
+            {Math.min(currentPage * PAGE_SIZE, filtered.length)} of{" "}
+            {filtered.length} proofs
+          </p>
+          <Pagination
+            current={currentPage}
+            pageSize={PAGE_SIZE}
+            total={filtered.length}
+            onChange={setCurrentPage}
+            size="small"
+            showSizeChanger={false}
+          />
+        </div>
+      )}
     </GlassCard>
   );
 }

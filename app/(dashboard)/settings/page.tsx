@@ -3,6 +3,7 @@
 import { useState } from "react";
 import {
   Card,
+  Modal,
   Tabs,
   Typography,
   Form,
@@ -39,6 +40,7 @@ function ProfileSection() {
     user?.profilePicture,
   );
   const [avatarPickerOpen, setAvatarPickerOpen] = useState(false);
+  const [pendingAvatarUrl, setPendingAvatarUrl] = useState<string | undefined>(undefined);
   const [form] = Form.useForm();
 
   const initials = user
@@ -80,12 +82,12 @@ function ProfileSection() {
             size={64}
             src={avatarUrl}
             className="bg-ds-brand-accent text-white font-bold text-xl cursor-pointer"
-            onClick={() => setAvatarPickerOpen(!avatarPickerOpen)}>
+            onClick={() => { setAvatarPickerOpen(true); setPendingAvatarUrl(avatarUrl); }}>
             {!avatarUrl && initials}
           </Avatar>
           <div
             className="absolute inset-0 flex items-center justify-center bg-black/40 rounded-full opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer"
-            onClick={() => setAvatarPickerOpen(!avatarPickerOpen)}>
+            onClick={() => { setAvatarPickerOpen(true); setPendingAvatarUrl(avatarUrl); }}>
             <ICONS.edit className="text-white text-sm" />
           </div>
         </div>
@@ -100,21 +102,25 @@ function ProfileSection() {
         </div>
       </div>
 
-      {avatarPickerOpen && (
-        <Card
-          size="small"
-          title="Choose Avatar"
-          bordered={false}
-          className="bg-ds-surface-base border border-ds-border-subtle">
-          <AvatarPicker
-            value={avatarUrl}
-            onChange={(url) => {
-              setAvatarUrl(url);
-              setAvatarPickerOpen(false);
-            }}
-          />
-        </Card>
-      )}
+      <Modal
+        open={avatarPickerOpen}
+        title="Choose Your Avatar"
+        width={680}
+        maskClosable={false}
+        onCancel={() => { setAvatarPickerOpen(false); setPendingAvatarUrl(undefined); }}
+        onOk={() => {
+          if (pendingAvatarUrl) setAvatarUrl(pendingAvatarUrl);
+          setAvatarPickerOpen(false);
+          setPendingAvatarUrl(undefined);
+        }}
+        okText="Apply Avatar"
+        cancelText="Cancel"
+        destroyOnClose>
+        <AvatarPicker
+          value={pendingAvatarUrl ?? avatarUrl}
+          onChange={(url) => setPendingAvatarUrl(url)}
+        />
+      </Modal>
 
       <Form
         form={form}
