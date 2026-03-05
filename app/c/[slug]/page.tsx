@@ -34,14 +34,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     const description = campaign?.description
         ? campaign.description.slice(0, 160)
         : `You've been invited to deploy this campaign with ${SITE_CONFIG.name}.`;
-    // Priority: explicit metaImage → IMAGE mediaUrl → thumbnailUrl → default OG
-    // Append ?v={updatedAt} so social platforms re-fetch the image when campaign
-    // media is updated (crawlers cache OG images keyed to URL; a new URL busts the cache).
+
+    // ── OG image resolution ────────────────────────────────────────────────
+    // Priority order (first truthy value wins):
+    //   1. campaign.metaImage          — explicit OG override set in the form
+    //   2. campaign.thumbnailUrl       — always safe: Cloudinary poster-frame jpg
+    //      (for videos this is the frame-at-1s jpg; for images it's the 400px scaled version)
+    //   3. campaign.mediaUrl ONLY for image media — raw mediaUrl is an MP4/video
+    //      stream for video campaigns; crawlers reject non-image content-types
+    //   4. SITE_CONFIG.ogImage         — branded fallback
+    //
+    // NOTE: We intentionally avoid using mediaUrl when mediaType is VIDEO
+    // because Cloudinary serves the file as video/mp4 and no web crawler will
+    // render it as an OG image. thumbnailUrl is always the poster-frame JPEG.
     const rawImage =
         campaign?.metaImage ??
-        (campaign?.mediaType === "IMAGE" && campaign?.mediaUrl ? campaign.mediaUrl : null) ??
         campaign?.thumbnailUrl ??
+        (campaign?.mediaType === "IMAGE" ? campaign?.mediaUrl ?? null : null) ??
         SITE_CONFIG.ogImage;
+
+    // Append ?v={updatedAt} so social platforms invalidate their cached preview
+    // whenever campaign media is updated (cache busting via URL change).
     const versionParam = campaign?.updatedAt
         ? `${rawImage.includes("?") ? "&" : "?"}v=${campaign.updatedAt.getTime()}`
         : "";
@@ -65,6 +78,12 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
             title,
             description,
             images: [image],
+        },
+        // Tell CDNs / proxies not to cache this page — so social crawlers
+        // that re-scrape a link always read the latest OG tags, not a stale
+        // edge-cached version with the old/missing image.
+        other: {
+            "Cache-Control": "no-store, must-revalidate",
         },
     };
 }
