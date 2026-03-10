@@ -532,6 +532,7 @@ declare global {
         totalClicks: number;
         totalShares: number;
         totalViews: number;
+        totalConversions: number;
         totalSmartLinks: number;
         totalReferrals: number;
         engagementRate: number;

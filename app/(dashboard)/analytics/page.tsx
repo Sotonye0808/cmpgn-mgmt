@@ -188,7 +188,7 @@ export default function AnalyticsPage() {
                           },
                           {
                             label: "Conversion Rate",
-                            value: `${(campaignAnalytics.fundraising.conversionRate * 100).toFixed(1)}%`,
+                            value: `${campaignAnalytics.fundraising.conversionRate.toFixed(1)}%`,
                           },
                           {
                             label: "Top Performers",
@@ -295,6 +295,10 @@ export default function AnalyticsPage() {
                       {
                         label: "Total Views",
                         value: overview.totalViews.toLocaleString(),
+                      },
+                      {
+                        label: "Total Conversions",
+                        value: overview.totalConversions.toLocaleString(),
                       },
                       {
                         label: "Engagement Rate",

@@ -67,7 +67,7 @@ export default function FundraisingProgress({
             Conversion Rate
           </div>
           <div className="text-xl font-bold text-ds-text-primary">
-            {(stats.conversionRate * 100).toFixed(1)}%
+            {stats.conversionRate.toFixed(1)}%
           </div>
         </div>
       </div>
