@@ -1,6 +1,6 @@
 "use client";
 
-import { Table } from "antd";
+import { Table, Button, Tooltip } from "antd";
 import type {
   ColumnGroupType,
   ColumnType,
@@ -8,10 +8,34 @@ import type {
   TableProps,
 } from "antd/es/table";
 import { cn } from "@/lib/utils/cn";
+import { exportToExcel } from "@/lib/utils/exportExcel";
+import { ICONS } from "@/config/icons";
+
+interface ExportConfig<T> {
+  /** Filename without extension. Defaults to "export". */
+  filename?: string;
+  /**
+   * Map from row object key → column header label used in the exported file.
+   * When omitted, all keys in the data objects are exported with their raw names.
+   * Pass an ordered partial record to control ordering and label overrides.
+   */
+  headers?: Partial<Record<keyof T, string>>;
+  /**
+   * Optional transformer to convert the table dataSource into the flat objects
+   * that will be written to the sheet. Useful when cells render computed values.
+   * When omitted, the raw dataSource objects are exported as-is.
+   */
+  toRow?: (item: T) => Record<string, unknown>;
+}
 
 interface DataTableProps<T extends object> extends TableProps<T> {
   /** Extra classes applied to the outer wrapper div. */
   wrapperClassName?: string;
+  /**
+   * When provided, an Export button is rendered above the table. Clicking it
+   * downloads the current dataSource as an Excel (.xlsx) file.
+   */
+  exportConfig?: ExportConfig<T>;
   /**
    * Max height of the scrollable table body (px number or CSS string).
    * Enables a sticky header + vertical body scroll within the container.
@@ -93,19 +117,45 @@ export default function DataTable<T extends object>({
   className,
   maxBodyHeight = "calc(100vh - 280px)",
   compactCells = false,
+  exportConfig,
   columns,
   ...props
 }: DataTableProps<T>) {
   const scrollY = maxBodyHeight === false ? undefined : maxBodyHeight;
 
+  const handleExport = () => {
+    const source = (props.dataSource ?? []) as T[];
+    if (source.length === 0) return;
+    const rows = exportConfig?.toRow
+      ? source.map(exportConfig.toRow)
+      : (source as unknown as Record<string, unknown>[]);
+    exportToExcel(
+      rows,
+      exportConfig?.filename ?? "export",
+      exportConfig?.headers as Partial<Record<string, string>> | undefined,
+    );
+  };
+
   return (
-    <div
-      className={cn(
+    <div className={cn("space-y-2", wrapperClassName)}>
+      {exportConfig && (
+        <div className="flex justify-end">
+          <Tooltip title="Export to Excel">
+            <Button
+              icon={<ICONS.download />}
+              onClick={handleExport}
+              disabled={!props.dataSource || (props.dataSource as T[]).length === 0}>
+              Export
+            </Button>
+          </Tooltip>
+        </div>
+      )}
+      <div
+        className={cn(
         // overflow-hidden clips corners to match the rounded border AND lets
         // AntD's INTERNAL scroll container (.ant-table-body) handle horizontal +
         // vertical overflow. Do NOT add overflow-x-auto here.
         "w-full overflow-hidden rounded-ds-xl border border-ds-border-base bg-ds-surface-elevated",
-        wrapperClassName,
       )}>
       <Table<T>
         {...props}
@@ -141,6 +191,7 @@ export default function DataTable<T extends object>({
               }
         }
       />
+    </div>
     </div>
   );
 }

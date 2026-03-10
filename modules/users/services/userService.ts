@@ -10,6 +10,7 @@ export interface UserListItem {
     email: string;
     firstName: string;
     lastName: string;
+    phone: string | null;
     role: string;
     createdAt: string;
     isActive: boolean;
@@ -40,6 +41,7 @@ export async function listUsers(
         email: u.email,
         firstName: u.firstName,
         lastName: u.lastName,
+        phone: u.whatsappNumber ?? null,
         role: u.role as string,
         createdAt: u.createdAt.toISOString(),
         isActive: u.isActive,
@@ -88,6 +90,7 @@ export async function changeUserRole(
         email: updated.email,
         firstName: updated.firstName,
         lastName: updated.lastName,
+        phone: updated.whatsappNumber ?? null,
         role: updated.role as string,
         createdAt: updated.createdAt.toISOString(),
         isActive: updated.isActive,
