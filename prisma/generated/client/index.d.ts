@@ -25916,7 +25916,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -25960,7 +25960,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -26092,7 +26092,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -31329,7 +31329,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -31372,7 +31372,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -32426,7 +32426,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -32469,7 +32469,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -32517,7 +32517,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -32560,7 +32560,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -33262,7 +33262,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -33305,7 +33305,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -33594,7 +33594,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -33637,7 +33637,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -34153,7 +34153,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -34196,7 +34196,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -34560,7 +34560,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -34603,7 +34603,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -35036,7 +35036,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -35079,7 +35079,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -35368,7 +35368,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -35411,7 +35411,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -36057,7 +36057,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -36100,7 +36100,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -36873,7 +36873,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -36916,7 +36916,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -37205,7 +37205,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null
@@ -37969,7 +37969,7 @@ export namespace Prisma {
     id?: string
     title: string
     description: string
-    content: string
+    content?: string
     media?: JsonNullValueInput | InputJsonValue
     mediaType?: $Enums.CampaignMediaType | null
     mediaUrl?: string | null

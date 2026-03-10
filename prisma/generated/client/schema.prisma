@@ -172,7 +172,7 @@ model Campaign {
   id               String             @id @default(cuid())
   title            String
   description      String             @db.Text
-  content          String             @db.Text
+  content          String             @default("") @db.Text
   media            Json               @default("[]") // CampaignMedia[]
   mediaType        CampaignMediaType?
   mediaUrl         String?
