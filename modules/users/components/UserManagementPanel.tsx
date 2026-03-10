@@ -108,6 +108,14 @@ export default function UserManagementPanel() {
       ),
     },
     {
+      title: "Phone",
+      dataIndex: "phone",
+      key: "phone",
+      render: (phone: string | null) => (
+        <span className="text-ds-text-secondary">{phone ?? "—"}</span>
+      ),
+    },
+    {
       title: USERS_PAGE_CONTENT.roleLabel,
       dataIndex: "role",
       key: "role",
@@ -186,6 +194,18 @@ export default function UserManagementPanel() {
             rowKey="id"
             size="small"
             pagination={{ pageSize: 15 }}
+            exportConfig={{
+              filename: "users",
+              toRow: (u) => ({
+                "First Name": u.firstName,
+                "Last Name": u.lastName,
+                "Email": u.email,
+                "Phone": u.phone ?? "",
+                "Role": u.role,
+                "Joined": formatDate(u.createdAt),
+                "Active": u.isActive ? "Yes" : "No",
+              }),
+            }}
           />
         )}
       </div>

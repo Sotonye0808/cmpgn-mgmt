@@ -2,6 +2,7 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { CACHE_TTL_ANALYTICS } from "@/lib/constants";
 import { getRankProgress } from "@/modules/leaderboard/services/leaderboardService";
+import { getReferralStats } from "@/modules/referral/services/referralService";
 
 // ─── User Analytics ───────────────────────────────────────────────────────────
 
@@ -65,16 +66,10 @@ export async function getUserAnalytics(userId: string): Promise<UserAnalytics> {
     // Rank progress
     const rank = getRankProgress(total);
 
-    // Referral stats
-    const referralStats: ReferralStats = {
-        userId,
-        totalReferrals: referrals.length,
-        activeReferrals: referrals.length,
-        conversionRate: links.length > 0
-            ? Number(((conversions / Math.max(clicks, 1)) * 100).toFixed(1))
-            : 0,
-        directInvites: referrals.length,
-    };
+    // Referral stats — delegate to the canonical implementation so the
+    // conversion-rate formula (converted_referrals / total_referrals) stays
+    // consistent everywhere.
+    const referralStats = await getReferralStats(userId);
 
     // Donation summary
     const toNum = (val: unknown): number => {
@@ -321,6 +316,7 @@ export async function getOverviewAnalytics(): Promise<OverviewAnalytics> {
         totalClicks,
         totalShares,
         totalViews,
+        totalConversions,
         totalSmartLinks,
         totalReferrals,
         engagementRate,

@@ -92,6 +92,34 @@ export const KPI_CARDS: (KpiCardConfig & { allowedRoles: RoleValue[] })[] = [
         color: "#DC2626",
         allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
     },
+    {
+        key: "conversions",
+        label: "My Conversions",
+        icon: "check",
+        color: "#16A34A",
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "conversionRate",
+        label: "Conv. Rate",
+        icon: "trend",
+        color: "#0891B2",
+        allowedRoles: [ROLE.USER, ROLE.TEAM_LEAD, ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "totalConversions",
+        label: "Platform Conversions",
+        icon: "check",
+        color: "#16A34A",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
+    {
+        key: "engagementRate",
+        label: "Engagement Rate",
+        icon: "trend",
+        color: "#0891B2",
+        allowedRoles: [ROLE.ADMIN, ROLE.SUPER_ADMIN],
+    },
 ];
 
 export const ANALYTICS_SECTIONS: (PageSection & { allowedRoles: RoleValue[] })[] = [

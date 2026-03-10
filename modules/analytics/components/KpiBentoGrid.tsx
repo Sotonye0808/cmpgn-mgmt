@@ -56,6 +56,18 @@ export default function KpiBentoGrid({
         return overview?.totalSmartLinks ?? null;
       case "totalReferrals":
         return overview?.totalReferrals ?? null;
+      case "conversions":
+        return analytics?.engagement.conversions ?? null;
+      case "conversionRate":
+        return analytics?.referrals.conversionRate != null
+          ? `${Math.round(analytics.referrals.conversionRate * 100)}%`
+          : null;
+      case "totalConversions":
+        return overview?.totalConversions ?? null;
+      case "engagementRate":
+        return overview?.engagementRate != null
+          ? `${overview.engagementRate}%`
+          : null;
       default:
         return null;
     }
