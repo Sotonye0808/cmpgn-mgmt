@@ -228,27 +228,33 @@ export async function getReferralStats(
         where: campaignId ? { inviterId: userId, campaignId } : { inviterId: userId },
     });
 
-    // "active" = invitee is still an active user
     const inviteeIds = all.map((r) => r.inviteeId);
-    const activeCount = await prisma.user.count({
-        where: { id: { in: inviteeIds }, isActive: true },
-    });
+    const referralIds = all.map((r) => r.id);
 
-    // invitees with a participation are counted as converted
-    const convertedCount = await prisma.campaignParticipation.count({
-        where: {
-            userId: { in: inviteeIds },
-            ...(campaignId ? { campaignId } : {}),
-        },
-    });
+    // Run active-user count and points aggregate in parallel
+    const [activeCount, pointsEarned] = await Promise.all([
+        inviteeIds.length > 0
+            ? prisma.user.count({ where: { id: { in: inviteeIds }, isActive: true } })
+            : Promise.resolve(0),
+        referralIds.length > 0
+            ? prisma.pointsLedgerEntry.aggregate({
+                _sum: { value: true },
+                where: { userId, referenceId: { in: referralIds } },
+            }).then((r) => r._sum.value ?? 0)
+            : Promise.resolve(0),
+    ]);
 
     const stats: ReferralStats = {
         userId,
         campaignId,
         totalReferrals: all.length,
         activeReferrals: activeCount,
-        conversionRate: all.length > 0 ? convertedCount / all.length : 0,
+        // conversionRate = share of referred users who are still active.
+        // A Referral record is only created after successful registration, so
+        // activeCount / totalReferrals is the correct active-conversion metric.
+        conversionRate: all.length > 0 ? activeCount / all.length : 0,
         directInvites: all.length,
+        pointsEarned,
     };
 
     await redis.set(cacheKey, stats, 30_000);

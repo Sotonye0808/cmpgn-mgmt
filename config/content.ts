@@ -251,6 +251,9 @@ export const REFERRAL_PAGE_CONTENT = {
         { title: "Earn points", description: "You receive referral points for each successful signup and ongoing cascade points." },
     ],
     emptyState: "You haven't referred anyone yet. Share your invite link to get started!",
+    pointsInsightsTitle: "Your Referral Earnings",
+    pointsInsightsDescription: "You earn Leadership Points for every signup through your referral link, plus a 10% cascade bonus on all points your referrals earn.",
+    pointsEarnedLabel: "Total Leadership Points from your referral network",
 } as const;
 
 export const POINTS_PAGE_CONTENT = {

@@ -68,6 +68,32 @@ export default function ReferralsPage() {
         </GlassCard>
       ) : null}
 
+      {/* Points Insights Section */}
+      {stats && stats.pointsEarned > 0 && (
+        <GlassCard>
+          <h2 className="text-lg font-semibold text-ds-text-primary mb-1">
+            {c.pointsInsightsTitle}
+          </h2>
+          <p className="text-sm text-ds-text-secondary mb-4">
+            {c.pointsInsightsDescription}
+          </p>
+          <div className="flex items-center gap-4 p-4 bg-ds-surface-elevated rounded-ds-lg border border-ds-brand-accent/30">
+            <ICONS.trophy
+              style={{ fontSize: 36 }}
+              className="text-ds-brand-accent shrink-0"
+            />
+            <div>
+              <div className="text-3xl font-bold text-ds-brand-accent font-ds-mono">
+                +{stats.pointsEarned}
+              </div>
+              <div className="text-xs text-ds-text-subtle mt-0.5">
+                {c.pointsEarnedLabel}
+              </div>
+            </div>
+          </div>
+        </GlassCard>
+      )}
+
       {/* How it works */}
       <GlassCard>
         <h2 className="text-lg font-semibold text-ds-text-primary mb-4">

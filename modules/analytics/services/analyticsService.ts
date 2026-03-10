@@ -26,7 +26,12 @@ export async function getUserAnalytics(userId: string): Promise<UserAnalytics> {
     const clicks = events.filter((e) => e.eventType === "CLICK").length;
     const shares = events.filter((e) => e.eventType === "SHARE").length;
     const views = events.filter((e) => e.eventType === "VIEW").length;
-    const conversions = events.filter((e) => e.eventType === "CONVERSION").length;
+    // conversions = total referrals made by this user.
+    // Using the Referral count as the source of truth because:
+    //  - Smart-link referrals create CONVERSION LinkEvents  → counted here
+    //  - Platform-invite referrals do NOT create LinkEvents → would be missed
+    // Every Referral record already represents a successful click-to-registration.
+    const conversions = referrals.length;
     const uniqueVisitors = new Set(events.map((e) => e.ipAddress).filter(Boolean)).size;
 
     const engagement: EngagementStats = {
@@ -300,12 +305,17 @@ export async function getOverviewAnalytics(): Promise<OverviewAnalytics> {
     const totalClicks = eventCountMap.get("CLICK") ?? 0;
     const totalShares = eventCountMap.get("SHARE") ?? 0;
     const totalViews = eventCountMap.get("VIEW") ?? 0;
-    const totalConversions = eventCountMap.get("CONVERSION") ?? 0;
+    // Use the Referral table as the canonical conversion count.
+    // CONVERSION LinkEvents only cover smart-link referrals; platform-invite
+    // referrals do not create LinkEvents but ARE real registrations.
+    const totalConversions = totalReferrals;
 
-    // Engagement rate: conversions / clicks (if any)
+    // Engagement rate: referral conversions / smart-link clicks.
+    // Falls back to 100 when conversions exist but clicks aren't tracked
+    // (i.e. all traffic came through platform invite URLs, not tracked smart links).
     const engagementRate = totalClicks > 0
         ? Number(((totalConversions / totalClicks) * 100).toFixed(1))
-        : 0;
+        : totalConversions > 0 ? 100 : 0;
 
     const result: OverviewAnalytics = {
         totalUsers,

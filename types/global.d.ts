@@ -427,6 +427,7 @@ declare global {
         activeReferrals: number;
         conversionRate: number;
         directInvites: number;
+        pointsEarned: number;
     }
 
     // ─── Points / Gamification ───────────────────────────────────────────────────

@@ -20,9 +20,16 @@ export async function getUserEngagement(
     });
     const linkIds = userLinks.map((l) => l.id);
 
-    const events = await prisma.linkEvent.findMany({
-        where: { linkId: { in: linkIds } },
-    });
+    // Fetch link events and referral count in parallel.
+    // Referral count is the authoritative conversion figure: every Referral record
+    // represents a completed click-to-registration. Platform-invite referrals never
+    // create CONVERSION LinkEvents, so counting only events would undercount.
+    const [events, referralCount] = await Promise.all([
+        prisma.linkEvent.findMany({ where: { linkId: { in: linkIds } } }),
+        prisma.referral.count({
+            where: campaignId ? { inviterId: userId, campaignId } : { inviterId: userId },
+        }),
+    ]);
 
     const stats: EngagementStats = {
         userId,
@@ -30,15 +37,10 @@ export async function getUserEngagement(
         clicks: events.filter((e) => (e.eventType ?? e.type) === "CLICK").length,
         views: events.filter((e) => (e.eventType ?? e.type) === "VIEW").length,
         shares: events.filter((e) => (e.eventType ?? e.type) === "SHARE").length,
-        conversions: events.filter((e) => (e.eventType ?? e.type) === "CONVERSION").length,
-        referrals: 0,
+        conversions: referralCount, // each successful referral registration = a conversion
+        referrals: referralCount,
         uniqueVisitors: new Set(events.map((e) => e.ipHash ?? e.ipAddress ?? "")).size,
     };
-
-    const referralCount = await prisma.referral.count({
-        where: campaignId ? { inviterId: userId, campaignId } : { inviterId: userId },
-    });
-    stats.referrals = referralCount;
 
     await redis.set(cacheKey, stats, CACHE_TTL_ENGAGEMENT);
     return stats;
@@ -56,11 +58,10 @@ export async function getCampaignEngagement(campaignId: string): Promise<Engagem
     });
     const linkIds = campaignLinks.map((l) => l.id);
 
-    const events = await prisma.linkEvent.findMany({
-        where: { linkId: { in: linkIds } },
-    });
-
-    const referralCount = await prisma.referral.count({ where: { campaignId } });
+    const [events, referralCount] = await Promise.all([
+        prisma.linkEvent.findMany({ where: { linkId: { in: linkIds } } }),
+        prisma.referral.count({ where: { campaignId } }),
+    ]);
 
     const stats: EngagementStats = {
         userId: "aggregate",
@@ -68,7 +69,7 @@ export async function getCampaignEngagement(campaignId: string): Promise<Engagem
         clicks: events.filter((e) => (e.eventType ?? e.type) === "CLICK").length,
         views: events.filter((e) => (e.eventType ?? e.type) === "VIEW").length,
         shares: events.filter((e) => (e.eventType ?? e.type) === "SHARE").length,
-        conversions: events.filter((e) => (e.eventType ?? e.type) === "CONVERSION").length,
+        conversions: referralCount, // each campaign referral registration = a conversion
         referrals: referralCount,
         uniqueVisitors: new Set(events.map((e) => e.ipHash ?? e.ipAddress ?? "")).size,
     };
