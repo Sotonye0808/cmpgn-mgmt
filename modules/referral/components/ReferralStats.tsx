@@ -63,6 +63,22 @@ export default function ReferralStats({
           {Math.round(stats.conversionRate * 100)}%
         </span>
       </div>
+
+      {/* Points earned card */}
+      {stats.pointsEarned > 0 && (
+        <div className="flex flex-col gap-1.5 p-4 bg-ds-surface-elevated border border-ds-border-base rounded-ds-lg border-l-4 border-l-ds-chart-2">
+          <div className="flex items-center gap-2 text-ds-text-subtle text-xs">
+            <ICONS.trophy className="text-ds-chart-2" />
+            <span>Pts Earned</span>
+          </div>
+          <span className="text-2xl font-bold text-ds-text-primary font-ds-mono">
+            +{formatNumber(stats.pointsEarned)}
+          </span>
+          <span className="text-[11px] text-ds-text-subtle">
+            Leadership pts
+          </span>
+        </div>
+      )}
     </div>
   );
 }
