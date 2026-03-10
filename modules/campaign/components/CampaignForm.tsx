@@ -66,6 +66,12 @@ export default function CampaignForm({
   }, [initialValues, form]);
 
   const handleFinish = async (rawValues: Record<string, unknown>) => {
+    const mt = rawValues.mediaType as string | undefined;
+    const cfg =
+      mt && mt in MEDIA_TYPE_FIELDS
+        ? MEDIA_TYPE_FIELDS[mt as MediaTypeKey]
+        : null;
+
     const values = {
       ...rawValues,
       startDate: rawValues.startDate
@@ -74,6 +80,10 @@ export default function CampaignForm({
       endDate: rawValues.endDate
         ? (rawValues.endDate as ReturnType<typeof dayjs>).toISOString()
         : undefined,
+      // Strip fields that are irrelevant for the chosen media type
+      // so stale values from a previous type selection are never sent.
+      ...(!cfg?.showContent && { content: undefined }),
+      ...(!cfg?.showMediaUrl && !cfg?.showUpload && { mediaUrl: undefined }),
     };
     await onSubmit(values);
   };
@@ -156,6 +166,12 @@ export default function CampaignForm({
         <Form.Item
           label={CAMPAIGN_CONTENT.form.contentLabel}
           name="content"
+          rules={[
+            {
+              required: true,
+              message: "Content is required for text campaigns",
+            },
+          ]}
           extra={CAMPAIGN_CONTENT.form.contentHint}>
           <Input.TextArea rows={5} placeholder="Campaign body content..." />
         </Form.Item>
@@ -163,7 +179,16 @@ export default function CampaignForm({
 
       {/* Media URL — only for LINK */}
       {fieldConfig?.showMediaUrl && (
-        <Form.Item label={CAMPAIGN_CONTENT.form.mediaUrlLabel} name="mediaUrl">
+        <Form.Item
+          label={CAMPAIGN_CONTENT.form.mediaUrlLabel}
+          name="mediaUrl"
+          rules={[
+            {
+              required: true,
+              type: "url",
+              message: "A valid URL is required for link campaigns",
+            },
+          ]}>
           <Input placeholder="https://..." />
         </Form.Item>
       )}
@@ -173,6 +198,12 @@ export default function CampaignForm({
         <Form.Item
           label={CAMPAIGN_CONTENT.form.uploadLabel}
           name="mediaUrl"
+          rules={[
+            {
+              required: true,
+              message: "Please upload media for this campaign",
+            },
+          ]}
           extra={CAMPAIGN_CONTENT.form.uploadHint}>
           <MediaUpload
             accept={

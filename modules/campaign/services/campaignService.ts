@@ -110,7 +110,7 @@ export async function createCampaign(
         data: {
             title: input.title,
             description: input.description,
-            content: input.content,
+            content: input.content ?? "",
             media: (input.media ?? []) as never,
             mediaType: input.mediaType as never,
             mediaUrl: input.mediaUrl,
