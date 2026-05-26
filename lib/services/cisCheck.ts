@@ -1,4 +1,4 @@
-import { cisConfig } from "@/lib/config/cis";
+import { cisConfig } from "@/lib/config/cis-config";
 
 export type CrossPlatformCheckResult = {
   exists: boolean;
