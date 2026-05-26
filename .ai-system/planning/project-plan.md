@@ -4,6 +4,18 @@
 
 ---
 
+## Cross-Platform Account Detection (2026-05-26)
+
+> **Section summary:** Pre-signup email check against CIS backend to detect existing accounts on other platforms.
+
+**Feature Objective:**
+When a user enters their email during registration, check CIS to see if that email already has accounts on other platforms (MyHarvestHub, Reporting System, Faith Hub, etc.). If matches are found, display a prompt offering to sign in instead.
+
+**Implementation:**
+- `lib/services/cisCheck.ts` — service calling CIS check-email endpoint
+- `components/ui/CrossPlatformAccountPrompt.tsx` — inline prompt in register form
+- Check fires on email blur (800ms debounce)
+
 ## CIS Federation Rollout (2026-05-13)
 
 > **Section summary:** Add CIS readiness and signed webhook intake plus a non-destructive persistence layer.

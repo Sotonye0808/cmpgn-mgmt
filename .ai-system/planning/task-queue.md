@@ -4,6 +4,16 @@
 
 ---
 
+## Cross-Platform Account Detection (2026-05-26)
+
+> **Section summary:** Pre-signup email check against CIS backend to detect existing accounts on other platforms.
+
+- [x] Add `lib/services/cisCheck.ts` — service calling `GET /api/v1/users/check-email/:email`
+- [x] Add `components/ui/CrossPlatformAccountPrompt.tsx` — UI prompt for detected cross-platform accounts
+- [x] Wire email blur check in `app/(auth)/register/RegisterForm.tsx` — triggers CIS check on email field blur
+- [x] Block signup submission until cross-platform prompt is dismissed or no match found
+- [x] Update `.ai-system` docs with feature decisions
+
 ## Current Sprint
 
 > **Section summary:** Tasks actively being worked on. Agents pick the first incomplete task.

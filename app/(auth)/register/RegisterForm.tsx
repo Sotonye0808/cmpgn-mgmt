@@ -1,7 +1,7 @@
 "use client";
 
 import { Form, Input, Alert, Select } from "antd";
-import { useState } from "react";
+import { useState, useRef, useCallback } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { AUTH_CONTENT } from "@/config/content";
@@ -10,6 +10,11 @@ import Button from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import PhoneInput from "@/components/ui/PhoneInput";
 import { CAMPUS_OPTIONS } from "@/config/campuses";
+import CrossPlatformAccountPrompt from "@/components/ui/CrossPlatformAccountPrompt";
+import type { CrossPlatformAccountInfo } from "@/components/ui/CrossPlatformAccountPrompt";
+import { checkEmailCrossPlatform, type CrossPlatformCheckResult } from "@/lib/services/cisCheck";
+
+const CHECK_DEBOUNCE_MS = 800;
 
 export default function RegisterForm() {
   const { login } = useAuth();
@@ -17,8 +22,54 @@ export default function RegisterForm() {
   const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [crossPlatformAccount, setCrossPlatformAccount] = useState<CrossPlatformAccountInfo | null>(null);
+  const emailTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const lastCheckedEmailRef = useRef<string>("");
 
   const c = AUTH_CONTENT.register;
+
+  const doEmailCheck = useCallback(async (email: string) => {
+    if (!email || !email.includes("@")) {
+      setCrossPlatformAccount(null);
+      return;
+    }
+
+    if (lastCheckedEmailRef.current === email) return;
+    lastCheckedEmailRef.current = email;
+
+    try {
+      const result: CrossPlatformCheckResult | null = await checkEmailCrossPlatform(email);
+      if (result?.exists && result.platforms.length > 0) {
+        setCrossPlatformAccount({
+          platforms: result.platforms,
+          firstName: result.canonicalUser?.firstName ?? null,
+          lastName: result.canonicalUser?.lastName ?? null,
+          email: result.canonicalUser?.email ?? email,
+        });
+      } else {
+        setCrossPlatformAccount(null);
+      }
+    } catch {
+      // silently ignore
+    }
+  }, []);
+
+  const handleEmailBlur = useCallback(() => {
+    if (emailTimerRef.current) {
+      clearTimeout(emailTimerRef.current);
+    }
+    const email = (document.querySelector('[name="email"]') as HTMLInputElement)?.value;
+    if (email && typeof email === "string" && email.includes("@")) {
+      emailTimerRef.current = setTimeout(() => doEmailCheck(email), CHECK_DEBOUNCE_MS);
+    }
+  }, [doEmailCheck]);
+
+  const handleEmailChange = useCallback(() => {
+    setCrossPlatformAccount(null);
+    if (emailTimerRef.current) {
+      clearTimeout(emailTimerRef.current);
+    }
+  }, []);
 
   const handleSubmit = async (values: {
     email: string;
@@ -28,11 +79,13 @@ export default function RegisterForm() {
     whatsappNumber?: string;
     campus?: string;
   }) => {
+    if (crossPlatformAccount) {
+      return;
+    }
+
     setLoading(true);
     setError(null);
     try {
-      // Forward ?ref= slug for referral attribution
-      // Also check sessionStorage (set by SmartLinkRedirect) as fallback
       const ref =
         searchParams.get("ref") ||
         (() => {
@@ -49,7 +102,6 @@ export default function RegisterForm() {
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Registration failed");
-      // Auto-login after registration
       await login(values.email, values.password);
       const redirect = searchParams.get("redirect");
       router.push(
@@ -77,6 +129,13 @@ export default function RegisterForm() {
           className="mb-4 rounded-ds-lg"
           closable
           onClose={() => setError(null)}
+        />
+      )}
+
+      {crossPlatformAccount && (
+        <CrossPlatformAccountPrompt
+          account={crossPlatformAccount}
+          onContinue={() => setCrossPlatformAccount(null)}
         />
       )}
 
@@ -126,6 +185,8 @@ export default function RegisterForm() {
             placeholder={c.emailPlaceholder}
             size="large"
             className="rounded-ds-lg"
+            onBlur={handleEmailBlur}
+            onChange={handleEmailChange}
           />
         </Form.Item>
 
@@ -191,7 +252,8 @@ export default function RegisterForm() {
           variant="primary"
           size="large"
           block
-          className="mt-2">
+          className="mt-2"
+          disabled={!!crossPlatformAccount}>
           {c.submitButton}
         </Button>
       </Form>

@@ -50,3 +50,23 @@
 **Alternatives Considered:** Direct user upsert/mutation. Rejected until the payload contract is finalized and migration scope is approved.
 
 **Implications:** Future identity linking work can attach to the mapping table without refactoring the webhook contract.
+
+## Cross-Platform Account Detection via Pre-Signup Email Check
+
+**Decision:** When a user enters their email on the register form, check the CIS backend's `GET /api/v1/users/check-email/:email` endpoint to detect existing accounts on other platforms. If matches are found, display a prompt offering "Sign In Instead" or "Continue with Signup".
+**Date:** 2026-05-26
+**Made by:** AI implementation session
+
+**Reason:**
+Users could silently create duplicate, unlinked identities across platforms because signup only checked local email uniqueness. CIS already tracks platform-user mappings but had no pre-signup query surface.
+
+**Alternatives Considered:**
+- Only check on form submission (rejected: slower feedback, would need to abort submission which is poor UX)
+- Always allow signup and link accounts post-hoc via webhook reconciliation (rejected: creates orphan identities that need later cleanup)
+- Embed the check in the register API route (rejected: ties CIS availability to registration success/failure and creates coupling)
+
+**Implications:**
+- Check fires on email blur with 800ms debounce
+- Signup submission is blocked while cross-platform prompt is visible
+- When CIS is not configured, check silently returns null and signup proceeds normally
+- The "Sign In Instead" button navigates to /login
