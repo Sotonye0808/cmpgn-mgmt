@@ -1,6 +1,11 @@
 # Development History
 
-> **Overview:** Chronological log of completed development work. Each sprint ends with a summary entry. Agents add entries after completing tasks. Useful for understanding what has been built and when decisions were made.
+> **Metadata**
+> - last-updated-by: update-ai-system
+> - last-verified-against-code: 2026-07-01
+> - staleness-policy: historical entries do not go stale
+
+> **Overview:** Chronological log of completed development work. Each sprint ends with a summary entry. Agents add entries after completing tasks. Useful for understanding what has been built, when decisions were made, and what patterns have emerged.
 
 ---
 
@@ -10,7 +15,7 @@
 ## [Date] — [Sprint or Session Title]
 
 **Summary:**
-[2–4 sentence overview of what was accomplished]
+[2-4 sentence overview of what was accomplished]
 
 **Completed:**
 - [task 1]
@@ -64,6 +69,48 @@ Bootstrapped the `.ai-system` documentation and implemented the CIS handshake su
 
 **Next Sprint Focus:**
 Define the CIS payload contract and determine if/when user linking should occur.
+
+## 2026-07-01 — .ai-system v1 → v2 Migration
+
+**Summary:**
+Migrated the `.ai-system` from v1 to v2 structure. All project-specific content preserved and updated to v2 format with freshness metadata, complexity tags, supersedes fields, and auto-regenerable markers.
+
+**Completed:**
+
+- Copied v2 kit as base structure.
+- Migrated system-architecture.md, project-context.md, design-system.md, repair-system.md.
+- Updated task-queue.md with complexity tags and completed task history.
+- Updated project-plan.md with completed feature entries.
+- Updated repo-map.md and dependency-graph.md with project-specific content and auto-regenerable markers.
+- Migrated memory entries with supersedes fields.
+- Appended session log entries and dev history.
+- Created .ai-context.md with project overview.
+
+**Key Changes:**
+
+- .ai-system restructured to v2: protocols/, standards/, agents/ (role-based), commands/ (12 commands).
+- Entry point changed from `agents/general-instructions.md` to `protocols/entry-protocol.md`.
+- Quality gate expanded to 9 criteria including Pattern Adherence.
+
+**Next Sprint Focus:**
+Begin development tasks from task-queue.md.
+
+## 2026-07-01 — Post-Migration System Sync
+
+**Summary:**
+Ran `update-ai-system.md` to reconcile `.ai-system/` docs with actual repo state after the v1→v2 migration. Discovered significant drift: the repo has 12 domain modules (not 4), a rich API surface with 19 endpoint groups, real external dependencies (21 packages), and additional structural directories not previously documented.
+
+**Completed:**
+- Updated repo-map.md with full project structure including all 12 modules, 3 providers, shared hooks, config dir, and app page groups
+- Updated dependency-graph.md with all 21 external dependencies and inter-module relationships
+- Updated system-architecture.md with all 12 domain modules and supporting lib directories
+- Marked Foundation phase items as complete where applicable
+
+**Key Changes:**
+- No code changes — documentation synchronized to match existing codebase state
+
+**Next Sprint Focus:**
+Begin next development task from task-queue.md (CIS identity link workflows).
 
 ## [DATE] — Project Initialization
 
