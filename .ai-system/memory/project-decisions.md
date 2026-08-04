@@ -1,6 +1,11 @@
 # Project Decisions
 
-> **Overview:** Log of significant architectural, technical, and product decisions made during development. Agents consult this before proposing changes to avoid contradicting prior reasoning. Each entry records what was decided, why, and what the alternatives were.
+> **Metadata**
+> - last-updated-by: update-ai-system
+> - last-verified-against-code: 2026-07-01
+> - staleness-policy: each entry has its own staleness — check supersedes links
+
+> **Overview:** Log of significant architectural, technical, and product decisions. Agents consult this before proposing changes to avoid contradicting prior reasoning. Uses supersedes/superseded-by links so contradictory entries are explicitly resolved rather than both appearing equally valid.
 
 ---
 
@@ -11,7 +16,9 @@
 
 **Decision:** [What was decided]
 **Date:** [YYYY-MM-DD]
-**Made by:** [Developer / AI agent / team]
+**Made by:** [Role / Agent / Developer]
+**Supersedes:** [link to any prior decision this replaces, or None]
+**Superseded by:** [link to any newer decision that replaces this, or None]
 
 **Reason:**
 [Why this choice was made]
@@ -32,6 +39,8 @@
 **Decision:** CIS pushes signed identity events to DMHicc via webhooks.
 **Date:** 2026-05-13
 **Made by:** AI assistant
+**Supersedes:** None
+**Superseded by:** None
 
 **Reason:** The webhook surface is already present and provides low-latency identity propagation without polling.
 
@@ -44,6 +53,8 @@
 **Decision:** Persist CIS identity mappings in `CisIdentity` and event history in `CisWebhookEvent` without mutating local user records.
 **Date:** 2026-05-13
 **Made by:** AI assistant
+**Supersedes:** None
+**Superseded by:** None
 
 **Reason:** This keeps the integration low-risk and avoids schema coupling while still providing traceability for sync events.
 
@@ -56,6 +67,8 @@
 **Decision:** When a user enters their email on the register form, check the CIS backend's `GET /api/v1/users/check-email/:email` endpoint to detect existing accounts on other platforms. If matches are found, display a prompt offering "Sign In Instead" or "Continue with Signup".
 **Date:** 2026-05-26
 **Made by:** AI implementation session
+**Supersedes:** None
+**Superseded by:** None
 
 **Reason:**
 Users could silently create duplicate, unlinked identities across platforms because signup only checked local email uniqueness. CIS already tracks platform-user mappings but had no pre-signup query surface.

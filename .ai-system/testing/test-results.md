@@ -1,13 +1,18 @@
 # Test Results
 
-> **Overview:** Latest test run results. Updated by agents after running the self-heal loop or test suite. Gives a quick snapshot of current project health.
+> **Metadata**
+> - last-updated-by: update-ai-system
+> - last-verified-against-code: 2026-07-01
+> - staleness-policy: overwritten on every test run — always current
+
+> **Overview:** Latest test run results. Updated by agents after running tests. Gives a quick snapshot of current project health.
 
 ---
 
 ## Last Run
 
 **Date:** [DATE]
-**Run by:** [Agent / developer]
+**Run by:** [Role / Agent]
 
 **Results:**
 | Suite | Passed | Failed | Skipped |
@@ -24,7 +29,7 @@
 
 | Test | Error | Status | Assigned To |
 |------|-------|--------|------------|
-| [test name] | [error message] | [Investigating / Fixed / Wont Fix] | [agent/dev] |
+| [test name] | [error message] | [Investigating / Fixed / Wont Fix] | [agent/role] |
 
 ---
 
