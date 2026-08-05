@@ -33,6 +33,14 @@ export default function ProofCard({
 
   const platformLabel = proof.platform as string;
 
+  // Legacy rows have an empty screenshotUrls array — fall back to the single
+  // screenshotUrl so older proofs keep rendering without a migration.
+  const screenshotUrls =
+    proof.screenshotUrls && proof.screenshotUrls.length > 0
+      ? proof.screenshotUrls
+      : [proof.screenshotUrl];
+  const isSingle = screenshotUrls.length === 1;
+
   return (
     <GlassCard padding="md" className="flex flex-col gap-3">
       {/* Header row */}
@@ -69,16 +77,38 @@ export default function ProofCard({
         </div>
       </div>
 
-      {/* Screenshot */}
-      <div className="rounded-ds-md overflow-hidden w-full border border-ds-border bg-ds-surface flex items-center justify-center min-h-[120px]">
-        <Image
-          src={proof.screenshotUrl}
-          alt={`Proof on ${platformLabel}`}
-          width="100%"
-          style={{ maxHeight: 260, objectFit: "contain", display: "block" }}
-          fallback="https://placehold.co/400x300?text=Screenshot"
-          preview={{ mask: "View Screenshot" }}
-        />
+      {/* Screenshots */}
+      <div className="rounded-ds-md overflow-hidden w-full border border-ds-border bg-ds-surface">
+        <Image.PreviewGroup>
+          {isSingle ? (
+            <Image
+              src={screenshotUrls[0]}
+              alt={`Proof on ${platformLabel}`}
+              width="100%"
+              style={{ maxHeight: 260, objectFit: "cover", display: "block" }}
+              fallback="https://placehold.co/400x300?text=Screenshot"
+              preview={{ mask: "View Screenshot" }}
+            />
+          ) : (
+            <div className="relative">
+              <div className="grid grid-cols-2 gap-1 p-1">
+                {screenshotUrls.map((url, idx) => (
+                  <Image
+                    key={url}
+                    src={url}
+                    alt={`Proof on ${platformLabel} — screenshot ${idx + 1}`}
+                    className="w-full h-28 object-cover"
+                    fallback="https://placehold.co/400x300?text=Screenshot"
+                    preview={{ mask: "View" }}
+                  />
+                ))}
+              </div>
+              <span className="absolute bottom-2 right-2 bg-black/60 text-white text-[10px] font-medium px-1.5 py-0.5 rounded-full pointer-events-none">
+                {screenshotUrls.length}
+              </span>
+            </div>
+          )}
+        </Image.PreviewGroup>
       </div>
 
       {/* Review notes (if any) */}

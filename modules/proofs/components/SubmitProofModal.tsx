@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Form, Select, Alert, InputNumber } from "antd";
 import Modal from "@/components/ui/Modal";
 import Button from "@/components/ui/Button";
-import MediaUpload from "@/components/ui/MediaUpload";
-import { PROOF_PLATFORM_OPTIONS, PROOFS_PAGE_CONTENT } from "../config";
+import MultiImageUpload from "@/components/ui/MultiImageUpload";
+import { PROOF_PLATFORM_OPTIONS, PROOFS_PAGE_CONTENT, MAX_PROOF_SCREENSHOTS } from "../config";
 import { useSubmitProof } from "../hooks/useProofs";
 import { useSmartLink } from "@/modules/links/hooks/useSmartLink";
 import { useCampaigns } from "@/modules/campaign/hooks/useCampaigns";
@@ -20,7 +20,7 @@ interface Props {
 interface FormValues {
   campaignId: string;
   platform: string;
-  screenshotUrl: string;
+  screenshotUrls: string[];
   viewCount: number;
 }
 
@@ -67,11 +67,13 @@ export default function SubmitProofModal({
 
   const onFinish = async (values: FormValues) => {
     if (!smartLink) return;
+    const screenshotUrls = values.screenshotUrls ?? [];
+    if (screenshotUrls.length === 0) return;
     await submit({
       campaignId: values.campaignId,
       smartLinkId: smartLink.id,
       platform: values.platform as SocialPlatform,
-      screenshotUrl: values.screenshotUrl,
+      screenshotUrls,
       viewCount: values.viewCount,
     });
   };
@@ -137,18 +139,32 @@ export default function SubmitProofModal({
           />
         </Form.Item>
 
-        {/* Screenshot Upload */}
+        {/* Screenshot Uploads */}
         <Form.Item
-          name="screenshotUrl"
-          label="Screenshot"
-          rules={[{ required: true, message: "Upload a screenshot" }]}
-          extra="Upload a screenshot showing your campaign share status.">
-          <MediaUpload
+          name="screenshotUrls"
+          label={PROOFS_PAGE_CONTENT.screenshotsLabel}
+          rules={[
+            {
+              required: true,
+              message: PROOFS_PAGE_CONTENT.screenshotsRequired,
+            },
+            {
+              validator: (_, val: string[] | undefined) =>
+                val && val.length > 0
+                  ? Promise.resolve()
+                  : Promise.reject(
+                      new Error(PROOFS_PAGE_CONTENT.screenshotsRequired),
+                    ),
+            },
+          ]}
+          extra={PROOFS_PAGE_CONTENT.screenshotsExtra}>
+          <MultiImageUpload
             accept="image/*"
+            max={MAX_PROOF_SCREENSHOTS}
             maxSizeMb={10}
-            showPreview
-            onUploadComplete={(media) => {
-              form.setFieldValue("screenshotUrl", media.url);
+            placeholder={PROOFS_PAGE_CONTENT.screenshotsPlaceholder}
+            onChange={(urls) => {
+              form.setFieldValue("screenshotUrls", urls);
             }}
           />
         </Form.Item>

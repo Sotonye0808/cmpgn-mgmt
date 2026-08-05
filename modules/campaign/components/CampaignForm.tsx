@@ -1,11 +1,13 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Form, Input, Select, DatePicker, InputNumber, Row, Col } from "antd";
 import dayjs from "dayjs";
 import Button from "@/components/ui/Button";
 import MediaUpload from "@/components/ui/MediaUpload";
 import { ICONS } from "@/config/icons";
+import { ROUTES } from "@/config/routes";
+import { useAuth } from "@/hooks/useAuth";
 import {
   CAMPAIGN_GOAL_OPTIONS,
   CAMPAIGN_MEDIA_OPTIONS,
@@ -47,6 +49,41 @@ export default function CampaignForm({
   const watchedMediaType = Form.useWatch("mediaType", form) as
     | string
     | undefined;
+
+  const { user } = useAuth();
+  const isAdmin = user?.role === "ADMIN" || user?.role === "SUPER_ADMIN";
+  const [teamLeadOptions, setTeamLeadOptions] = useState<
+    { value: string; label: string }[]
+  >([]);
+
+  // Load TEAM_LEAD users for the campaign's team-lead assignment dropdown.
+  // Only admins ever create/edit campaigns, so this endpoint is always reachable.
+  useEffect(() => {
+    if (!isAdmin) return;
+    let cancelled = false;
+    fetch(`${ROUTES.API.USERS.BASE}?role=TEAM_LEAD`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((json) => {
+        if (cancelled) return;
+        const list = (json?.data ?? []) as {
+          id: string;
+          firstName: string;
+          lastName: string;
+        }[];
+        setTeamLeadOptions(
+          list.map((u) => ({
+            value: u.id,
+            label: `${u.firstName} ${u.lastName}`,
+          })),
+        );
+      })
+      .catch(() => {
+        /* silent — dropdown stays empty; form remains usable */
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [isAdmin]);
 
   // Resolve field visibility from the MEDIA_TYPE_FIELDS config
   const fieldConfig =
@@ -295,6 +332,22 @@ export default function CampaignForm({
           options={[...CAMPAIGN_AUDIENCE_TAGS]}
         />
       </Form.Item>
+
+      {/* Team Leads — assigned leads may verify this campaign's screenshots */}
+      {isAdmin && (
+        <Form.Item
+          label={CAMPAIGN_CONTENT.form.teamLeadLabel}
+          name="teamLeadIds"
+          extra={CAMPAIGN_CONTENT.form.teamLeadHint}>
+          <Select
+            mode="multiple"
+            allowClear
+            placeholder={CAMPAIGN_CONTENT.form.teamLeadPlaceholder}
+            options={teamLeadOptions}
+            optionFilterProp="label"
+          />
+        </Form.Item>
+      )}
 
       {/* Actions */}
       <div className="flex flex-wrap items-center justify-end gap-3 pt-2">
