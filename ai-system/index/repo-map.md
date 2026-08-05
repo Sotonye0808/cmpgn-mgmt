@@ -1,8 +1,8 @@
 # Repository Map
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: auto-regenerable — can be derived from `Get-ChildItem -Recurse` or `tree` command. Manual content only where intent cannot be derived from structure.
 
 > **Overview:** Visual map of the project folder structure with purpose descriptions. Updated when the folder structure changes. This file is **auto-regenerable** — use tool-based discovery (filesystem MCP, git ls-tree) for ground truth, and treat manual entries here as supplementary context, not primary navigation.
@@ -80,11 +80,11 @@ cmpgn-mgmt/
 | Directory | Purpose | Key Files |
 |-----------|---------|-----------|
 | `app/` | Next.js App Router pages and API handlers | `app/api/cis/*`, `app/(auth)/register/*` |
-| `components/` | Reusable UI components | `components/ui/CrossPlatformAccountPrompt.tsx` |
+| `components/` | Reusable UI components | `components/ui/MultiImageUpload.tsx`, `components/ui/CrossPlatformAccountPrompt.tsx` |
 | `config/` | App-level config-driven copy | `config/content.ts`, `config/navigation.ts` |
 | `hooks/` | Shared React hooks | `hooks/useAuth.ts`, `hooks/useRole.ts` |
 | `lib/` | Shared utilities, config, services | `lib/config/cis.ts`, `lib/data/mockDb.ts`, `lib/schemas/*` |
-| `modules/` | Domain feature modules (12 modules) | `modules/campaign/`, `modules/analytics/`, etc. |
+| `modules/` | Domain feature modules (12 modules) | `modules/campaign/`, `modules/proofs/services/proofReviewAccess.ts`, `modules/analytics/`, etc. |
 | `prisma/` | Database schema and migrations | `prisma/schema.prisma` |
 | `providers/` | React context providers | `providers/AuthProvider.tsx`, `providers/ThemeProvider.tsx` |
 | `types/` | Global TypeScript type definitions | `types/global.d.ts` |

@@ -231,6 +231,7 @@ model Campaign {
     startDate        DateTime?
     endDate          DateTime?
     targetAudience   String[]           @default([])
+    teamLeadIds      String[]           @default([])
     publishedAt      DateTime?
     metaTitle        String?
     metaDescription  String?            @db.Text
@@ -457,6 +458,7 @@ model ViewProof {
     smartLinkId   String
     platform      SocialPlatform
     screenshotUrl String
+    screenshotUrls String[]       @default([])
     viewCount     Int             @default(0)
     status        ViewProofStatus @default(PENDING)
     reviewedById  String?

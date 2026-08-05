@@ -14,6 +14,7 @@ const campaignBaseFields = {
     startDate: z.string().optional(),
     endDate: z.string().optional(),
     targetAudience: z.array(z.string()).optional(),
+    teamLeadIds: z.array(z.string()).optional(),
     metaTitle: z.string().max(120).optional(),
     metaDescription: z.string().max(300).optional(),
     metaImage: z.string().url().optional().or(z.literal("")),

@@ -1,8 +1,8 @@
 # Development Task Queue
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: re-verify before each session
 
 > **Overview:** Sprint-level task queue with complexity tagging. Agents execute tasks top to bottom within the current sprint. Each task is sized so it can be completed in a single session.
@@ -63,6 +63,10 @@ Tags help agents self-select whether a task needs the full `execute-feature.md` 
 | Wire email blur check in `app/(auth)/register/RegisterForm.tsx` | 2026-05-26 |
 | Block signup submission until cross-platform prompt is dismissed | 2026-05-26 |
 | Update `ai-system` docs with feature decisions | 2026-05-26 |
+| Issue #33: multi-screenshot proof uploads (max 5) + additive `ViewProof.screenshotUrls` schema/migration | 2026-08-05 |
+| Issue #33: campaign-assigned team leads (`Campaign.teamLeadIds`) + tightened, centralized review scoping (`proofReviewAccess.ts`, all proof routes) | 2026-08-05 |
+| Issue #33: responsive screenshot views + pagination (ProofCard grid, ProofReviewPanel, "My Status Views") | 2026-08-05 |
+| Issue #33: QA (typecheck, lint, production build) + `update-ai-system.md` sync | 2026-08-05 |
 
 ---
 

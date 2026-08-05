@@ -1,8 +1,8 @@
 # Project Plan
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: re-verify if project scope or phase changes
 
 > **Overview:** High-level feature checklist organized by development phase. See `planning/task-queue.md` for granular, sprint-level tasks.
@@ -78,7 +78,20 @@ Enable CIS to discover DMHicc readiness and push signed identity sync events wit
 
 ---
 
+## Multi-Screenshot Proofs + Campaign-Assigned Team Leads (2026-08-05)
+
+**Feature Objective (issue #33):**
+(1) Allow uploading up to 5 screenshots per proof submission; (2) allow assigning team leads to a campaign and give them rights to verify that campaign's screenshots — tightening the previously too-broad team-lead review rights; (3) make the screenshot views responsive with pagination.
+
+**Implementation:**
+- `ViewProof.screenshotUrls String[] @default([])` (additive; `screenshotUrl` stays as primary for backward compat), `Campaign.teamLeadIds String[] @default([])`.
+- `modules/proofs/services/proofReviewAccess.ts` centralizes review scoping: admins unrestricted; team leads scoped to team members + assigned campaigns (legacy team scope as fallback).
+- `components/ui/MultiImageUpload.tsx` handles multi-file Cloudinary uploads; `SubmitProofModal`, `ProofCard` (responsive grid + legacy fallback), `ProofReviewPanel` and proofs page pagination updated.
+
+---
+
 ## Completed
 
 - [x] CIS Federation Rollout — status + webhook + persistence
 - [x] Cross-Platform Account Detection — pre-signup CIS email check
+- [x] Multi-Screenshot Proofs + Campaign-Assigned Team Leads — additive schema, scoped review, responsive pagination

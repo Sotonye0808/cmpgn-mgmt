@@ -1,8 +1,8 @@
 # System Architecture
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: re-verify before trusting if any architecture-affecting commits have been made since last-verified-against-code
 
 > **Overview:** DMHicc is a Next.js 15 App Router platform that combines role-aware UI routes with API handlers, domain modules, and a Prisma-backed data layer. Feature modules live under `modules/`, while shared utilities, config, and middleware live under `lib/`. The data layer runs on a mock DB in early phases and swaps to Prisma/PostgreSQL without refactoring service boundaries.
@@ -33,13 +33,13 @@ PostgreSQL / Redis / Cloudinary / CIS
 |--------|---------------|-----------|--------------|
 | `app/` | UI routes, layouts, and API handlers | `app/(auth)/*`, `app/(dashboard)/*`, `app/(public)/*`, `app/api/*` | `modules/*`, `lib/*` |
 | `modules/analytics` | Analytics and metrics dashboards | `modules/analytics/*` | `lib/data/*` |
-| `modules/campaign` | Campaign CRUD and configuration | `modules/campaign/*` | `lib/data/*` |
+| `modules/campaign` | Campaign CRUD and configuration | `modules/campaign/*` | `lib/data/*`, `prisma` |
 | `modules/donation` | Donation processing and tracking | `modules/donation/*` | `lib/data/*` |
 | `modules/engagement` | Proofs, participation, timeline | `modules/engagement/*` | `lib/data/*` |
 | `modules/leaderboard` | Leaderboard and rankings | `modules/leaderboard/*` | `lib/data/*` |
 | `modules/links` | Smart link generation and tracking | `modules/links/*` | `lib/utils/slug` |
 | `modules/points` | Points and scoring system | `modules/points/*` | `lib/data/*` |
-| `modules/proofs` | Proof of participation | `modules/proofs/*` | `lib/data/*` |
+| `modules/proofs` | Proof of participation — submission, display, and role-scoped review | `modules/proofs/*` | `lib/prisma`, `lib/utils/serialize`, `modules/points`, `components/ui/MultiImageUpload`, `modules/proofs/services/proofReviewAccess` |
 | `modules/referral` | Referral tracking | `modules/referral/*` | `lib/data/*` |
 | `modules/teams` | Team management | `modules/teams/*` | `lib/data/*` |
 | `modules/trust` | Trust/safety review | `modules/trust/*` | `lib/data/*` |
@@ -88,9 +88,10 @@ PostgreSQL / Redis / Cloudinary / CIS
 ### Data Persistence Flow
 
 ```
-1) Mock DB is the source of truth during early phases.
-2) Prisma/PostgreSQL becomes canonical in Phase 14 with the same service interfaces.
-3) Multi-table writes use mockDb.transaction() to preserve ACID boundaries.
+1) Mock DB was the source of truth during early phases; proofs/engagement/campaign
+   routes now use Prisma/PostgreSQL directly.
+2) Some flows still read from lib/data/mockDb.ts — see the drift note below.
+3) Multi-table writes use prisma.$transaction() where applicable.
 ```
 
 ---
@@ -130,6 +131,8 @@ All config points listed here should follow the fallback discipline from `standa
 - Role-aware rendering must remain route-agnostic.
 - Mock DB is canonical in early phases; migration must be additive.
 - Design system tokens are mandatory (`--ds-*`).
+- **Known drift (2026-08-05):** docs historically describe mock DB as canonical in early phases, but proof/campaign routes already talk to Prisma/PostgreSQL directly. `lib/constants.ts` exists but is not listed in the repo map. Team-lead review access is now centralized in `modules/proofs/services/proofReviewAccess.ts` and must stay the single source of truth for proof-review scoping.
+- Team-lead verification scope rule: a lead may review a proof only if the submitter is in the lead's team AND the proof's campaign is in the lead's `Campaign.teamLeadIds`. Leads with no campaign assignments keep the legacy team-scoped behaviour (no campaign restriction) so existing setups don't lose access.
 
 ---
 

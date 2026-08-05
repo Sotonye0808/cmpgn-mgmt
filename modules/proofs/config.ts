@@ -11,6 +11,9 @@ type RoleValue = (typeof ROLE)[keyof typeof ROLE];
 
 // ─── Status display config ───────────────────────────────────────────────────
 
+/** Max screenshots that can be uploaded per proof submission */
+export const MAX_PROOF_SCREENSHOTS = 5;
+
 export const PROOF_STATUS_CONFIG: Record<
     string,
     { label: string; color: string; bgToken: string }
@@ -58,4 +61,10 @@ export const PROOFS_PAGE_CONTENT = {
     reviewNotesPlaceholder: "Optional notes for the soldier...",
     campaignFilterLabel: "Filter by Campaign",
     allCampaigns: "All Campaigns",
+    screenshotsLabel: "Screenshots",
+    screenshotsPlaceholder: "Click or drag to upload screenshots",
+    screenshotsExtra: `Upload up to ${MAX_PROOF_SCREENSHOTS} screenshots showing your campaign share status. At least one is required.`,
+    screenshotsRequired: "Upload at least one screenshot",
+    removeScreenshotLabel: "Remove screenshot",
+    screenshotsCountLabel: "Screenshot {current} of {total}",
 } as const;

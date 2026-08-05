@@ -7253,6 +7253,7 @@ export namespace Prisma {
     startDate: number
     endDate: number
     targetAudience: number
+    teamLeadIds: number
     publishedAt: number
     metaTitle: number
     metaDescription: number
@@ -7374,6 +7375,7 @@ export namespace Prisma {
     startDate?: true
     endDate?: true
     targetAudience?: true
+    teamLeadIds?: true
     publishedAt?: true
     metaTitle?: true
     metaDescription?: true
@@ -7496,6 +7498,7 @@ export namespace Prisma {
     startDate: Date | null
     endDate: Date | null
     targetAudience: string[]
+    teamLeadIds: string[]
     publishedAt: Date | null
     metaTitle: string | null
     metaDescription: string | null
@@ -7550,6 +7553,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     targetAudience?: boolean
+    teamLeadIds?: boolean
     publishedAt?: boolean
     metaTitle?: boolean
     metaDescription?: boolean
@@ -7597,6 +7601,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     targetAudience?: boolean
+    teamLeadIds?: boolean
     publishedAt?: boolean
     metaTitle?: boolean
     metaDescription?: boolean
@@ -7634,6 +7639,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     targetAudience?: boolean
+    teamLeadIds?: boolean
     publishedAt?: boolean
     metaTitle?: boolean
     metaDescription?: boolean
@@ -7671,6 +7677,7 @@ export namespace Prisma {
     startDate?: boolean
     endDate?: boolean
     targetAudience?: boolean
+    teamLeadIds?: boolean
     publishedAt?: boolean
     metaTitle?: boolean
     metaDescription?: boolean
@@ -7687,7 +7694,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "content" | "media" | "mediaType" | "mediaUrl" | "thumbnailUrl" | "ctaText" | "ctaUrl" | "createdById" | "status" | "goalType" | "goalTarget" | "goalCurrent" | "startDate" | "endDate" | "targetAudience" | "publishedAt" | "metaTitle" | "metaDescription" | "metaImage" | "viewCount" | "clickCount" | "shareCount" | "likeCount" | "participantCount" | "isMegaCampaign" | "parentCampaignId" | "bankAccountIds" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
+  export type CampaignOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "title" | "description" | "content" | "media" | "mediaType" | "mediaUrl" | "thumbnailUrl" | "ctaText" | "ctaUrl" | "createdById" | "status" | "goalType" | "goalTarget" | "goalCurrent" | "startDate" | "endDate" | "targetAudience" | "teamLeadIds" | "publishedAt" | "metaTitle" | "metaDescription" | "metaImage" | "viewCount" | "clickCount" | "shareCount" | "likeCount" | "participantCount" | "isMegaCampaign" | "parentCampaignId" | "bankAccountIds" | "createdAt" | "updatedAt", ExtArgs["result"]["campaign"]>
   export type CampaignInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     creator?: boolean | UserDefaultArgs<ExtArgs>
     parentCampaign?: boolean | Campaign$parentCampaignArgs<ExtArgs>
@@ -7745,6 +7752,7 @@ export namespace Prisma {
       startDate: Date | null
       endDate: Date | null
       targetAudience: string[]
+      teamLeadIds: string[]
       publishedAt: Date | null
       metaTitle: string | null
       metaDescription: string | null
@@ -8211,6 +8219,7 @@ export namespace Prisma {
     readonly startDate: FieldRef<"Campaign", 'DateTime'>
     readonly endDate: FieldRef<"Campaign", 'DateTime'>
     readonly targetAudience: FieldRef<"Campaign", 'String[]'>
+    readonly teamLeadIds: FieldRef<"Campaign", 'String[]'>
     readonly publishedAt: FieldRef<"Campaign", 'DateTime'>
     readonly metaTitle: FieldRef<"Campaign", 'String'>
     readonly metaDescription: FieldRef<"Campaign", 'String'>
@@ -19252,6 +19261,7 @@ export namespace Prisma {
     smartLinkId: number
     platform: number
     screenshotUrl: number
+    screenshotUrls: number
     viewCount: number
     status: number
     reviewedById: number
@@ -19310,6 +19320,7 @@ export namespace Prisma {
     smartLinkId?: true
     platform?: true
     screenshotUrl?: true
+    screenshotUrls?: true
     viewCount?: true
     status?: true
     reviewedById?: true
@@ -19413,6 +19424,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls: string[]
     viewCount: number
     status: $Enums.ViewProofStatus
     reviewedById: string | null
@@ -19448,6 +19460,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    screenshotUrls?: boolean
     viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
@@ -19467,6 +19480,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    screenshotUrls?: boolean
     viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
@@ -19486,6 +19500,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    screenshotUrls?: boolean
     viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
@@ -19505,6 +19520,7 @@ export namespace Prisma {
     smartLinkId?: boolean
     platform?: boolean
     screenshotUrl?: boolean
+    screenshotUrls?: boolean
     viewCount?: boolean
     status?: boolean
     reviewedById?: boolean
@@ -19514,7 +19530,7 @@ export namespace Prisma {
     updatedAt?: boolean
   }
 
-  export type ViewProofOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "campaignId" | "smartLinkId" | "platform" | "screenshotUrl" | "viewCount" | "status" | "reviewedById" | "reviewedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["viewProof"]>
+  export type ViewProofOmit<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = $Extensions.GetOmit<"id" | "userId" | "campaignId" | "smartLinkId" | "platform" | "screenshotUrl" | "screenshotUrls" | "viewCount" | "status" | "reviewedById" | "reviewedAt" | "notes" | "createdAt" | "updatedAt", ExtArgs["result"]["viewProof"]>
   export type ViewProofInclude<ExtArgs extends $Extensions.InternalArgs = $Extensions.DefaultArgs> = {
     user?: boolean | UserDefaultArgs<ExtArgs>
     reviewedBy?: boolean | ViewProof$reviewedByArgs<ExtArgs>
@@ -19545,6 +19561,7 @@ export namespace Prisma {
       smartLinkId: string
       platform: $Enums.SocialPlatform
       screenshotUrl: string
+      screenshotUrls: string[]
       viewCount: number
       status: $Enums.ViewProofStatus
       reviewedById: string | null
@@ -19984,6 +20001,7 @@ export namespace Prisma {
     readonly smartLinkId: FieldRef<"ViewProof", 'String'>
     readonly platform: FieldRef<"ViewProof", 'SocialPlatform'>
     readonly screenshotUrl: FieldRef<"ViewProof", 'String'>
+    readonly screenshotUrls: FieldRef<"ViewProof", 'String[]'>
     readonly viewCount: FieldRef<"ViewProof", 'Int'>
     readonly status: FieldRef<"ViewProof", 'ViewProofStatus'>
     readonly reviewedById: FieldRef<"ViewProof", 'String'>
@@ -26184,6 +26202,7 @@ export namespace Prisma {
     startDate: 'startDate',
     endDate: 'endDate',
     targetAudience: 'targetAudience',
+    teamLeadIds: 'teamLeadIds',
     publishedAt: 'publishedAt',
     metaTitle: 'metaTitle',
     metaDescription: 'metaDescription',
@@ -26345,6 +26364,7 @@ export namespace Prisma {
     smartLinkId: 'smartLinkId',
     platform: 'platform',
     screenshotUrl: 'screenshotUrl',
+    screenshotUrls: 'screenshotUrls',
     viewCount: 'viewCount',
     status: 'status',
     reviewedById: 'reviewedById',
@@ -27131,6 +27151,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     targetAudience?: StringNullableListFilter<"Campaign">
+    teamLeadIds?: StringNullableListFilter<"Campaign">
     publishedAt?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     metaTitle?: StringNullableFilter<"Campaign"> | string | null
     metaDescription?: StringNullableFilter<"Campaign"> | string | null
@@ -27177,6 +27198,7 @@ export namespace Prisma {
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     targetAudience?: SortOrder
+    teamLeadIds?: SortOrder
     publishedAt?: SortOrderInput | SortOrder
     metaTitle?: SortOrderInput | SortOrder
     metaDescription?: SortOrderInput | SortOrder
@@ -27226,6 +27248,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     targetAudience?: StringNullableListFilter<"Campaign">
+    teamLeadIds?: StringNullableListFilter<"Campaign">
     publishedAt?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     metaTitle?: StringNullableFilter<"Campaign"> | string | null
     metaDescription?: StringNullableFilter<"Campaign"> | string | null
@@ -27272,6 +27295,7 @@ export namespace Prisma {
     startDate?: SortOrderInput | SortOrder
     endDate?: SortOrderInput | SortOrder
     targetAudience?: SortOrder
+    teamLeadIds?: SortOrder
     publishedAt?: SortOrderInput | SortOrder
     metaTitle?: SortOrderInput | SortOrder
     metaDescription?: SortOrderInput | SortOrder
@@ -27315,6 +27339,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     targetAudience?: StringNullableListFilter<"Campaign">
+    teamLeadIds?: StringNullableListFilter<"Campaign">
     publishedAt?: DateTimeNullableWithAggregatesFilter<"Campaign"> | Date | string | null
     metaTitle?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
     metaDescription?: StringNullableWithAggregatesFilter<"Campaign"> | string | null
@@ -28056,6 +28081,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    screenshotUrls?: StringNullableListFilter<"ViewProof">
     viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
@@ -28075,6 +28101,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    screenshotUrls?: SortOrder
     viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
@@ -28097,6 +28124,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    screenshotUrls?: StringNullableListFilter<"ViewProof">
     viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
@@ -28116,6 +28144,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    screenshotUrls?: SortOrder
     viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrderInput | SortOrder
@@ -28140,6 +28169,7 @@ export namespace Prisma {
     smartLinkId?: StringWithAggregatesFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformWithAggregatesFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringWithAggregatesFilter<"ViewProof"> | string
+    screenshotUrls?: StringNullableListFilter<"ViewProof">
     viewCount?: IntWithAggregatesFilter<"ViewProof"> | number
     status?: EnumViewProofStatusWithAggregatesFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableWithAggregatesFilter<"ViewProof"> | string | null
@@ -28951,6 +28981,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -28996,6 +29027,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -29039,6 +29071,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29084,6 +29117,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29128,6 +29162,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -29162,6 +29197,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29196,6 +29232,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -29960,6 +29997,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -29978,6 +30016,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -29992,6 +30031,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30010,6 +30050,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -30026,6 +30067,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -30040,6 +30082,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -30055,6 +30098,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -31107,6 +31151,7 @@ export namespace Prisma {
     startDate?: SortOrder
     endDate?: SortOrder
     targetAudience?: SortOrder
+    teamLeadIds?: SortOrder
     publishedAt?: SortOrder
     metaTitle?: SortOrder
     metaDescription?: SortOrder
@@ -31845,6 +31890,7 @@ export namespace Prisma {
     smartLinkId?: SortOrder
     platform?: SortOrder
     screenshotUrl?: SortOrder
+    screenshotUrls?: SortOrder
     viewCount?: SortOrder
     status?: SortOrder
     reviewedById?: SortOrder
@@ -32990,6 +33036,10 @@ export namespace Prisma {
     set: string[]
   }
 
+  export type CampaignCreateteamLeadIdsInput = {
+    set: string[]
+  }
+
   export type CampaignCreatebankAccountIdsInput = {
     set: string[]
   }
@@ -33157,6 +33207,11 @@ export namespace Prisma {
   }
 
   export type CampaignUpdatetargetAudienceInput = {
+    set?: string[]
+    push?: string | string[]
+  }
+
+  export type CampaignUpdateteamLeadIdsInput = {
     set?: string[]
     push?: string | string[]
   }
@@ -33763,6 +33818,10 @@ export namespace Prisma {
     update?: XOR<XOR<UserUpdateToOneWithWhereWithoutNotificationsInput, UserUpdateWithoutNotificationsInput>, UserUncheckedUpdateWithoutNotificationsInput>
   }
 
+  export type ViewProofCreatescreenshotUrlsInput = {
+    set: string[]
+  }
+
   export type UserCreateNestedOneWithoutViewProofsInput = {
     create?: XOR<UserCreateWithoutViewProofsInput, UserUncheckedCreateWithoutViewProofsInput>
     connectOrCreate?: UserCreateOrConnectWithoutViewProofsInput
@@ -33783,6 +33842,11 @@ export namespace Prisma {
 
   export type EnumSocialPlatformFieldUpdateOperationsInput = {
     set?: $Enums.SocialPlatform
+  }
+
+  export type ViewProofUpdatescreenshotUrlsInput = {
+    set?: string[]
+    push?: string | string[]
   }
 
   export type EnumViewProofStatusFieldUpdateOperationsInput = {
@@ -34593,6 +34657,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -34636,6 +34701,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -34987,6 +35053,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -35003,6 +35070,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -35027,6 +35095,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -35044,6 +35113,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -35245,6 +35315,7 @@ export namespace Prisma {
     startDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     endDate?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     targetAudience?: StringNullableListFilter<"Campaign">
+    teamLeadIds?: StringNullableListFilter<"Campaign">
     publishedAt?: DateTimeNullableFilter<"Campaign"> | Date | string | null
     metaTitle?: StringNullableFilter<"Campaign"> | string | null
     metaDescription?: StringNullableFilter<"Campaign"> | string | null
@@ -35561,6 +35632,7 @@ export namespace Prisma {
     smartLinkId?: StringFilter<"ViewProof"> | string
     platform?: EnumSocialPlatformFilter<"ViewProof"> | $Enums.SocialPlatform
     screenshotUrl?: StringFilter<"ViewProof"> | string
+    screenshotUrls?: StringNullableListFilter<"ViewProof">
     viewCount?: IntFilter<"ViewProof"> | number
     status?: EnumViewProofStatusFilter<"ViewProof"> | $Enums.ViewProofStatus
     reviewedById?: StringNullableFilter<"ViewProof"> | string | null
@@ -36071,6 +36143,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -36115,6 +36188,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -36162,6 +36236,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -36206,6 +36281,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -36437,6 +36513,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -36453,6 +36530,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -36610,6 +36688,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36654,6 +36733,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -36911,6 +36991,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -36955,6 +37036,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -37090,6 +37172,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37134,6 +37217,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37247,6 +37331,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -37291,6 +37376,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -37468,6 +37554,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37512,6 +37599,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -37812,6 +37900,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -37856,6 +37945,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -38068,6 +38158,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38112,6 +38203,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38225,6 +38317,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -38269,6 +38362,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -38475,6 +38569,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38519,6 +38614,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38709,6 +38805,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -38753,6 +38850,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -38888,6 +38986,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -38932,6 +39031,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39045,6 +39145,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -39089,6 +39190,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -39224,6 +39326,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39268,6 +39371,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -39748,6 +39852,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -39792,6 +39897,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -40004,6 +40110,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40048,6 +40155,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40574,6 +40682,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -40618,6 +40727,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -40747,6 +40857,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40791,6 +40902,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -40910,6 +41022,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -41031,6 +41144,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -41047,6 +41161,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedAt?: Date | string | null
@@ -41113,6 +41228,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41156,6 +41272,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41199,6 +41316,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41519,6 +41637,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41535,6 +41654,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41550,6 +41670,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41564,6 +41685,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41581,6 +41703,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41596,6 +41719,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -41785,6 +41909,7 @@ export namespace Prisma {
     startDate?: Date | string | null
     endDate?: Date | string | null
     targetAudience?: CampaignCreatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignCreateteamLeadIdsInput | string[]
     publishedAt?: Date | string | null
     metaTitle?: string | null
     metaDescription?: string | null
@@ -41871,6 +41996,7 @@ export namespace Prisma {
     smartLinkId: string
     platform: $Enums.SocialPlatform
     screenshotUrl: string
+    screenshotUrls?: ViewProofCreatescreenshotUrlsInput | string[]
     viewCount?: number
     status?: $Enums.ViewProofStatus
     reviewedById?: string | null
@@ -41909,6 +42035,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41953,6 +42080,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -41996,6 +42124,7 @@ export namespace Prisma {
     startDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     endDate?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     targetAudience?: CampaignUpdatetargetAudienceInput | string[]
+    teamLeadIds?: CampaignUpdateteamLeadIdsInput | string[]
     publishedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
     metaTitle?: NullableStringFieldUpdateOperationsInput | string | null
     metaDescription?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42213,6 +42342,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedAt?: NullableDateTimeFieldUpdateOperationsInput | Date | string | null
@@ -42229,6 +42359,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null
@@ -42244,6 +42375,7 @@ export namespace Prisma {
     smartLinkId?: StringFieldUpdateOperationsInput | string
     platform?: EnumSocialPlatformFieldUpdateOperationsInput | $Enums.SocialPlatform
     screenshotUrl?: StringFieldUpdateOperationsInput | string
+    screenshotUrls?: ViewProofUpdatescreenshotUrlsInput | string[]
     viewCount?: IntFieldUpdateOperationsInput | number
     status?: EnumViewProofStatusFieldUpdateOperationsInput | $Enums.ViewProofStatus
     reviewedById?: NullableStringFieldUpdateOperationsInput | string | null

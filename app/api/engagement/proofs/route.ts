@@ -9,22 +9,37 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { serialize } from "@/lib/utils/serialize";
 import { z } from "zod";
+import { MAX_PROOF_SCREENSHOTS } from "@/modules/proofs/config";
+import { buildProofReviewAccess } from "@/modules/proofs/services/proofReviewAccess";
 
-const createProofSchema = z.object({
-    campaignId: z.string().min(1),
-    smartLinkId: z.string().min(1),
-    platform: z.enum([
-        "FACEBOOK",
-        "INSTAGRAM",
-        "TWITTER_X",
-        "TIKTOK",
-        "YOUTUBE",
-        "WHATSAPP",
-        "SNAPCHAT",
-    ]),
-    screenshotUrl: z.string().url(),
-    viewCount: z.number().int().min(0),
-});
+// Accepts either a single legacy `screenshotUrl` or the new `screenshotUrls`
+// array (max MAX_PROOF_SCREENSHOTS). `.or()` keeps old clients working.
+const createProofSchema = z
+    .object({
+        campaignId: z.string().min(1),
+        smartLinkId: z.string().min(1),
+        platform: z.enum([
+            "FACEBOOK",
+            "INSTAGRAM",
+            "TWITTER_X",
+            "TIKTOK",
+            "YOUTUBE",
+            "WHATSAPP",
+            "SNAPCHAT",
+        ]),
+        screenshotUrl: z.string().url().optional(),
+        screenshotUrls: z
+            .array(z.string().url())
+            .min(1)
+            .max(MAX_PROOF_SCREENSHOTS)
+            .optional(),
+        viewCount: z.number().int().min(0),
+    })
+    .refine(
+        (data) =>
+            Boolean(data.screenshotUrls?.length) || Boolean(data.screenshotUrl),
+        { message: "At least one screenshot is required" }
+    );
 
 // POST — submit a new view proof
 export async function POST(request: NextRequest) {
@@ -38,13 +53,27 @@ export async function POST(request: NextRequest) {
             return badRequestResponse(parsed.error.errors[0].message);
         }
 
+        // Normalize: screenshotUrls wins; legacy screenshotUrl is wrapped.
+        // Dedupe + cap defensively against a client sending more than allowed.
+        const urls = Array.from(
+            new Set([
+                ...(parsed.data.screenshotUrls ?? []),
+                ...(parsed.data.screenshotUrl ? [parsed.data.screenshotUrl] : []),
+            ])
+        ).slice(0, MAX_PROOF_SCREENSHOTS);
+
+        if (urls.length === 0) {
+            return badRequestResponse("At least one screenshot is required");
+        }
+
         const proof = await prisma.viewProof.create({
             data: {
                 userId: user.id,
                 campaignId: parsed.data.campaignId,
                 smartLinkId: parsed.data.smartLinkId,
                 platform: parsed.data.platform as never,
-                screenshotUrl: parsed.data.screenshotUrl,
+                screenshotUrl: urls[0],
+                screenshotUrls: urls,
                 viewCount: parsed.data.viewCount,
                 status: "PENDING" as never,
             },
@@ -69,33 +98,38 @@ export async function GET(request: NextRequest) {
         const isTeamLead = user.role === "TEAM_LEAD";
 
         const where: Record<string, unknown> = {};
+        // Campaigns a team lead is permitted to verify — null means "any campaign"
+        let allowedCampaignIds: string[] | null = null;
 
         if (isAdmin) {
             // Admins see all proofs
         } else if (isTeamLead && scope === "team") {
-            // Team leads see proofs from their team members
-            const currentUser = await prisma.user.findUnique({
-                where: { id: user.id },
-                select: { teamId: true },
-            });
-
-            if (currentUser?.teamId) {
-                const teamMembers = await prisma.user.findMany({
-                    where: { teamId: currentUser.teamId },
-                    select: { id: true },
-                });
-                const memberUserIds = teamMembers.map((m: { id: string }) => m.id);
-                where.userId = { in: memberUserIds };
-            } else {
-                // No team — fall back to own proofs only
-                where.userId = user.id;
+            // Team leads see proofs from their team members, scoped to the
+            // campaigns they've been assigned to (falling back to all
+            // campaigns when they have no assignments yet).
+            const ctx = await buildProofReviewAccess(user);
+            if (ctx.managedCampaignIds.length > 0) {
+                allowedCampaignIds = ctx.managedCampaignIds;
             }
+            where.userId =
+                ctx.teamMemberIds.length > 0
+                    ? { in: ctx.teamMemberIds }
+                    : user.id;
         } else {
             // Regular users see only their own proofs
             where.userId = user.id;
         }
 
-        if (campaignId) where.campaignId = campaignId;
+        if (campaignId) {
+            // A team lead must not reach proofs outside their assigned campaigns
+            // by filtering on a specific campaign id.
+            if (allowedCampaignIds && !allowedCampaignIds.includes(campaignId)) {
+                return successResponse([]);
+            }
+            where.campaignId = campaignId;
+        } else if (allowedCampaignIds) {
+            where.campaignId = { in: allowedCampaignIds };
+        }
 
         const proofs = await prisma.viewProof.findMany({
             where: where as never,

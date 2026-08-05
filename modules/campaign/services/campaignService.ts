@@ -124,6 +124,7 @@ export async function createCampaign(
             startDate: input.startDate ? new Date(input.startDate) : undefined,
             endDate: input.endDate ? new Date(input.endDate) : undefined,
             targetAudience: input.targetAudience ?? [],
+            teamLeadIds: input.teamLeadIds ?? [],
             publishedAt: input.publishImmediately ? now : undefined,
             metaTitle: input.metaTitle,
             metaDescription: input.metaDescription,

@@ -231,6 +231,7 @@ model Campaign {
   startDate        DateTime?
   endDate          DateTime?
   targetAudience   String[]           @default([])
+  teamLeadIds      String[]           @default([])
   publishedAt      DateTime?
   metaTitle        String?
   metaDescription  String?            @db.Text
@@ -451,19 +452,20 @@ model AppNotification {
 }
 
 model ViewProof {
-  id            String          @id @default(cuid())
-  userId        String
-  campaignId    String
-  smartLinkId   String
-  platform      SocialPlatform
-  screenshotUrl String
-  viewCount     Int             @default(0)
-  status        ViewProofStatus @default(PENDING)
-  reviewedById  String?
-  reviewedAt    DateTime?
-  notes         String?         @db.Text
-  createdAt     DateTime        @default(now())
-  updatedAt     DateTime        @updatedAt
+  id             String          @id @default(cuid())
+  userId         String
+  campaignId     String
+  smartLinkId    String
+  platform       SocialPlatform
+  screenshotUrl  String
+  screenshotUrls String[]        @default([])
+  viewCount      Int             @default(0)
+  status         ViewProofStatus @default(PENDING)
+  reviewedById   String?
+  reviewedAt     DateTime?
+  notes          String?         @db.Text
+  createdAt      DateTime        @default(now())
+  updatedAt      DateTime        @updatedAt
 
   // Relations
   user       User     @relation("ViewProofUser", fields: [userId], references: [id], onDelete: Cascade)

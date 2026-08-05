@@ -1,8 +1,8 @@
 # Test Results
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: overwritten on every test run — always current
 
 > **Overview:** Latest test run results. Updated by agents after running tests. Gives a quick snapshot of current project health.
@@ -11,17 +11,20 @@
 
 ## Last Run
 
-**Date:** [DATE]
-**Run by:** [Role / Agent]
+**Date:** 2026-08-05
+**Run by:** AI implementation session
 
 **Results:**
 | Suite | Passed | Failed | Skipped |
 |-------|--------|--------|---------|
+| Static typecheck (`tsc --noEmit`) | 1 | 0 | 0 |
+| Lint (`next lint`) | 1 | 0 | 0 |
+| Production build (`next build`) | 1 | 0 | 0 |
 | Unit | — | — | — |
 | Integration | — | — | — |
 | E2E | — | — | — |
 
-**Overall Status:** [ Passing | Failing | Partial ]
+**Overall Status:** Passing (static gates). No automated unit/integration suites exist yet — scoping rules are covered in `testing/test-plan.md` as pending automated tests.
 
 ---
 
@@ -29,7 +32,7 @@
 
 | Test | Error | Status | Assigned To |
 |------|-------|--------|------------|
-| [test name] | [error message] | [Investigating / Fixed / Wont Fix] | [agent/role] |
+| (none) | — | — | — |
 
 ---
 
@@ -37,4 +40,4 @@
 
 | Date | Passed | Failed | Notes |
 |------|--------|--------|-------|
-| [date] | [n] | [n] | [notes] |
+| 2026-08-05 | 3 (static) | 0 | Issue #33 feature — typecheck, lint, build all green |

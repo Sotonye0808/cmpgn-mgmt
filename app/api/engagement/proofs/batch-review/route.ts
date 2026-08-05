@@ -9,6 +9,10 @@ import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { serializeArray } from "@/lib/utils/serialize";
 import { award } from "@/modules/points/services/pointsService";
+import {
+    buildProofReviewAccess,
+    canReviewProof,
+} from "@/modules/proofs/services/proofReviewAccess";
 import { z } from "zod";
 
 const batchReviewSchema = z.object({
@@ -40,9 +44,22 @@ export async function PATCH(request: NextRequest) {
             return badRequestResponse("No pending proofs found for the given IDs");
         }
 
+        // Tightened access: drop proofs the reviewer isn't permitted to verify
+        // so a team lead can never batch-approve outside their scope.
+        const ctx = await buildProofReviewAccess(auth.user);
+        const reviewable = proofs.filter((p) =>
+            canReviewProof(ctx, p, auth.user.id)
+        );
+
+        if (reviewable.length === 0) {
+            return badRequestResponse(
+                "No pending proofs found for the given IDs"
+            );
+        }
+
         // Batch update all matching proofs
         const updated = await prisma.viewProof.updateMany({
-            where: { id: { in: proofs.map((p) => p.id) } },
+            where: { id: { in: reviewable.map((p) => p.id) } },
             data: {
                 status: status as never,
                 reviewedById: auth.user.id,
@@ -54,7 +71,7 @@ export async function PATCH(request: NextRequest) {
         // Award points for each approved proof
         if (status === "APPROVED") {
             await Promise.all(
-                proofs.map((p) =>
+                reviewable.map((p) =>
                     award(p.userId, "PROOF_APPROVED", p.campaignId, p.id)
                 ),
             );
@@ -64,12 +81,12 @@ export async function PATCH(request: NextRequest) {
 
         // Return the updated proofs
         const result = await prisma.viewProof.findMany({
-            where: { id: { in: proofs.map((p) => p.id) } },
+            where: { id: { in: reviewable.map((p) => p.id) } },
         });
 
         return successResponse({
             updated: updated.count,
-            skipped: ids.length - proofs.length,
+            skipped: ids.length - reviewable.length,
             proofs: serializeArray(result),
         });
     } catch (err) {

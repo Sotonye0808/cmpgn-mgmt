@@ -1,8 +1,8 @@
 # Dependency Graph
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: auto-regenerable — can be derived from import analysis tools. Manual content only for conventions and rules that cannot be inferred from code.
 
 > **Overview:** Maps how modules depend on each other. Agents use this to understand the impact of changes. This file is **auto-regenerable** — prefer tool-based import analysis for ground truth, and treat manual entries as supplementary.
@@ -25,6 +25,24 @@ CIS Identity Service
 Campaign Service
   → lib/data/mockDb.ts
   → modules/users (role checks)
+  → prisma (Campaign model — teamLeadIds)
+
+Proof Service (proofs module)
+  → prisma (ViewProof, Campaign, Team models)
+  → modules/proofs/services/proofReviewAccess (reviewer scoping)
+  → modules/points (award on approval)
+  → lib/utils/serialize
+  → modules/proofs/config (MAX_PROOF_SCREENSHOTS)
+
+proofReviewAccess (modules/proofs/services)
+  → prisma (ViewProof / Campaign / Team lookups)
+  → types/global.d.ts (AuthUser, ViewProof shapes)
+
+Proof UI (SubmitProofModal, ProofCard, ProofReviewPanel, proofs page)
+  → components/ui/MultiImageUpload (multi-screenshot upload via /api/upload)
+  → modules/proofs/hooks/useProofs
+  → hooks/useAuth (role-based scoping)
+  → config/content.ts (campaign team-lead copy)
 
 Analytics Service
   → lib/data/mockDb.ts
