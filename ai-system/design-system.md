@@ -1,8 +1,8 @@
 # Design System
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: re-verify if UI components or styling dependencies change
 
 > **Overview:** DMHicc uses a token-driven design system. The canonical spec lives in `.github/design-system.md`; this file captures non-negotiable rules and conventions for AI changes.

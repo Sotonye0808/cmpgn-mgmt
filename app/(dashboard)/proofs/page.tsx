@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from "react";
-import { Button as AntButton } from "antd";
+import { useState, useEffect } from "react";
+import { Button as AntButton, Pagination } from "antd";
 import { useAuth } from "@/hooks/useAuth";
 import { useCampaigns } from "@/modules/campaign/hooks/useCampaigns";
 import { useProofs } from "@/modules/proofs/hooks/useProofs";
@@ -19,10 +19,13 @@ import {
   PROOFS_PAGE_CONTENT,
 } from "@/modules/proofs/config";
 
+const MY_PROOFS_PAGE_SIZE = 6;
+
 export default function ProofsPage() {
   const { user } = useAuth();
   const [submitOpen, setSubmitOpen] = useState(false);
   const [myStatusFilter, setMyStatusFilter] = useState<string>("");
+  const [myPage, setMyPage] = useState(1);
 
   const {
     proofs: myProofs,
@@ -33,15 +36,35 @@ export default function ProofsPage() {
     pageSize: 100,
   });
 
+  const filteredMyProofs = myStatusFilter
+    ? myProofs.filter((p) => (p.status as string) === myStatusFilter)
+    : myProofs;
+
+  const paginatedMyProofs = filteredMyProofs.slice(
+    (myPage - 1) * MY_PROOFS_PAGE_SIZE,
+    myPage * MY_PROOFS_PAGE_SIZE,
+  );
+
+  // Keep the current page within range when the list shrinks (e.g. after a
+  // refresh removes reviewed proofs).
+  useEffect(() => {
+    const maxPage = Math.max(
+      1,
+      Math.ceil(filteredMyProofs.length / MY_PROOFS_PAGE_SIZE),
+    );
+    if (myPage > maxPage) setMyPage(maxPage);
+  }, [filteredMyProofs.length, myPage]);
+
   if (!user) return null;
 
   const userRole = user.role as string;
 
   const visibleSections = filterByRole(PROOFS_PAGE_SECTIONS, userRole);
 
-  const filteredMyProofs = myStatusFilter
-    ? myProofs.filter((p) => (p.status as string) === myStatusFilter)
-    : myProofs;
+  const handleMyStatusFilterChange = (val: string) => {
+    setMyStatusFilter(val);
+    setMyPage(1);
+  };
 
   const renderSection = (key: string) => {
     switch (key) {
@@ -61,7 +84,7 @@ export default function ProofsPage() {
               <div className="flex flex-wrap items-center gap-2">
                 <ProofStatusFilter
                   value={myStatusFilter}
-                  onChange={setMyStatusFilter}
+                  onChange={handleMyStatusFilterChange}
                 />
                 <AntButton
                   type="primary"
@@ -72,10 +95,31 @@ export default function ProofsPage() {
               </div>
             </div>
             <ProofList
-              proofs={filteredMyProofs}
+              proofs={paginatedMyProofs}
               loading={myProofsLoading}
               emptyText={PROOFS_PAGE_CONTENT.myProofsEmpty}
             />
+            {filteredMyProofs.length > MY_PROOFS_PAGE_SIZE && (
+              <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-ds-border-subtle">
+                <p className="text-xs text-ds-text-subtle">
+                  Showing {(myPage - 1) * MY_PROOFS_PAGE_SIZE + 1}–
+                  {Math.min(
+                    myPage * MY_PROOFS_PAGE_SIZE,
+                    filteredMyProofs.length,
+                  )}{" "}
+                  of {filteredMyProofs.length} proofs
+                </p>
+                <Pagination
+                  current={myPage}
+                  pageSize={MY_PROOFS_PAGE_SIZE}
+                  total={filteredMyProofs.length}
+                  onChange={setMyPage}
+                  size="small"
+                  showSizeChanger={false}
+                  showLessItems
+                />
+              </div>
+            )}
           </GlassCard>
         );
 

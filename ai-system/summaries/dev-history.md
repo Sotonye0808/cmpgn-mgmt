@@ -1,8 +1,8 @@
 # Development History
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: historical entries do not go stale
 
 > **Overview:** Chronological log of completed development work. Each sprint ends with a summary entry. Agents add entries after completing tasks. Useful for understanding what has been built, when decisions were made, and what patterns have emerged.
@@ -31,6 +31,28 @@
 ---
 
 ## History
+
+---
+
+## 2026-08-05 — Multi-Screenshot Proofs + Campaign-Assigned Team Leads (issue #33)
+
+**Summary:**
+Implemented issue #33 with an additive, non-breaking design. Proofs now support up to 5 screenshots (`ViewProof.screenshotUrls`, `screenshotUrl` retained as primary for legacy rows), campaigns can be assigned team leads (`Campaign.teamLeadIds`), and team-lead proof review is now scoped to team members + assigned campaigns via a centralized access module. Screenshot views are responsive with pagination in both the review panel and the "My Status Views" list.
+
+**Completed:**
+- Added `screenshotUrls String[] @default([])` to `ViewProof` and `teamLeadIds String[] @default([])` to `Campaign` plus additive migration `20260805100000_multi_screenshot_and_campaign_leads`.
+- Regenerated the Prisma client and updated `types/global.d.ts` and `lib/schemas/campaignSchemas.ts`.
+- Created `modules/proofs/services/proofReviewAccess.ts` (`buildProofReviewAccess` + `canReviewProof`) and applied it to the proofs list, single-review, and batch-review routes.
+- Created `components/ui/MultiImageUpload.tsx` and wired multi-upload into `SubmitProofModal`; `ProofCard` renders a responsive grid with legacy fallback.
+- Added admin-only team-lead assignment to `CampaignForm`; `ProofReviewPanel` and the proofs page got scoped campaign filtering + responsive pagination.
+- QA: `tsc --noEmit`, `next lint`, and `next build` all pass.
+
+**Key Changes:**
+- Team-lead verification is now bounded by campaign assignment; leads with no assignments keep the legacy team-scoped behaviour.
+- All new user-facing copy is config-driven (`modules/proofs/config.ts`, `config/content.ts`).
+
+**Next Sprint Focus:**
+Continue task-queue work (CIS identity link workflows); add real automated tests for the proof-review scoping rules.
 
 ---
 

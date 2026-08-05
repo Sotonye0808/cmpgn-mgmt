@@ -165,6 +165,8 @@ declare global {
         startDate?: string;
         endDate?: string;
         targetAudience?: string[];
+        /** User IDs of TEAM_LEADs assigned to verify this campaign's proofs */
+        teamLeadIds?: string[];
         publishedAt?: string;
         metaTitle?: string;
         metaDescription?: string;
@@ -299,6 +301,8 @@ declare global {
         smartLinkId: string;
         platform: SocialPlatform;
         screenshotUrl: string;
+        /** All screenshot URLs on this proof — falls back to [screenshotUrl] when empty (legacy rows) */
+        screenshotUrls?: string[];
         viewCount: number;
         status: ViewProofStatus;
         reviewedById?: string;
@@ -328,6 +332,7 @@ declare global {
         startDate?: string;
         endDate?: string;
         targetAudience?: string[];
+        teamLeadIds?: string[];
         metaTitle?: string;
         metaDescription?: string;
         metaImage?: string;
@@ -351,6 +356,7 @@ declare global {
         startDate?: string;
         endDate?: string;
         targetAudience?: string[];
+        teamLeadIds?: string[];
         metaTitle?: string;
         metaDescription?: string;
         metaImage?: string;
@@ -375,7 +381,10 @@ declare global {
         campaignId: string;
         smartLinkId: string;
         platform: SocialPlatform;
-        screenshotUrl: string;
+        /** Primary screenshot URL — kept for backward compatibility; server derives it from screenshotUrls when absent */
+        screenshotUrl?: string;
+        /** Up to MAX_PROOF_SCREENSHOTS (5) screenshot URLs */
+        screenshotUrls: string[];
         viewCount: number;
     }
 

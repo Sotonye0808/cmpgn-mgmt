@@ -1,8 +1,8 @@
 # Project Decisions
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: each entry has its own staleness — check supersedes links
 
 > **Overview:** Log of significant architectural, technical, and product decisions. Agents consult this before proposing changes to avoid contradicting prior reasoning. Uses supersedes/superseded-by links so contradictory entries are explicitly resolved rather than both appearing equally valid.
@@ -83,3 +83,43 @@ Users could silently create duplicate, unlinked identities across platforms beca
 - Signup submission is blocked while cross-platform prompt is visible
 - When CIS is not configured, check silently returns null and signup proceeds normally
 - The "Sign In Instead" button navigates to /login
+
+## Multi-Screenshot Proofs (Additive)
+
+**Decision:** Add `screenshotUrls String[] @default([])` to `ViewProof` for up to `MAX_PROOF_SCREENSHOTS` (5) screenshots, while keeping `screenshotUrl` as the primary (first) URL for backward compatibility. The API accepts either the legacy single `screenshotUrl` or the new `screenshotUrls` array.
+**Date:** 2026-08-05
+**Made by:** AI implementation session
+**Supersedes:** None
+**Superseded by:** None
+
+**Reason:**
+The feature requires multiple screenshots per proof, but existing rows and clients only send one URL. Keeping `screenshotUrl` populated avoids a data migration and keeps old consumers working.
+
+**Alternatives Considered:**
+- Migrate to `screenshotUrls` only and drop `screenshotUrl` (rejected: breaking change, requires backfill + client updates).
+- Store screenshots as a joined table (rejected: over-engineered for a bounded 5-image cap).
+
+**Implications:**
+- `ProofCard` falls back to `[screenshotUrl]` when `screenshotUrls` is empty so legacy rows render unchanged.
+- Server normalizes/dedupes/caps the array defensively before persisting.
+- Upload cap and copy live in `modules/proofs/config.ts` (`MAX_PROOF_SCREENSHOTS`).
+
+## Team-Lead Verification Scope (Tightened)
+
+**Decision:** A team lead may review a proof only when the submitter is a member of the lead's team AND the proof's campaign is in the lead's assigned `Campaign.teamLeadIds`. A lead with no campaign assignments keeps the legacy team-scoped access (no campaign restriction) so existing setups don't lose coverage. Access logic is centralized in `modules/proofs/services/proofReviewAccess.ts` and applied to list, single-review, and batch-review endpoints.
+**Date:** 2026-08-05
+**Made by:** AI implementation session
+**Supersedes:** None
+**Superseded by:** None
+
+**Reason:**
+Previously any team lead could review any proof (team leads were assigned to teams only, and the review endpoints were not scoped). Issue #33 requires leads to verify a *specific campaign's* screenshots, so verification must be bounded by campaign assignment.
+
+**Alternatives Considered:**
+- Restrict by team only (rejected: does not satisfy the campaign-assignment requirement).
+- Add a dedicated campaign-reviewer join table (rejected: additive `String[]` on Campaign matches the existing `targetAudience` pattern and avoids a new table).
+
+**Implications:**
+- `GET /api/engagement/proofs?scope=team` filters by managed campaigns and returns `[]` when a requested campaign is outside scope.
+- Single and batch review endpoints enforce `canReviewProof` and drop/forbid out-of-scope proofs.
+- CampaignForm (admin-only) exposes a `teamLeadIds` multi-select.

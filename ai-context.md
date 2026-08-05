@@ -1,8 +1,8 @@
 # Project AI Context
 
 > **Metadata**
-> - last-updated-by: bootstrap-project
-> - last-verified-against-code: 2026-08-04
+> - last-updated-by: update-ai-system.md
+> - last-verified-against-code: 2026-08-05
 > - staleness-policy: re-verify before trusting if project structure has changed
 
 > **Overview:** DMHicc (Digital Mobilization & Harvest Impact Campaign Center) is a standalone Next.js 15 campaign management platform for digital mobilization, smart links, referral tracking, gamification, and fundraising. Designed for the Harvesters ecosystem but self-contained for MVP.

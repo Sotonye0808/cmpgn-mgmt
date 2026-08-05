@@ -4,12 +4,17 @@ import {
     successResponse,
     badRequestResponse,
     notFoundResponse,
+    forbiddenResponse,
     handleApiError,
 } from "@/lib/utils/api";
 import { prisma } from "@/lib/prisma";
 import { redis } from "@/lib/redis";
 import { serialize } from "@/lib/utils/serialize";
 import { award } from "@/modules/points/services/pointsService";
+import {
+    buildProofReviewAccess,
+    canReviewProof,
+} from "@/modules/proofs/services/proofReviewAccess";
 import { z } from "zod";
 
 const reviewSchema = z.object({
@@ -36,6 +41,15 @@ export async function PATCH(
         const existing = await prisma.viewProof.findUnique({ where: { id: proofId } });
         if (!existing) {
             return notFoundResponse("View proof not found");
+        }
+
+        // Tightened access: a team lead may only review proofs inside their
+        // team scope + assigned campaigns.
+        const ctx = await buildProofReviewAccess(auth.user);
+        if (!canReviewProof(ctx, existing, auth.user.id)) {
+            return forbiddenResponse(
+                "You are not permitted to review this proof"
+            );
         }
 
         const updated = await prisma.viewProof.update({

@@ -6,6 +6,7 @@ import GlassCard from "@/components/ui/GlassCard";
 import Button from "@/components/ui/Button";
 import ProofList, { ProofStatusFilter } from "./ProofList";
 import { useProofs, useBatchReviewProof } from "../hooks/useProofs";
+import { useAuth } from "@/hooks/useAuth";
 import { PROOFS_PAGE_CONTENT } from "../config";
 
 interface Props {
@@ -17,6 +18,7 @@ interface Props {
 
 export default function ProofReviewPanel({ campaigns, userMap }: Props) {
   const { message: msgApi } = App.useApp();
+  const { user } = useAuth();
   const [filterCampaignId, setFilterCampaignId] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("");
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -34,6 +36,19 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
     refresh();
   });
 
+  // Team leads may only filter by the campaigns they've been assigned to.
+  // Leads without assignments keep the full list (backward compatible).
+  const isTeamLead = user?.role === "TEAM_LEAD";
+  const visibleCampaigns = useMemo(() => {
+    if (!isTeamLead) return campaigns;
+    const managedIds = campaigns
+      .filter((c) => c.teamLeadIds?.includes(user.id))
+      .map((c) => c.id);
+    return managedIds.length > 0
+      ? campaigns.filter((c) => managedIds.includes(c.id))
+      : campaigns;
+  }, [campaigns, isTeamLead, user?.id]);
+
   const campaignMap = useMemo(
     () => Object.fromEntries(campaigns.map((c) => [c.id, c.title])),
     [campaigns],
@@ -41,7 +56,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
 
   const campaignOptions = [
     { value: "", label: PROOFS_PAGE_CONTENT.allCampaigns },
-    ...campaigns.map((c) => ({ value: c.id, label: c.title })),
+    ...visibleCampaigns.map((c) => ({ value: c.id, label: c.title })),
   ];
 
   const filtered = useMemo(() => {
@@ -167,7 +182,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
 
       {/* Pagination — only shown when there are more proofs than one page */}
       {filtered.length > PAGE_SIZE && (
-        <div className="flex items-center justify-between mt-4 pt-4 border-t border-ds-border-subtle">
+        <div className="flex flex-wrap items-center justify-between gap-3 mt-4 pt-4 border-t border-ds-border-subtle">
           <p className="text-xs text-ds-text-subtle">
             Showing {(currentPage - 1) * PAGE_SIZE + 1}–
             {Math.min(currentPage * PAGE_SIZE, filtered.length)} of{" "}
@@ -180,6 +195,7 @@ export default function ProofReviewPanel({ campaigns, userMap }: Props) {
             onChange={setCurrentPage}
             size="small"
             showSizeChanger={false}
+            showLessItems
           />
         </div>
       )}
