@@ -106,8 +106,31 @@ PostgreSQL / Redis / Cloudinary / CIS
 | `REDIS_URL` | Redis cache connection | `.env*` | optional |
 | `CIS_API_URL` | CIS base URL | `.env*` | optional |
 | `CIS_WEBHOOK_SECRET` | CIS webhook HMAC secret | `.env*` | optional |
+| `ENABLE_DESIGN_VIEWER` | Mounts the dev-only design-asset viewer at `/__design/*`; must be false in production builds | .env | false |
 
 All config points listed here should follow the fallback discipline from `standards/engineering-principles.md` §1 and §3 — every config-driven value must have a documented, safe fallback so the system degrades gracefully if the value is missing or malformed.
+
+---
+
+## Verification CLI (agent-verifiable behavior)
+
+If the project exposes a CLI for observing/verifying application behavior end-to-end (engineering principle §24), list its commands here so agents know it exists before reaching for a manual check:
+
+| Command | What it proves | When to use |
+|---------|---------------|-------------|
+| [cli command] | [what real state it checks] | [e.g. before a quality-gate close] |
+
+---
+
+## Rollback & Undo (deployment level)
+
+This is the "undo" instinct applied one layer up from data (§22 covers user-facing undo; this covers deployments). Document the project's actual rollback mechanism here so `commands/fix-build.md` knows it exists as an escalation option, not just "fix forward":
+
+- **Previous-build promotion** — what gets re-deployed, and how.
+- **DB migration reversibility** — are migrations down-migratable? What state is recoverable?
+- **Feature-flag kill switch** — is there a flag that disables a bad feature without a deploy?
+
+If the project has no documented rollback mechanism, say so explicitly here — that is itself a known constraint.
 
 ---
 

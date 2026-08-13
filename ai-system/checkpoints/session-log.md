@@ -181,3 +181,40 @@ Add automated unit tests for `canReviewProof`/`buildProofReviewAccess` and the p
 **Notes / Blockers:**
 - Prisma Accelerate validation warnings appear in build output with a dummy `DATABASE_URL` but are non-fatal; build exits 0.
 - `prisma/seed.ts` and `lib/data/seed.ts` still write only `screenshotUrl` — valid, since the column is optional and ProofCard falls back.
+
+---
+
+## Session 6 — 2026-08-13
+
+**Completed:**
+
+- Ran `pull-template-update.md` against `https://github.com/Sotonye0808/ai-system-template` (reachable). Upstream `VERSION` = `3.0.0`; no recorded baseline existed locally (v2 kit shipped no versioning), so this migration establishes the first baseline.
+- Upgraded `ai-system/` v2 → v3 per `V2_TO_V3_MIGRATION.md`:
+  - Added `skills/` (9 skills), `tools/` (registry + integrations), `design-references/` folders.
+  - Added commands: `audit-sources.md`, `visual-review.md`, `generate-design-md.md`, `pull-template-update.md`.
+  - Added root `VERSION` (3.0.0) and `CHANGELOG.md`.
+  - Added mandatory `Chains to` contract rows to all commands; wired `execute-feature`/`dev-cycle`/`refactor-codebase`/`fix-build`/`resume-session`/`cloud-session` to `update-ai-system.md`/`sync-context.md` triggers.
+  - `standards/engineering-principles.md`: added §11–§24, renumbered enforcement §10 → §25, added doc-style addendum on §9.
+  - `protocols/entry-protocol.md`: tool-discovery-first step + closing-turn advisory. `context-tiering.md`: Tier 3/4 rows for skills/tools/design-references. `verification-rules.md`: v3 principle checks + contract-compliance checks (task-queue coupling, chain order). `quality-gate.md`: v3 principle cross-checks.
+  - `agents/tester-qa.md`: live-preview/browsing capability + degradation rule.
+  - `design-system.md`: Reference Library + Design Asset Viewer (env-gated) sections. `system-architecture.md`: `ENABLE_DESIGN_VIEWER` config row, Verification CLI, Rollback & Undo sections.
+  - `planning/task-queue.md`: added `last-synced` marker + seeded v3 backlog items.
+  - `ai-context.md`: recorded `installed-ai-system-version: 3.0.0` + catalog pointers.
+  - `memory/project-decisions.md`: seeded PDF-extraction-backend + update-ai-system-triggers decisions.
+
+**Files Modified:**
+
+- ai-system/ (framework + new folders: skills/, tools/, design-references/), ai-context.md, VERSION (new), CHANGELOG.md (new)
+
+**Next Task:**
+
+Human review of this diff/proposal (this is a pull-template-update proposal — nothing is auto-merged). On approval, run `audit-drift.md` to verify freshness metadata and chain/checkpoint compliance across the migrated files, then resume task-queue work (CIS identity link workflows).
+
+**Assumptions Made:**
+
+- No ai-system-template customizations were logged in `memory/project-decisions.md`, so all changed files classify as `merge-clean` (framework files) or `content-preserved` (project content files where only v3 sections were appended — template placeholders were never copied over local content).
+- Local freshness dates (`last-verified-against-code: 2026-08-05`) were preserved where present rather than reset to placeholders.
+
+**Notes / Blockers:**
+
+- The task-queue `last-synced` marker and session-log entry above satisfy the v3 §9 coupling trace for this migration.

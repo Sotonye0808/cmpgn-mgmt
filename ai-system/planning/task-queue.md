@@ -3,6 +3,7 @@
 > **Metadata**
 > - last-updated-by: update-ai-system.md
 > - last-verified-against-code: 2026-08-05
+> - last-synced: 2026-08-13 — updated during v3 upgrade (ai-system-template pull-template-update)
 > - staleness-policy: re-verify before each session
 
 > **Overview:** Sprint-level task queue with complexity tagging. Agents execute tasks top to bottom within the current sprint. Each task is sized so it can be completed in a single session.
@@ -47,6 +48,8 @@ Tags help agents self-select whether a task needs the full `execute-feature.md` 
 | Size | Task |
 |------|------|
 | [M] | Pull-to-refresh or polling for dashboard metrics |
+| [XL] | Package the `ai-system` kit for versioned install (npm / GitHub Releases) for distribution beyond "clone the template repo" — deferred stretch goal from template v3 |
+| [XL] | Optional `integrations/opencode/` adapter mapping `ai-system` commands to opencode-specific slash-commands (multi-manifest pattern, `AGENTS.md` + `opencode.json`), clearly labeled so the core kit stays vendor-neutral — deferred stretch goal from template v3 |
 
 ---
 
