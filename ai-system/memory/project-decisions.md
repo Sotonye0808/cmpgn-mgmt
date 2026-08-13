@@ -123,3 +123,40 @@ Previously any team lead could review any proof (team leads were assigned to tea
 - `GET /api/engagement/proofs?scope=team` filters by managed campaigns and returns `[]` when a requested campaign is outside scope.
 - Single and batch review endpoints enforce `canReviewProof` and drop/forbid out-of-scope proofs.
 - CampaignForm (admin-only) exposes a `teamLeadIds` multi-select.
+
+## PDF Extraction Backend for the Design-Asset Viewer
+
+**Decision:** Use the single multi-format converter (`markitdown`) if the project is Python-heavy; use the PDF classify-then-extract library (`pdf-inspector`) if the project is Rust/WASM-friendly. Reaffirm at implementation time of the design-asset viewer.
+**Date:** 2026-08-13
+**Made by:** bootstrap-project (seeds the v3 decision)
+**Supersedes:** None
+**Superseded by:** None
+
+**Reason:**
+The viewer needs PDF text/structure extraction in one thin wrapper. `tools/registry.md` evaluates both candidates as "adopt (approach)." Picking one is a stack-fit decision (see `tools/integrations/markitdown.md` and `tools/integrations/pdf-inspector.md`), not a fixed default.
+
+**Alternatives Considered:**
+- A PDF-only Rust extractor as a hard dependency — rejected as over-coupling where the stack is not Rust/WASM.
+- No extraction at all (render-only viewer) — rejected because agents must be able to read a PDF spec as Markdown.
+
+**Implications:**
+- The design-asset viewer's extraction utility is a thin wrapper around whichever backend the stack favors.
+- Do not add both backends unless measurements justify it.
+
+## Update-ai-system.md Triggers: Conditional, Not Unconditional
+
+**Decision:** `update-ai-system.md` fires only on the conditional triggers defined in each command's `Chains to` row (architecture-affecting work in `execute-feature.md`, an emptied sprint table in `dev-cycle.md`, always in `refactor-codebase.md`, major drift in `resume-session.md`, and always in `cloud-session.md`) — not after every task unconditionally.
+**Date:** 2026-08-13
+**Made by:** v3 upgrade (opencode session)
+**Supersedes:** None
+**Superseded by:** None
+
+**Reason:**
+The v3 spec explicitly flagged this as a judgment call. `update-ai-system.md` is the *heavier* sibling of `sync-context.md` by design; running the full deep sync after every trivial `[XS]`/`[S]` task would burn tokens on work that only `sync-context.md`'s lightweight check needs. The conditional set is the point where skipping the deep sync is actually risky.
+
+**Alternatives Considered:**
+- Unconditional invocation on the four named commands — rejected: predicts many trivial-task deep syncs per day, violating the token/context-economy goal. It remains a one-line override per command if the operator prefers it.
+
+**Implications:**
+- Five commands now carry mandatory `Chains to` triggers that invoke `update-ai-system.md` automatically under their conditions — its own `Does NOT` contract is worded accordingly (invoked explicitly or via a command's mandated chain trigger, never on a schedule).
+- `verification-rules.md` and `audit-drift.md` check chain order mechanically from `session-log.md`, so a skipped trigger is caught, not trusted.
